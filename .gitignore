@@ -1,0 +1,6 @@
+.DS_Store
+vendor/
+docker-manager
+var/
+!var/lib/image-service/source/.gitkeep
+!var/lib/image-service/cache/.gitkeep

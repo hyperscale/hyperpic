@@ -1,0 +1,20 @@
+hash: fb14d2c2c7abc5b24455198f6cd902d1bb5e5538a9d59b57dbe9edb6c63d0169
+updated: 2017-02-08T13:12:17.41966123+01:00
+imports:
+- name: github.com/rs/xhandler
+  version: ed27b6fd65218132ee50cd95f38474a3d8a2cd12
+- name: github.com/rs/xid
+  version: e39c3571542a72a9d44559fc96e2a80ed896682b
+- name: github.com/rs/xlog
+  version: ee33a676e5f4bbda5b80dace72043f7e3b61ebda
+  subpackages:
+  - internal/term
+- name: golang.org/x/net
+  version: 236b8f043b920452504e263bc21d354427127473
+  subpackages:
+  - context
+- name: gopkg.in/h2non/bimg.v1
+  version: 9bb3ae10c5ce30e72f7ac0834368536fc095d6a7
+- name: gopkg.in/h2non/filetype.v0
+  version: caab3653a0a5ff729cb3eea293d1d26a24781455
+testImports: []

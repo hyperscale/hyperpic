@@ -1,0 +1,4 @@
+.git/*
+ui/*
+!ui/dist
+var/*
