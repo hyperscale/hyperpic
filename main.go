@@ -9,6 +9,7 @@ func main() {
 
 	// for dev
 	config.Image.Path = "." + config.Image.Path
+	config.Server.Port = 8574
 
 	server := NewServer(config)
 

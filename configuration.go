@@ -4,6 +4,10 @@
 
 package main
 
+import (
+	"strings"
+)
+
 type ImageConfiguration struct {
 	Path string
 }
@@ -33,10 +37,18 @@ func NewConfiguration() *Configuration {
 
 // SourcePath return the absolute path of source folder
 func (c ImageConfiguration) SourcePath() string {
-	return c.Path + "/source"
+	return strings.TrimSuffix(c.Path, "/") + "/source"
+}
+
+func (c ImageConfiguration) SourcePathWithFile(file string) string {
+	return c.SourcePath() + "/" + strings.TrimPrefix(file, "/")
 }
 
 // CachePath return the absolute path of cache folder
 func (c ImageConfiguration) CachePath() string {
-	return c.Path + "/cache"
+	return strings.TrimSuffix(c.Path, "/") + "/cache"
+}
+
+func (c ImageConfiguration) CachePathWithFile(file string) string {
+	return c.CachePath() + "/" + strings.TrimPrefix(file, "/")
 }

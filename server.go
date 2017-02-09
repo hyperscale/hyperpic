@@ -6,16 +6,20 @@ package main
 
 import (
 	"fmt"
-	"github.com/rs/xlog"
 	"net/http"
-	"os"
-	"strings"
 	"time"
+
+	"strconv"
+
+	"github.com/rs/xlog"
 )
 
+// Server struct
 type Server struct {
 	mux    *http.ServeMux
 	config *Configuration
+	source SourceProvider
+	cache  CacheProvider
 }
 
 // NewServer constructor
@@ -23,7 +27,19 @@ func NewServer(config *Configuration) *Server {
 	return &Server{
 		mux:    http.NewServeMux(),
 		config: config,
+		source: NewFileSystemSourceProvider(config.Image.SourcePath()),
+		cache:  NewFileSystemCacheProvider(config.Image.CachePath()),
 	}
+}
+
+// SetSourceProvider to server
+func (s *Server) SetSourceProvider(source SourceProvider) {
+	s.source = source
+}
+
+// SetCacheProvider to server
+func (s *Server) SetCacheProvider(cache CacheProvider) {
+	s.cache = cache
 }
 
 func (s Server) failure(w http.ResponseWriter, status int) {
@@ -49,19 +65,56 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path := strings.TrimPrefix(r.URL.Path, "/")
+	// parse query string
+	options, err := ParseImageOptions(r.URL.Query())
+	if err != nil {
+		xlog.Errorf("Error while parsing options: %v", err.Error())
 
-	fullPath := s.config.Image.SourcePath() + "/" + path
+		s.failure(w, http.StatusBadRequest)
 
-	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+		return
+	}
+	/*if options.IsValid() == false {
+		s.failure(w, http.StatusBadRequest)
+
+		return
+	}*/
+
+	// fetch from cache
+	if resource, ok := s.cache.Get(r.URL.Path, options); ok {
+		http.ServeFile(w, r, resource.CachePath)
+
+		return
+	}
+
+	resource, err := s.source.Get(r.URL.Path)
+	if err != nil {
 		s.failure(w, http.StatusNotFound)
 
 		return
 	}
 
-	http.ServeFile(w, r, fullPath)
+	if err := ProcessImage(resource, options); err != nil {
+		xlog.Errorf("Error while processing the image: %v", err.Error())
 
-	//w.Write([]byte(fullPath))
+		s.failure(w, http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", resource.MimeType)
+	w.Header().Set("Content-Length", strconv.Itoa(len(resource.Body)))
+
+	w.Write(resource.Body)
+
+	//http.ServeFile(w, r, resource.SourcePath)
+
+	// save resource in cache
+	go func(r *Resource) {
+		if err := s.cache.Set(r); err != nil {
+			xlog.Error(err)
+		}
+	}(resource)
 }
 
 // ListenAndServe service

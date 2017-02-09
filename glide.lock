@@ -1,5 +1,5 @@
-hash: fb14d2c2c7abc5b24455198f6cd902d1bb5e5538a9d59b57dbe9edb6c63d0169
-updated: 2017-02-08T13:12:17.41966123+01:00
+hash: cda68df58f329f4334ca3f015984de5dddeede8b422bc20093bdd1e73e24a958
+updated: 2017-02-08T23:50:07.776111142+01:00
 imports:
 - name: github.com/rs/xhandler
   version: ed27b6fd65218132ee50cd95f38474a3d8a2cd12
@@ -9,6 +9,8 @@ imports:
   version: ee33a676e5f4bbda5b80dace72043f7e3b61ebda
   subpackages:
   - internal/term
+- name: github.com/tj/go-debug
+  version: ff4a55a20a86994118644bbddc6a216da193cc13
 - name: golang.org/x/net
   version: 236b8f043b920452504e263bc21d354427127473
   subpackages:
@@ -17,4 +19,7 @@ imports:
   version: 9bb3ae10c5ce30e72f7ac0834368536fc095d6a7
 - name: gopkg.in/h2non/filetype.v0
   version: caab3653a0a5ff729cb3eea293d1d26a24781455
+  subpackages:
+  - matchers
+  - types
 testImports: []
