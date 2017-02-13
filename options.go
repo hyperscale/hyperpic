@@ -11,19 +11,15 @@ import (
 	"fmt"
 
 	bimg "gopkg.in/h2non/bimg.v1"
+	"regexp"
 )
 
-type OrientationType int
+var (
+	cropMatcher = regexp.MustCompile("^crop-(\\d+)-(\\d+)")
+)
+
 type FitType int
 type FilterType int
-
-const (
-	OrientationAuto OrientationType = 999
-	Orientation0    OrientationType = 0
-	Orientation90   OrientationType = 90
-	Orientation180  OrientationType = 180
-	Orientation270  OrientationType = 270
-)
 
 const (
 	FitContain FitType = iota
@@ -47,12 +43,15 @@ const (
 	FilterSepia
 )
 
-var orientationToType = map[string]OrientationType{
-	"auto": OrientationAuto,
-	"0":    Orientation0,
-	"90":   Orientation90,
-	"180":  Orientation180,
-	"270":  Orientation270,
+var orientationToType = map[string]bimg.Angle{
+	"0":   bimg.D0,
+	"45":  bimg.D45,
+	"90":  bimg.D90,
+	"135": bimg.D135,
+	"180": bimg.D180,
+	"235": bimg.D235,
+	"270": bimg.D270,
+	"315": bimg.D315,
 }
 
 var fitToType = map[string]FitType{
@@ -106,7 +105,7 @@ type CropOptions struct {
 
 // ImageOptions represent all the supported image transformation params as first level members
 type ImageOptions struct {
-	Orientation OrientationType
+	Orientation bimg.Angle
 	Crop        CropOptions
 	Width       int
 	Height      int
@@ -149,7 +148,22 @@ func ParseImageOptions(query url.Values) (ImageOptions, error) {
 	if params["fit"].(string) != "" {
 		fit, ok := fitToType[params["fit"].(string)]
 		if ok == false {
-			return ImageOptions{}, fmt.Errorf("Bad fit type: %s", params["fit"].(string))
+			matches := cropMatcher.FindAllStringSubmatch(params["fit"].(string), 2)
+			if len(matches) != 1 {
+				return ImageOptions{}, fmt.Errorf("Bad fit type: %s", params["fit"].(string))
+			}
+
+			fit = FitCropFocalPoint
+
+			x, _ := strconv.Atoi(matches[0][1])
+			y, _ := strconv.Atoi(matches[0][2])
+
+			opts.Crop = CropOptions{
+				X:      x,
+				Y:      y,
+				Height: -1,
+				Width:  -1,
+			}
 		}
 
 		opts.Fit = fit
@@ -161,6 +175,41 @@ func ParseImageOptions(query url.Values) (ImageOptions, error) {
 
 	if params["h"].(int) > 0 {
 		opts.Height = params["h"].(int)
+	}
+
+	if params["q"].(int) > 0 {
+		opts.Quality = params["q"].(int)
+	}
+
+	if params["crop"].(string) != "" {
+		crop := strings.Split(params["crop"].(string), ",")
+
+		w, err := strconv.Atoi(crop[0])
+		if err != nil {
+			return ImageOptions{}, fmt.Errorf("Bad crop value")
+		}
+
+		h, err := strconv.Atoi(crop[1])
+		if err != nil {
+			return ImageOptions{}, fmt.Errorf("Bad crop value")
+		}
+
+		x, err := strconv.Atoi(crop[2])
+		if err != nil {
+			return ImageOptions{}, fmt.Errorf("Bad crop value")
+		}
+
+		y, err := strconv.Atoi(crop[3])
+		if err != nil {
+			return ImageOptions{}, fmt.Errorf("Bad crop value")
+		}
+
+		opts.Crop = CropOptions{
+			Width:  w,
+			Height: h,
+			X:      x,
+			Y:      y,
+		}
 	}
 
 	return opts, nil
@@ -265,6 +314,13 @@ func BimgOptions(o ImageOptions) bimg.Options {
 		Width:  o.Width,
 		Height: o.Height,
 		Crop:   o.Fit == FitCropCenter,
+		Rotate: o.Orientation,
+		// Interlace:    true,
+		// Interpolator: bimg.Bilinear,
+		NoProfile: true,
+		Embed:     true,
+		Enlarge:   true,
+		Quality:   o.Quality,
 		/*Flip:           o.Flip,
 		Flop:           o.Flop,
 		Quality:        o.Quality,
@@ -276,8 +332,7 @@ func BimgOptions(o ImageOptions) bimg.Options {
 		Embed:          o.Embed,
 		Extend:         o.Extend,
 		Interpretation: o.Colorspace,
-		Type:           ImageType(o.Type),
-		Rotate:         bimg.Angle(o.Rotate),*/
+		Type:           ImageType(o.Type),*/
 	}
 
 	/*if len(o.Background) != 0 {
