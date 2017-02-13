@@ -11,6 +11,7 @@ import (
 
 	"strconv"
 
+	"github.com/justinas/alice"
 	"github.com/rs/xlog"
 )
 
@@ -42,15 +43,9 @@ func (s *Server) SetCacheProvider(cache CacheProvider) {
 	s.cache = cache
 }
 
-func (s Server) failure(w http.ResponseWriter, status int) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("X-Content-Type-Options", "nosniff")
-	w.WriteHeader(status)
-}
-
 func (s Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
-		s.failure(w, http.StatusMethodNotAllowed)
+		HTTPFailure(w, http.StatusMethodNotAllowed)
 
 		return
 	}
@@ -60,22 +55,21 @@ func (s Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
-		s.failure(w, http.StatusMethodNotAllowed)
+		HTTPFailure(w, http.StatusMethodNotAllowed)
 
 		return
 	}
 
-	// parse query string
-	options, err := ParseImageOptions(r.URL.Query())
+	options, err := ParamsFromContext(r.Context())
 	if err != nil {
 		xlog.Errorf("Error while parsing options: %v", err.Error())
 
-		s.failure(w, http.StatusBadRequest)
+		HTTPFailure(w, http.StatusBadRequest)
 
 		return
 	}
 	/*if options.IsValid() == false {
-		s.failure(w, http.StatusBadRequest)
+		HTTPFailure(w, http.StatusBadRequest)
 
 		return
 	}*/
@@ -89,7 +83,7 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 
 	resource, err := s.source.Get(r.URL.Path)
 	if err != nil {
-		s.failure(w, http.StatusNotFound)
+		HTTPFailure(w, http.StatusNotFound)
 
 		return
 	}
@@ -97,12 +91,12 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 	if err := ProcessImage(resource, options); err != nil {
 		xlog.Errorf("Error while processing the image: %v", err.Error())
 
-		s.failure(w, http.StatusInternalServerError)
+		HTTPFailure(w, http.StatusInternalServerError)
 
 		return
 	}
 
-	w.Header().Set("Content-Type", resource.MimeType)
+	// w.Header().Set("Content-Type", resource.MimeType)
 	w.Header().Set("Content-Length", strconv.Itoa(len(resource.Body)))
 
 	w.Write(resource.Body)
@@ -111,7 +105,7 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 
 	// save resource in cache
 	go func(r *Resource) {
-		if err := s.cache.Set(r); err != nil {
+		if err := s.cache.Set(r, options); err != nil {
 			xlog.Error(err)
 		}
 	}(resource)
@@ -119,8 +113,14 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 
 // ListenAndServe service
 func (s *Server) ListenAndServe() {
+
+	middleware := alice.New(
+		NewParamsHandler(),
+		NewClientHintsHandler(),
+	)
+
 	s.mux.HandleFunc("/health", s.healthHandler)
-	s.mux.HandleFunc("/", s.imageHandler)
+	s.mux.Handle("/", middleware.ThenFunc(s.imageHandler))
 
 	srv := &http.Server{
 		ReadTimeout:  5 * time.Second,

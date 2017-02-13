@@ -5,3 +5,5 @@ import:
 - package: gopkg.in/h2non/filetype.v0
   version: caab3653a0a5ff729cb3eea293d1d26a24781455
 - package: github.com/rs/xlog
+- package: github.com/justinas/alice
+  version: ^1.0.0

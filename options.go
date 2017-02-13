@@ -3,15 +3,12 @@ package main
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"math"
-	"net/url"
-	"strconv"
-	"strings"
+
+	"regexp"
 
 	"fmt"
 
 	bimg "gopkg.in/h2non/bimg.v1"
-	"regexp"
 )
 
 var (
@@ -76,27 +73,7 @@ var filterToType = map[string]FilterType{
 	"sepia":     FilterSepia,
 }
 
-var allowedOptions = map[string]string{
-	"or":     "orientation",
-	"crop":   "string",
-	"w":      "int",
-	"h":      "int",
-	"fit":    "fit",
-	"dpr":    "int",
-	"bri":    "int",
-	"con":    "int",
-	"gam":    "float",
-	"sharp":  "int",
-	"blur":   "int",
-	"pixel":  "int",
-	"filt":   "filter",
-	"bg":     "color",
-	"border": "",
-	"q":      "int",
-	"fm":     "fm",
-}
-
-type CropOptions struct {
+type CropType struct {
 	Width  int
 	Height int
 	X      int
@@ -106,7 +83,7 @@ type CropOptions struct {
 // ImageOptions represent all the supported image transformation params as first level members
 type ImageOptions struct {
 	Orientation bimg.Angle
-	Crop        CropOptions
+	Crop        CropType
 	Width       int
 	Height      int
 	Fit         FitType
@@ -123,117 +100,6 @@ type ImageOptions struct {
 	Format      bimg.ImageType
 	Compression int
 	hash        string
-	query       url.Values
-}
-
-func ParseImageOptions(query url.Values) (ImageOptions, error) {
-	params := make(map[string]interface{})
-
-	for key, kind := range allowedOptions {
-		param := query.Get(key)
-		params[key] = parseParam(param, kind)
-	}
-
-	opts := ImageOptions{}
-
-	if params["or"].(string) != "" {
-		or, ok := orientationToType[params["or"].(string)]
-		if ok == false {
-			return ImageOptions{}, fmt.Errorf("Bad orientation type: %s", params["or"].(string))
-		}
-
-		opts.Orientation = or
-	}
-
-	if params["fit"].(string) != "" {
-		fit, ok := fitToType[params["fit"].(string)]
-		if ok == false {
-			matches := cropMatcher.FindAllStringSubmatch(params["fit"].(string), 2)
-			if len(matches) != 1 {
-				return ImageOptions{}, fmt.Errorf("Bad fit type: %s", params["fit"].(string))
-			}
-
-			fit = FitCropFocalPoint
-
-			x, _ := strconv.Atoi(matches[0][1])
-			y, _ := strconv.Atoi(matches[0][2])
-
-			opts.Crop = CropOptions{
-				X:      x,
-				Y:      y,
-				Height: -1,
-				Width:  -1,
-			}
-		}
-
-		opts.Fit = fit
-	}
-
-	if params["w"].(int) > 0 {
-		opts.Width = params["w"].(int)
-	}
-
-	if params["h"].(int) > 0 {
-		opts.Height = params["h"].(int)
-	}
-
-	if params["q"].(int) > 0 {
-		opts.Quality = params["q"].(int)
-	}
-
-	if params["crop"].(string) != "" {
-		crop := strings.Split(params["crop"].(string), ",")
-
-		w, err := strconv.Atoi(crop[0])
-		if err != nil {
-			return ImageOptions{}, fmt.Errorf("Bad crop value")
-		}
-
-		h, err := strconv.Atoi(crop[1])
-		if err != nil {
-			return ImageOptions{}, fmt.Errorf("Bad crop value")
-		}
-
-		x, err := strconv.Atoi(crop[2])
-		if err != nil {
-			return ImageOptions{}, fmt.Errorf("Bad crop value")
-		}
-
-		y, err := strconv.Atoi(crop[3])
-		if err != nil {
-			return ImageOptions{}, fmt.Errorf("Bad crop value")
-		}
-
-		opts.Crop = CropOptions{
-			Width:  w,
-			Height: h,
-			X:      x,
-			Y:      y,
-		}
-	}
-
-	return opts, nil
-	/*
-		return ImageOptions{
-			Orientation: or,
-			// Crop:        params["crop"].(CropOptions),
-			Width:      params["w"].(int),
-			Height:     params["h"].(int),
-			Fit:        fit,
-			DPR:        params["dpr"].(int),
-			Brightness: params["bri"].(int),
-			Contrast:   params["con"].(int),
-			Gamma:      params["gam"].(float64),
-			Sharpen:    params["sharp"].(int),
-			Blur:       params["blur"].(int),
-			pixel:      params["pixel"].(int),
-			//Filter:      params["filt"].(FilterType),
-			//Background:  params["filt"].(bimg.Color),
-			Quality: params["q"].(int),
-			//Format:      params["fm"].(bimg.ImageType),
-			Compression: params["c"].(int),
-			query:       query,
-		}, nil*/
 }
 
 // Hash return hash of options
@@ -243,96 +109,35 @@ func (o *ImageOptions) Hash() string {
 	}
 
 	hasher := md5.New()
-	hasher.Write([]byte(o.query.Encode()))
-
+	hasher.Write([]byte(fmt.Sprintf(
+		"w=%d&h=%d&fit=%d&q=%d&fm=%d&dpr=%d&or=%d",
+		o.Width,
+		o.Height,
+		o.Fit,
+		o.Quality,
+		o.Format,
+		o.DPR,
+		o.Orientation,
+	)))
 	o.hash = hex.EncodeToString(hasher.Sum(nil))
 
 	return o.hash
 }
 
-func parseParam(param, kind string) interface{} {
-	switch kind {
-	case "int":
-		return parseInt(param)
-	case "float":
-		return parseFloat(param)
-	case "color":
-		return parseColor(param)
-	case "bool":
-		return parseBool(param)
-	default:
-		return param
-	}
-}
-
-func parseBool(val string) bool {
-	value, _ := strconv.ParseBool(val)
-	return value
-}
-
-func parseInt(param string) int {
-	return int(math.Floor(parseFloat(param) + 0.5))
-}
-
-func parseFloat(param string) float64 {
-	val, _ := strconv.ParseFloat(param, 64)
-	return math.Abs(val)
-}
-
-func parseColor(val string) []uint8 {
-	const max float64 = 255
-	buf := []uint8{}
-	if val != "" {
-		for _, num := range strings.Split(val, ",") {
-			n, _ := strconv.ParseUint(strings.Trim(num, " "), 10, 8)
-			buf = append(buf, uint8(math.Min(float64(n), max)))
-		}
-	}
-	return buf
-}
-
-func parseGravity(val string) bimg.Gravity {
-	val = strings.TrimSpace(strings.ToLower(val))
-
-	switch val {
-	case "south":
-		return bimg.GravitySouth
-	case "north":
-		return bimg.GravityNorth
-	case "east":
-		return bimg.GravityEast
-	case "west":
-		return bimg.GravityWest
-	default:
-		return bimg.GravityCentre
-	}
-}
-
 // BimgOptions creates a new bimg compatible options struct mapping the fields properly
-func BimgOptions(o ImageOptions) bimg.Options {
+func BimgOptions(o *ImageOptions) bimg.Options {
 	opts := bimg.Options{
-		Width:  o.Width,
-		Height: o.Height,
-		Crop:   o.Fit == FitCropCenter,
-		Rotate: o.Orientation,
-		// Interlace:    true,
-		// Interpolator: bimg.Bilinear,
+		Width:     o.Width,
+		Height:    o.Height,
+		Crop:      o.Fit == FitCropCenter,
+		Rotate:    o.Orientation,
 		NoProfile: true,
 		Embed:     true,
 		Enlarge:   true,
 		Quality:   o.Quality,
-		/*Flip:           o.Flip,
-		Flop:           o.Flop,
-		Quality:        o.Quality,
-		Compression:    o.Compression,
-		NoAutoRotate:   o.NoRotation,
-		NoProfile:      o.NoProfile,
-		Force:          o.Force,
-		Gravity:        o.Gravity,
-		Embed:          o.Embed,
-		Extend:         o.Extend,
-		Interpretation: o.Colorspace,
-		Type:           ImageType(o.Type),*/
+		Type:      o.Format,
+		// Interlace:    true,
+		// Interpolator: bimg.Bilinear,
 	}
 
 	/*if len(o.Background) != 0 {

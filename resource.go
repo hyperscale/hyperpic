@@ -8,6 +8,7 @@ import (
 
 // Resource struct
 type Resource struct {
+	File       string
 	SourcePath string
 	CachePath  string
 	MimeType   string
@@ -28,6 +29,7 @@ func NewResource(config *ImageConfiguration, file string) (*Resource, error) {
 	}
 
 	return &Resource{
+		File:       file,
 		SourcePath: sourcePath,
 		CachePath:  config.CachePathWithFile(file),
 	}, nil

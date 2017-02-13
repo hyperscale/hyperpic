@@ -29,6 +29,7 @@ func (p FileSystemSourceProvider) Get(file string) (*Resource, error) {
 	}
 
 	return &Resource{
+		File:       file,
 		SourcePath: path,
 	}, nil
 }

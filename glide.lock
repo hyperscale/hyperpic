@@ -1,6 +1,8 @@
-hash: cda68df58f329f4334ca3f015984de5dddeede8b422bc20093bdd1e73e24a958
-updated: 2017-02-08T23:50:07.776111142+01:00
+hash: e1fa611ea7d1d5b388df1b003ff3490d5d03e7482d3829573b8711ebcc09d5aa
+updated: 2017-02-13T22:10:12.662308327+01:00
 imports:
+- name: github.com/justinas/alice
+  version: 052b8b6c18edb9db317af86806d8e00ebaa94160
 - name: github.com/rs/xhandler
   version: ed27b6fd65218132ee50cd95f38474a3d8a2cd12
 - name: github.com/rs/xid

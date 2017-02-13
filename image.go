@@ -42,7 +42,7 @@ func Process(buf []byte, opts bimg.Options) (out Image, err error) {
 	return Image{Body: buf, Mime: mime}, nil
 }
 
-func ProcessImage(resource *Resource, options ImageOptions) error {
+func ProcessImage(resource *Resource, options *ImageOptions) error {
 
 	// Read file
 	buf, err := resource.Read()
