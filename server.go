@@ -68,6 +68,7 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+	xlog.Infof("options: %#v", options)
 	/*if options.IsValid() == false {
 		HTTPFailure(w, http.StatusBadRequest)
 

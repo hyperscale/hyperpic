@@ -8,6 +8,7 @@ import (
 
 	"fmt"
 
+	// "github.com/rs/xlog"
 	bimg "gopkg.in/h2non/bimg.v1"
 )
 
@@ -126,9 +127,20 @@ func (o *ImageOptions) Hash() string {
 
 // BimgOptions creates a new bimg compatible options struct mapping the fields properly
 func BimgOptions(o *ImageOptions) bimg.Options {
+	width := o.Width
+	height := o.Height
+
+	if width > 0 {
+		width = (width * o.DPR)
+	}
+
+	if height > 0 {
+		height = (height * o.DPR)
+	}
+
 	opts := bimg.Options{
-		Width:     o.Width,
-		Height:    o.Height,
+		Width:     width,
+		Height:    height,
 		Crop:      o.Fit == FitCropCenter,
 		Rotate:    o.Orientation,
 		NoProfile: true,
@@ -139,6 +151,15 @@ func BimgOptions(o *ImageOptions) bimg.Options {
 		// Interlace:    true,
 		// Interpolator: bimg.Bilinear,
 	}
+
+	/*if o.Crop.Height > 0 && o.Crop.Width > 0 {
+		opts.AreaHeight = o.Crop.Height
+		opts.AreaWidth = o.Crop.Width
+		opts.Left = o.Crop.X
+		opts.Top = o.Crop.Y
+	}
+
+	xlog.Infof("options bimg: %#v", opts)*/
 
 	/*if len(o.Background) != 0 {
 		opts.Background = bimg.Color{o.Background[0], o.Background[1], o.Background[2]}
