@@ -96,7 +96,7 @@ type ImageOptions struct {
 	Blur        int
 	pixel       int
 	Filter      FilterType
-	Background  bimg.Color
+	Background  []uint8
 	Quality     int
 	Format      bimg.ImageType
 	Compression int
@@ -127,15 +127,21 @@ func (o *ImageOptions) Hash() string {
 
 // BimgOptions creates a new bimg compatible options struct mapping the fields properly
 func BimgOptions(o *ImageOptions) bimg.Options {
+	dpr := o.DPR
+
+	if dpr == 0 {
+		dpr = 1
+	}
+
 	width := o.Width
 	height := o.Height
 
 	if width > 0 {
-		width = (width * o.DPR)
+		width = (width * dpr)
 	}
 
 	if height > 0 {
-		height = (height * o.DPR)
+		height = (height * dpr)
 	}
 
 	opts := bimg.Options{
@@ -144,7 +150,7 @@ func BimgOptions(o *ImageOptions) bimg.Options {
 		Crop:      o.Fit == FitCropCenter,
 		Rotate:    o.Orientation,
 		NoProfile: true,
-		Embed:     true,
+		Embed:     o.Fit == FitFill,
 		Enlarge:   true,
 		Quality:   o.Quality,
 		Type:      o.Format,
@@ -152,18 +158,21 @@ func BimgOptions(o *ImageOptions) bimg.Options {
 		// Interpolator: bimg.Bilinear,
 	}
 
-	/*if o.Crop.Height > 0 && o.Crop.Width > 0 {
+	if o.Crop.Height > 0 && o.Crop.Width > 0 {
 		opts.AreaHeight = o.Crop.Height
 		opts.AreaWidth = o.Crop.Width
 		opts.Left = o.Crop.X
 		opts.Top = o.Crop.Y
+		opts.Crop = true
 	}
 
-	xlog.Infof("options bimg: %#v", opts)*/
-
-	/*if len(o.Background) != 0 {
-		opts.Background = bimg.Color{o.Background[0], o.Background[1], o.Background[2]}
-	}*/
+	if len(o.Background) != 0 {
+		opts.Background = bimg.Color{
+			R: o.Background[0],
+			G: o.Background[1],
+			B: o.Background[2],
+		}
+	}
 
 	return opts
 }

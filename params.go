@@ -6,7 +6,13 @@ import (
 	"strconv"
 	"strings"
 
+	"regexp"
+
 	bimg "gopkg.in/h2non/bimg.v1"
+)
+
+var (
+	colorRGBMatcher = regexp.MustCompile("^(\\d+),(\\d+),(\\d+)$")
 )
 
 var allowedParams = map[string]string{
@@ -72,6 +78,7 @@ func mapImageParams(params map[string]interface{}) *ImageOptions {
 		Orientation: params["or"].(bimg.Angle),
 		Fit:         params["fit"].(FitType),
 		Crop:        params["crop"].(CropType),
+		Background:  params["bg"].([]uint8),
 	}
 }
 

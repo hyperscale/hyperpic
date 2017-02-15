@@ -77,6 +77,8 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 
 	// fetch from cache
 	if resource, ok := s.cache.Get(r.URL.Path, options); ok {
+		w.Header().Set("X-Image-From", "cache")
+
 		http.ServeFile(w, r, resource.CachePath)
 
 		return
@@ -99,6 +101,7 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 
 	// w.Header().Set("Content-Type", resource.MimeType)
 	w.Header().Set("Content-Length", strconv.Itoa(len(resource.Body)))
+	w.Header().Set("X-Image-From", "source")
 
 	w.Write(resource.Body)
 
