@@ -9,9 +9,9 @@ type FileSystemCacheProvider struct {
 	path string
 }
 
-func NewFileSystemCacheProvider(path string) *FileSystemCacheProvider {
+func NewFileSystemCacheProvider(config *CacheFSConfiguration) *FileSystemCacheProvider {
 	return &FileSystemCacheProvider{
-		path: path,
+		path: config.Path,
 	}
 }
 

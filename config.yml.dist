@@ -1,0 +1,13 @@
+server:
+  host: ~
+  port: 8574
+
+image:
+  source:
+    provider: fs
+    fs:
+      path: ./var/lib/image-service/source
+  cache:
+    provider: fs
+    fs:
+      path: ./var/lib/image-service/cache

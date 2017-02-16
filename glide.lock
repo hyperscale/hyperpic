@@ -1,8 +1,29 @@
-hash: e1fa611ea7d1d5b388df1b003ff3490d5d03e7482d3829573b8711ebcc09d5aa
-updated: 2017-02-13T22:10:12.662308327+01:00
+hash: 6cae0ae72f0646f52feebc3d3051c1357551453d3aad622a9ba2ae87ddf5b94a
+updated: 2017-02-16T13:40:14.175034539+01:00
 imports:
+- name: github.com/fsnotify/fsnotify
+  version: a904159b9206978bb6d53fcc7a769e5cd726c737
+- name: github.com/hashicorp/hcl
+  version: 372e8ddaa16fd67e371e9323807d056b799360af
+  subpackages:
+  - hcl/ast
+  - hcl/parser
+  - hcl/scanner
+  - hcl/strconv
+  - hcl/token
+  - json/parser
+  - json/scanner
+  - json/token
 - name: github.com/justinas/alice
   version: 052b8b6c18edb9db317af86806d8e00ebaa94160
+- name: github.com/magiconair/properties
+  version: b3b15ef068fd0b17ddf408a23669f20811d194d2
+- name: github.com/mitchellh/mapstructure
+  version: db1efb556f84b25a0a13a04aad883943538ad2e0
+- name: github.com/pelletier/go-buffruneio
+  version: df1e16fde7fc330a0ca68167c23bf7ed6ac31d6d
+- name: github.com/pelletier/go-toml
+  version: c9506ee96398e7571356462217b9e24d6a628d71
 - name: github.com/rs/xhandler
   version: ed27b6fd65218132ee50cd95f38474a3d8a2cd12
 - name: github.com/rs/xid
@@ -11,12 +32,33 @@ imports:
   version: ee33a676e5f4bbda5b80dace72043f7e3b61ebda
   subpackages:
   - internal/term
+- name: github.com/spf13/afero
+  version: 72b31426848c6ef12a7a8e216708cb0d1530f074
+  subpackages:
+  - mem
+- name: github.com/spf13/cast
+  version: d1139bab1c07d5ad390a65e7305876b3c1a8370b
+- name: github.com/spf13/jwalterweatherman
+  version: fa7ca7e836cf3a8bb4ebf799f472c12d7e903d66
+- name: github.com/spf13/pflag
+  version: 9ff6c6923cfffbcd502984b8e0c80539a94968b7
+- name: github.com/spf13/viper
+  version: 5ed0fc31f7f453625df314d8e66b9791e8d13003
 - name: github.com/tj/go-debug
   version: ff4a55a20a86994118644bbddc6a216da193cc13
 - name: golang.org/x/net
   version: 236b8f043b920452504e263bc21d354427127473
   subpackages:
   - context
+- name: golang.org/x/sys
+  version: e24f485414aeafb646f6fca458b0bf869c0880a1
+  subpackages:
+  - unix
+- name: golang.org/x/text
+  version: 85c29909967d7f171f821e7a42e7b7af76fb9598
+  subpackages:
+  - transform
+  - unicode/norm
 - name: gopkg.in/h2non/bimg.v1
   version: 9bb3ae10c5ce30e72f7ac0834368536fc095d6a7
 - name: gopkg.in/h2non/filetype.v0
@@ -24,4 +66,6 @@ imports:
   subpackages:
   - matchers
   - types
+- name: gopkg.in/yaml.v2
+  version: a3f3340b5840cee44f372bddb5880fcbc419b46a
 testImports: []

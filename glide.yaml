@@ -7,3 +7,4 @@ import:
 - package: github.com/rs/xlog
 - package: github.com/justinas/alice
   version: ^1.0.0
+- package: github.com/spf13/viper

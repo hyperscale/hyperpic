@@ -25,11 +25,25 @@ type Server struct {
 
 // NewServer constructor
 func NewServer(config *Configuration) *Server {
+
+	var source SourceProvider
+	var cache CacheProvider
+
+	switch config.Image.Source.Provider {
+	case "fs":
+		source = NewFileSystemSourceProvider(config.Image.Source.FS)
+	}
+
+	switch config.Image.Cache.Provider {
+	case "fs":
+		cache = NewFileSystemCacheProvider(config.Image.Cache.FS)
+	}
+
 	return &Server{
 		mux:    http.NewServeMux(),
 		config: config,
-		source: NewFileSystemSourceProvider(config.Image.SourcePath()),
-		cache:  NewFileSystemCacheProvider(config.Image.CachePath()),
+		source: source,
+		cache:  cache,
 	}
 }
 

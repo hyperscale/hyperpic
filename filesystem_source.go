@@ -10,9 +10,9 @@ type FileSystemSourceProvider struct {
 	path string
 }
 
-func NewFileSystemSourceProvider(path string) *FileSystemSourceProvider {
+func NewFileSystemSourceProvider(config *SourceFSConfiguration) *FileSystemSourceProvider {
 	return &FileSystemSourceProvider{
-		path: path,
+		path: config.Path,
 	}
 }
 
