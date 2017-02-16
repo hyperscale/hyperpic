@@ -20,3 +20,10 @@ TODO
 * Add Hot cache for best images (memory cache provider ?)
 * Add cluster mode (???) or use DB distributed (own ??)
 * Add UI (???)
+
+Articles
+--------
+
+* https://blog.imgix.com/2016/03/11/auto-compress.html
+* https://blog.imgix.com/2016/03/30/dpr-quality.html
+* https://blog.imgix.com/2016/03/09/save-data-client-hint.html
