@@ -60,6 +60,17 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if containsDotDot(r.URL.Path) {
+		// Too many programs use r.URL.Path to construct the argument to
+		// serveFile. Reject the request under the assumption that happened
+		// here and ".." may not be wanted.
+		// Note that name might not contain "..", for example if code (still
+		// incorrectly) used filepath.Join(myDir, r.URL.Path).
+		HTTPFailure(w, http.StatusBadRequest)
+
+		return
+	}
+
 	options, err := ParamsFromContext(r.Context())
 	if err != nil {
 		xlog.Errorf("Error while parsing options: %v", err.Error())

@@ -40,6 +40,8 @@ func ImageType(name string) bimg.ImageType {
 	switch ext {
 	case "jpeg":
 		return bimg.JPEG
+	case "jpg":
+		return bimg.JPEG
 	case "png":
 		return bimg.PNG
 	case "webp":

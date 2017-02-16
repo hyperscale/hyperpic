@@ -72,38 +72,45 @@ func NewClientHintsHandler() func(http.Handler) http.Handler {
 				return
 			}
 
-			w.Header().Set("Accept-CH", "DPR, Width")
-			w.Header().Add("Vary", "Accept")
+			w.Header().Set("Accept-CH", "DPR, Width, Save-Data")
 
-			mime := httputil.NegotiateContentType(r, []string{
-				"image/webp",
-				"image/jpeg",
-				"image/jpg",
-				"image/tiff",
-				"image/png",
-			}, "image/jpg")
+			if params.Format == bimg.UNKNOWN {
+				mime := httputil.NegotiateContentType(r, []string{
+					"image/webp",
+					"image/jpeg",
+					"image/jpg",
+					"image/tiff",
+					"image/png",
+				}, "image/jpg")
 
-			format := ExtractImageTypeFromMime(mime)
+				format := ExtractImageTypeFromMime(mime)
 
-			if !bimg.IsTypeNameSupported(format) {
-				http.Error(w, fmt.Sprintf("Format not supported"), http.StatusUnsupportedMediaType)
+				if !bimg.IsTypeNameSupported(format) {
+					http.Error(w, fmt.Sprintf("Format not supported"), http.StatusUnsupportedMediaType)
 
-				return
+					return
+				}
+
+				params.Format = ImageType(format)
+				w.Header().Set("Content-Type", mime)
+				w.Header().Add("Vary", "Accept")
 			}
 
-			params.Format = ImageType(format)
-			w.Header().Set("Content-Type", mime)
-
 			if dpr := r.Header.Get("DPR"); dpr != "" {
-				params.DPR = parseInt(dpr)
+				params.DPR = parseFloat(dpr)
 
-				w.Header().Set("Content-DPR", fmt.Sprintf("%d", params.DPR))
+				w.Header().Set("Content-DPR", fmt.Sprintf("%f", params.DPR))
 				w.Header().Add("Vary", "DPR")
 			}
 
 			if width := r.Header.Get("Width"); width != "" {
 				params.Width = parseInt(width)
 				w.Header().Add("Vary", "Width")
+			}
+
+			if saveData := r.Header.Get("Save-Data"); saveData == "on" {
+				params.Quality = 65
+				w.Header().Add("Vary", "Save-Data")
 			}
 
 			r = r.WithContext(NewParamsContext(r.Context(), params))

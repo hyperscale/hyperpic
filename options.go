@@ -9,6 +9,8 @@ import (
 	"fmt"
 
 	// "github.com/rs/xlog"
+
+	"github.com/rs/xlog"
 	bimg "gopkg.in/h2non/bimg.v1"
 )
 
@@ -88,7 +90,7 @@ type ImageOptions struct {
 	Width       int
 	Height      int
 	Fit         FitType
-	DPR         int
+	DPR         float64
 	Brightness  int
 	Contrast    int
 	Gamma       float64
@@ -111,7 +113,7 @@ func (o *ImageOptions) Hash() string {
 
 	hasher := md5.New()
 	hasher.Write([]byte(fmt.Sprintf(
-		"w=%d&h=%d&fit=%d&q=%d&fm=%d&dpr=%d&or=%d",
+		"w=%d&h=%d&fit=%d&q=%d&fm=%d&dpr=%f&or=%d&bg=%v&bri=%d&con=%d&gam=%f&sharp=%d&blur=%d",
 		o.Width,
 		o.Height,
 		o.Fit,
@@ -119,6 +121,12 @@ func (o *ImageOptions) Hash() string {
 		o.Format,
 		o.DPR,
 		o.Orientation,
+		o.Background,
+		o.Brightness,
+		o.Contrast,
+		o.Gamma,
+		o.Sharpen,
+		o.Blur,
 	)))
 	o.hash = hex.EncodeToString(hasher.Sum(nil))
 
@@ -129,12 +137,12 @@ func (o *ImageOptions) Hash() string {
 func BimgOptions(o *ImageOptions) bimg.Options {
 	dpr := o.DPR
 
-	if dpr == 0 {
-		dpr = 1
+	if dpr == 0.0 {
+		dpr = 1.0
 	}
 
-	width := o.Width
-	height := o.Height
+	width := float64(o.Width)
+	height := float64(o.Height)
 
 	if width > 0 {
 		width = (width * dpr)
@@ -145,8 +153,8 @@ func BimgOptions(o *ImageOptions) bimg.Options {
 	}
 
 	opts := bimg.Options{
-		Width:     width,
-		Height:    height,
+		Width:     int(width),
+		Height:    int(height),
 		Crop:      o.Fit == FitCropCenter,
 		Rotate:    o.Orientation,
 		NoProfile: true,
@@ -166,13 +174,15 @@ func BimgOptions(o *ImageOptions) bimg.Options {
 		opts.Crop = true
 	}
 
-	if len(o.Background) != 0 {
+	if len(o.Background) == 3 {
 		opts.Background = bimg.Color{
 			R: o.Background[0],
 			G: o.Background[1],
 			B: o.Background[2],
 		}
 	}
+
+	xlog.Infof("options bimg: %#v", opts)
 
 	return opts
 }

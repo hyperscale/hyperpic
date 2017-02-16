@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"net/url"
 	"strconv"
@@ -20,7 +21,7 @@ var allowedParams = map[string]string{
 	"w":     "int",
 	"h":     "int",
 	"fit":   "fit",
-	"dpr":   "int",
+	"dpr":   "float",
 	"bri":   "int",
 	"con":   "int",
 	"gam":   "float",
@@ -72,13 +73,18 @@ func mapImageParams(params map[string]interface{}) *ImageOptions {
 	return &ImageOptions{
 		Width:       params["w"].(int),
 		Height:      params["h"].(int),
-		DPR:         params["dpr"].(int),
+		DPR:         params["dpr"].(float64),
 		Quality:     params["q"].(int),
 		Format:      params["fm"].(bimg.ImageType),
 		Orientation: params["or"].(bimg.Angle),
 		Fit:         params["fit"].(FitType),
 		Crop:        params["crop"].(CropType),
 		Background:  params["bg"].([]uint8),
+		Brightness:  params["bri"].(int),
+		Contrast:    params["con"].(int),
+		Gamma:       params["gam"].(float64),
+		Sharpen:     params["sharp"].(int),
+		Blur:        params["blur"].(int),
 	}
 }
 
@@ -100,13 +106,47 @@ func parseFloat(param string) float64 {
 
 func parseColor(val string) []uint8 {
 	const max float64 = 255
+
 	buf := []uint8{}
 
-	if val != "" {
+	if val == "" {
+		return buf
+	}
+
+	// retrun color by name
+	if color, ok := colorsToRGB[val]; ok {
+		return color
+	}
+
+	if strings.Contains(val, ",") {
 		for _, num := range strings.Split(val, ",") {
 			n, _ := strconv.ParseUint(strings.Trim(num, " "), 10, 8)
 			buf = append(buf, uint8(math.Min(float64(n), max)))
 		}
+	}
+
+	if length := len(val); length == 6 || length == 3 {
+		format := "%02x%02x%02x"
+		factor := 1.0 / 255.0
+
+		if length == 3 {
+			format = "%1x%1x%1x"
+			factor = 1.0 / 15.0
+		}
+
+		var r, g, b uint8
+		n, err := fmt.Sscanf(val, format, &r, &g, &b)
+		if err != nil {
+			return buf
+		}
+
+		if n != 3 {
+			return buf
+		}
+
+		buf = append(buf, uint8(math.Min(float64(r)*factor, max)))
+		buf = append(buf, uint8(math.Min(float64(g)*factor, max)))
+		buf = append(buf, uint8(math.Min(float64(b)*factor, max)))
 	}
 
 	return buf
