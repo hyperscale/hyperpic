@@ -42,27 +42,20 @@ func Process(buf []byte, opts bimg.Options) (out Image, err error) {
 	return Image{Body: buf, Mime: mime}, nil
 }
 
-func ProcessImage(resource *Resource, options *ImageOptions) error {
-
-	// Read file
-	buf, err := resource.Read()
-	if err != nil {
-		return err
-	}
-
+func ProcessImage(resource *Resource) error {
 	// Infer the body MIME type via mimesniff algorithm
-	mimeType := http.DetectContentType(buf)
+	mimeType := http.DetectContentType(resource.Body)
 
 	// If cannot infer the type, infer it via magic numbers
 	if mimeType == "application/octet-stream" {
-		kind, err := filetype.Get(buf)
+		kind, err := filetype.Get(resource.Body)
 		if err == nil && kind.MIME.Value != "" {
 			mimeType = kind.MIME.Value
 		}
 	}
 
 	// Infer text/plain responses as potential SVG image
-	if strings.Contains(mimeType, "text/plain") && len(buf) > 8 && bimg.IsSVGImage(buf) {
+	if strings.Contains(mimeType, "text/plain") && len(resource.Body) > 8 && bimg.IsSVGImage(resource.Body) {
 		mimeType = "image/svg+xml"
 	}
 
@@ -71,7 +64,7 @@ func ProcessImage(resource *Resource, options *ImageOptions) error {
 		return fmt.Errorf("MimeType %s is not supported", mimeType)
 	}
 
-	img, err := Process(buf, BimgOptions(options))
+	img, err := Process(resource.Body, BimgOptions(resource.Options))
 	if err != nil {
 		return err
 	}

@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -17,19 +19,44 @@ func NewFileSystemSourceProvider(config *SourceFSConfiguration) *FileSystemSourc
 }
 
 func (p FileSystemSourceProvider) Get(file string) (*Resource, error) {
-	path := p.path + "/" + strings.TrimPrefix(file, "/")
+	if containsDotDot(file) {
+		// Too many programs use r.URL.Path to construct the argument to
+		// serveFile. Reject the request under the assumption that happened
+		// here and ".." may not be wanted.
+		// Note that name might not contain "..", for example if code (still
+		// incorrectly) used filepath.Join(myDir, r.URL.Path).
 
-	finfo, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return nil, fmt.Errorf("File %s not exists", file)
+		return nil, fmt.Errorf("Invalid URL path")
 	}
 
-	if finfo.IsDir() {
+	path := p.path + "/" + strings.TrimPrefix(file, "/")
+
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	d, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	if d.IsDir() {
 		return nil, fmt.Errorf("%s is not a file", file)
 	}
 
+	body, err := ioutil.ReadAll(f)
+	if err != nil {
+		return nil, err
+	}
+
+	_, name := filepath.Split(file)
+
 	return &Resource{
-		File:       file,
-		SourcePath: path,
+		Path:       file,
+		Name:       name,
+		Body:       body,
+		ModifiedAt: d.ModTime(),
 	}, nil
 }

@@ -7,7 +7,6 @@ package main
 import (
 	"github.com/rs/xlog"
 	"github.com/spf13/viper"
-	"strings"
 )
 
 var (
@@ -15,6 +14,7 @@ var (
 )
 
 func init() {
+	viper.SetDefault("logger.level", "info")
 	viper.SetDefault("server.host", "")
 	viper.SetDefault("server.port", 8080)
 	viper.SetDefault("image.source.provider", "fs")
@@ -29,7 +29,7 @@ func init() {
 
 	// Find and read the config file
 	if err := viper.ReadInConfig(); err != nil {
-		xlog.Fatalf("Fatal error config file: %s", err)
+		xlog.Info(err)
 	}
 }
 
@@ -61,7 +61,12 @@ type ServerConfiguration struct {
 	Port int
 }
 
+type LoggerConfiguration struct {
+	Level string
+}
+
 type Configuration struct {
+	Logger *LoggerConfiguration
 	Server *ServerConfiguration
 	Image  *ImageConfiguration
 }
@@ -69,6 +74,9 @@ type Configuration struct {
 // NewConfiguration constructor
 func NewConfiguration() *Configuration {
 	return &Configuration{
+		Logger: &LoggerConfiguration{
+			Level: viper.GetString("logger.level"),
+		},
 		Server: &ServerConfiguration{
 			Host: viper.GetString("server.host"),
 			Port: viper.GetInt("server.port"),
@@ -88,22 +96,4 @@ func NewConfiguration() *Configuration {
 			},
 		},
 	}
-}
-
-// SourcePath return the absolute path of source folder
-func (c ImageConfiguration) SourcePath() string {
-	return strings.TrimSuffix(c.Source.Path, "/") + "/source"
-}
-
-func (c ImageConfiguration) SourcePathWithFile(file string) string {
-	return c.SourcePath() + "/" + strings.TrimPrefix(file, "/")
-}
-
-// CachePath return the absolute path of cache folder
-func (c ImageConfiguration) CachePath() string {
-	return strings.TrimSuffix(c.Path, "/") + "/cache"
-}
-
-func (c ImageConfiguration) CachePathWithFile(file string) string {
-	return c.CachePath() + "/" + strings.TrimPrefix(file, "/")
 }

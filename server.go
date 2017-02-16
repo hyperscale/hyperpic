@@ -7,9 +7,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"time"
-
-	"strconv"
 
 	"github.com/justinas/alice"
 	"github.com/rs/xlog"
@@ -25,7 +24,6 @@ type Server struct {
 
 // NewServer constructor
 func NewServer(config *Configuration) *Server {
-
 	var source SourceProvider
 	var cache CacheProvider
 
@@ -59,7 +57,7 @@ func (s *Server) SetCacheProvider(cache CacheProvider) {
 
 func (s Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
-		HTTPFailure(w, http.StatusMethodNotAllowed)
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 
 		return
 	}
@@ -69,7 +67,7 @@ func (s Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
-		HTTPFailure(w, http.StatusMethodNotAllowed)
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 
 		return
 	}
@@ -80,7 +78,8 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 		// here and ".." may not be wanted.
 		// Note that name might not contain "..", for example if code (still
 		// incorrectly) used filepath.Join(myDir, r.URL.Path).
-		HTTPFailure(w, http.StatusBadRequest)
+
+		http.Error(w, "Invalid URL path", http.StatusBadRequest)
 
 		return
 	}
@@ -88,53 +87,54 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 	options, err := ParamsFromContext(r.Context())
 	if err != nil {
 		xlog.Errorf("Error while parsing options: %v", err.Error())
-
-		HTTPFailure(w, http.StatusBadRequest)
+		http.Error(w, "Error while parsing options", http.StatusBadRequest)
 
 		return
 	}
-	xlog.Infof("options: %#v", options)
-	/*if options.IsValid() == false {
-		HTTPFailure(w, http.StatusBadRequest)
-
-		return
-	}*/
+	// xlog.Infof("options: %#v", options)
 
 	// fetch from cache
 	if resource, ok := s.cache.Get(r.URL.Path, options); ok {
 		w.Header().Set("X-Image-From", "cache")
 
-		http.ServeFile(w, r, resource.CachePath)
+		ServeImage(w, r, resource)
 
 		return
 	}
 
 	resource, err := s.source.Get(r.URL.Path)
 	if err != nil {
-		HTTPFailure(w, http.StatusNotFound)
+		if os.IsNotExist(err) {
+			msg := fmt.Sprintf("File %s not found", r.URL.Path)
+
+			xlog.Info(msg)
+			http.Error(w, msg, http.StatusNotFound)
+
+			return
+		}
+
+		xlog.Error(err)
+		http.Error(w, err.Error(), http.StatusNotFound)
 
 		return
 	}
 
-	if err := ProcessImage(resource, options); err != nil {
+	resource.Options = options
+
+	if err := ProcessImage(resource); err != nil {
 		xlog.Errorf("Error while processing the image: %v", err.Error())
-
-		HTTPFailure(w, http.StatusInternalServerError)
+		http.Error(w, "Error while processing the image", http.StatusInternalServerError)
 
 		return
 	}
 
-	// w.Header().Set("Content-Type", resource.MimeType)
-	w.Header().Set("Content-Length", strconv.Itoa(len(resource.Body)))
 	w.Header().Set("X-Image-From", "source")
 
-	w.Write(resource.Body)
-
-	//http.ServeFile(w, r, resource.SourcePath)
+	ServeImage(w, r, resource)
 
 	// save resource in cache
 	go func(r *Resource) {
-		if err := s.cache.Set(r, options); err != nil {
+		if err := s.cache.Set(r); err != nil {
 			xlog.Error(err)
 		}
 	}(resource)
@@ -142,7 +142,6 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 
 // ListenAndServe service
 func (s *Server) ListenAndServe() {
-
 	middleware := alice.New(
 		NewParamsHandler(),
 		NewClientHintsHandler(),
