@@ -1,6 +1,8 @@
 TODO
 ====
 
+* Configuration by file, argument and env variable.
+* Setup xlog config level
 * Detect if image source is alpha, if yes use format supported alpha (webp if accepted or png)
 * Create inteligent compression algo and choose best format by context
 * Adjust quality by dpr. Ex: w=400&dpr=1 => quality=75 and w=400&dpr=2 => quality=55
@@ -24,6 +26,7 @@ TODO
 Articles
 --------
 
+* https://github.com/spf13/afero
 * https://blog.imgix.com/2016/03/11/auto-compress.html
 * https://blog.imgix.com/2016/03/30/dpr-quality.html
 * https://blog.imgix.com/2016/03/09/save-data-client-hint.html

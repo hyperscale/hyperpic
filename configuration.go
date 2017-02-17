@@ -31,6 +31,8 @@ func init() {
 	if err := viper.ReadInConfig(); err != nil {
 		xlog.Info(err)
 	}
+
+	viper.AutomaticEnv()
 }
 
 type SourceFSConfiguration struct {
