@@ -1,5 +1,5 @@
-hash: 6cae0ae72f0646f52feebc3d3051c1357551453d3aad622a9ba2ae87ddf5b94a
-updated: 2017-02-16T13:40:14.175034539+01:00
+hash: 549da6a26baaa7fa7b872112f8ab83a635e7fdec60288e81ac3d6d2e8e78fcb9
+updated: 2017-02-17T14:11:37.062160741+01:00
 imports:
 - name: github.com/fsnotify/fsnotify
   version: a904159b9206978bb6d53fcc7a769e5cd726c737
@@ -46,6 +46,8 @@ imports:
   version: 5ed0fc31f7f453625df314d8e66b9791e8d13003
 - name: github.com/tj/go-debug
   version: ff4a55a20a86994118644bbddc6a216da193cc13
+- name: github.com/whitedevops/colors
+  version: c998952eaed08f982f86a90b7c87c5ecd37a51d8
 - name: golang.org/x/net
   version: 236b8f043b920452504e263bc21d354427127473
   subpackages:

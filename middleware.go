@@ -8,7 +8,12 @@ import (
 	"fmt"
 
 	"github.com/euskadi31/image-service/httputil"
+	"github.com/rs/xlog"
+	"github.com/whitedevops/colors"
 	"gopkg.in/h2non/bimg.v1"
+	"path/filepath"
+	"strings"
+	"time"
 )
 
 var (
@@ -39,6 +44,40 @@ func ParamsFromContext(ctx context.Context) (*ImageOptions, error) {
 	}
 
 	return params, nil
+}
+
+// NewLoggerHandler log request
+func NewLoggerHandler() func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			start := time.Now()
+
+			next.ServeHTTP(w, r)
+
+			xlog.Infof("  %s   %s   %s  %s", fmtDuration(start), fmtStatus(w), fmtMethod(r), fmtPath(r.URL.Path))
+		})
+	}
+}
+
+// NewImageExtensionFilterHandler filtered url for accept image file only
+func NewImageExtensionFilterHandler(config *Configuration) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ext := strings.ToLower(filepath.Ext(r.URL.Path))
+			ext = ext[1:]
+
+			if config.Image.Support.IsExtSupported(ext) == false {
+				msg := fmt.Sprintf("File %s is not supported", r.URL.Path)
+
+				xlog.Debug(msg)
+				http.Error(w, msg, http.StatusNotFound)
+
+				return
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
 }
 
 // NewParamsHandler parse query string
@@ -118,4 +157,48 @@ func NewClientHintsHandler() func(http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func fmtDuration(start time.Time) string {
+	return fmt.Sprintf("%s%s%13s%s", colors.ResetAll, colors.Dim, time.Since(start), colors.ResetAll)
+}
+
+func fmtStatus(w http.ResponseWriter) string {
+	code := httputil.ResponseStatus(w)
+
+	color := colors.White
+
+	switch {
+	case code >= 200 && code <= 299:
+		color += colors.BackgroundGreen
+	case code >= 300 && code <= 399:
+		color += colors.BackgroundCyan
+	case code >= 400 && code <= 499:
+		color += colors.BackgroundYellow
+	default:
+		color += colors.BackgroundRed
+	}
+
+	return fmt.Sprintf("%s%s %3d %s", colors.ResetAll, color, code, colors.ResetAll)
+}
+
+func fmtMethod(r *http.Request) string {
+	var color string
+
+	switch r.Method {
+	case "GET":
+		color += colors.Green
+	case "POST":
+		color += colors.Cyan
+	case "PUT", "PATCH":
+		color += colors.Blue
+	case "DELETE":
+		color += colors.Red
+	}
+
+	return fmt.Sprintf("%s%s%s%s", colors.ResetAll, color, r.Method, colors.ResetAll)
+}
+
+func fmtPath(path string) string {
+	return fmt.Sprintf("%s%s%s%s", colors.ResetAll, colors.Dim, path, colors.ResetAll)
 }

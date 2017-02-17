@@ -21,6 +21,13 @@ func init() {
 	viper.SetDefault("image.source.fs.path", basePath+"/source")
 	viper.SetDefault("image.cache.provider", "fs")
 	viper.SetDefault("image.cache.fs.path", basePath+"/cache")
+	viper.SetDefault("image.support.extensions", map[string]bool{
+		"jpg":  true,
+		"jpeg": true,
+		"webp": true,
+		"png":  true,
+		"tiff": true,
+	})
 
 	viper.SetConfigName("config")
 	viper.AddConfigPath("/etc/" + AppName + "/")   // path to look for the config file in
@@ -31,7 +38,7 @@ func init() {
 	if err := viper.ReadInConfig(); err != nil {
 		xlog.Info(err)
 	}
-
+	viper.SetEnvPrefix("IS")
 	viper.AutomaticEnv()
 }
 
@@ -53,9 +60,20 @@ type ImageCacheConfiguration struct {
 	FS       *CacheFSConfiguration
 }
 
+type ImageSupportConfiguration struct {
+	Extensions map[string]interface{}
+}
+
+func (c ImageSupportConfiguration) IsExtSupported(ext string) bool {
+	enable, ok := c.Extensions[ext]
+
+	return (ok && enable.(bool))
+}
+
 type ImageConfiguration struct {
-	Source *ImageSourceConfiguration
-	Cache  *ImageCacheConfiguration
+	Source  *ImageSourceConfiguration
+	Cache   *ImageCacheConfiguration
+	Support *ImageSupportConfiguration
 }
 
 type ServerConfiguration struct {
@@ -95,6 +113,9 @@ func NewConfiguration() *Configuration {
 				FS: &CacheFSConfiguration{
 					Path: viper.GetString("image.cache.fs.path"),
 				},
+			},
+			Support: &ImageSupportConfiguration{
+				Extensions: viper.GetStringMap("image.support.extensions"),
 			},
 		},
 	}

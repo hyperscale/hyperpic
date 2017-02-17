@@ -11,3 +11,9 @@ image:
     provider: fs
     fs:
       path: ./var/lib/image-service/cache
+  support:
+    extensions:
+      jpg: true
+      jpeg: true
+      png: true
+      webp: true

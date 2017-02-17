@@ -65,6 +65,10 @@ func (s Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
 }
 
+func (s Server) notFoundHandler(w http.ResponseWriter, r *http.Request) {
+	http.Error(w, "Not Found", http.StatusNotFound)
+}
+
 func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
@@ -143,10 +147,13 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 // ListenAndServe service
 func (s *Server) ListenAndServe() {
 	middleware := alice.New(
+		NewLoggerHandler(),
+		NewImageExtensionFilterHandler(s.config),
 		NewParamsHandler(),
 		NewClientHintsHandler(),
 	)
 
+	s.mux.HandleFunc("/favicon.ico", s.notFoundHandler)
 	s.mux.HandleFunc("/health", s.healthHandler)
 	s.mux.Handle("/", middleware.ThenFunc(s.imageHandler))
 
