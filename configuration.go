@@ -46,6 +46,9 @@ func init() {
 	if err := viper.ReadInConfig(); err != nil {
 		xlog.Info(err)
 	}
+
+	viper.RegisterAlias("port", "server.port")
+	viper.BindEnv("PORT")
 	viper.SetEnvPrefix("IS")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
