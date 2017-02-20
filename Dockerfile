@@ -1,10 +1,9 @@
-FROM docker:1.12-dind
+FROM alpine:latest
 MAINTAINER Axel Etcheverry <axel@etcheverry.biz>
 ENV PORT 8080
-ENV DEBUG true
+RUN apk add --update curl && rm -rf /var/cache/apk/*
 HEALTHCHECK --interval=1m --timeout=3s CMD curl -f http://localhost:${PORT}/health > /dev/null 2>&1 || exit 1
 EXPOSE ${PORT}
-VOLUME /var/lib/docker-manager
-ADD ui/dist/* /opt/docker-manager/ui/
-ADD docker-manager /opt/docker-manager/
-ENTRYPOINT ["/usr/local/bin/dockerd-entrypoint.sh", "/opt/docker-manager/docker-manager"]
+VOLUME /var/lib/image-service
+ADD image-service /opt/image-service/
+ENTRYPOINT ["/opt/image-service/image-service"]
