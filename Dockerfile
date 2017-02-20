@@ -6,4 +6,5 @@ HEALTHCHECK --interval=1m --timeout=3s CMD curl -f http://localhost:${PORT}/heal
 EXPOSE ${PORT}
 VOLUME /var/lib/image-service
 ADD image-service /opt/image-service/
+ADD config.yml.dist /etc/image-service/config.yml
 ENTRYPOINT ["/opt/image-service/image-service"]
