@@ -5,5 +5,6 @@
 package main
 
 type SourceProvider interface {
-	Get(file string) (*Resource, error)
+	Get(resource *Resource) (*Resource, error)
+	Set(resource *Resource) error
 }

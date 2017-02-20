@@ -5,11 +5,17 @@
 package main
 
 import (
+	"crypto/md5"
 	"fmt"
 	"net/http"
 	"os"
 	"time"
 
+	filetype "gopkg.in/h2non/filetype.v0"
+
+	"io/ioutil"
+
+	"github.com/euskadi31/image-service/httputil"
 	"github.com/justinas/alice"
 	"github.com/rs/xlog"
 )
@@ -69,13 +75,77 @@ func (s Server) notFoundHandler(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Not Found", http.StatusNotFound)
 }
 
-func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+func (s Server) uploadHandler(w http.ResponseWriter, r *http.Request) {
+	if containsDotDot(r.URL.Path) {
+		// Too many programs use r.URL.Path to construct the argument to
+		// serveFile. Reject the request under the assumption that happened
+		// here and ".." may not be wanted.
+		// Note that name might not contain "..", for example if code (still
+		// incorrectly) used filepath.Join(myDir, r.URL.Path).
+
+		httputil.Failure(w, http.StatusBadRequest, httputil.ErrorMessage{
+			Code:    0,
+			Message: "Invalid URL path",
+		})
 
 		return
 	}
 
+	resource := &Resource{
+		Path: r.URL.Path,
+	}
+
+	r.ParseMultipartForm(32 << 20)
+
+	file, _, err := r.FormFile("image")
+	if err != nil {
+		httputil.FailureFromError(w, http.StatusBadRequest, err)
+
+		return
+	}
+
+	defer file.Close()
+
+	body, err := ioutil.ReadAll(file)
+	if err != nil {
+		httputil.FailureFromError(w, http.StatusBadRequest, err)
+
+		return
+	}
+
+	resource.Body = body
+
+	if err := s.source.Set(resource); err != nil {
+		httputil.FailureFromError(w, http.StatusInternalServerError, err)
+
+		return
+	}
+
+	// delete cache from source file
+	go s.cache.Del(resource)
+
+	mimeType := http.DetectContentType(body)
+
+	// If cannot infer the type, infer it via magic numbers
+	if mimeType == "application/octet-stream" {
+		kind, err := filetype.Get(body)
+		if err == nil && kind.MIME.Value != "" {
+			mimeType = kind.MIME.Value
+		}
+	}
+
+	h := md5.New()
+	h.Write(body)
+
+	httputil.JSON(w, http.StatusCreated, map[string]interface{}{
+		"file": r.URL.Path,
+		"size": len(body),
+		"type": mimeType,
+		"hash": fmt.Sprintf("%x", h.Sum(nil)),
+	})
+}
+
+func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 	if containsDotDot(r.URL.Path) {
 		// Too many programs use r.URL.Path to construct the argument to
 		// serveFile. Reject the request under the assumption that happened
@@ -97,8 +167,13 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// xlog.Infof("options: %#v", options)
 
+	resource := &Resource{
+		Path:    r.URL.Path,
+		Options: options,
+	}
+
 	// fetch from cache
-	if resource, ok := s.cache.Get(r.URL.Path, options); ok {
+	if resource, ok := s.cache.Get(resource); ok {
 		w.Header().Set("X-Image-From", "cache")
 
 		ServeImage(w, r, resource)
@@ -106,7 +181,7 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resource, err := s.source.Get(r.URL.Path)
+	resource, err = s.source.Get(resource)
 	if err != nil {
 		if os.IsNotExist(err) {
 			msg := fmt.Sprintf("File %s not found", r.URL.Path)
@@ -122,8 +197,6 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
-	resource.Options = options
 
 	if err := ProcessImage(resource); err != nil {
 		xlog.Errorf("Error while processing the image: %v", err.Error())
@@ -149,13 +222,28 @@ func (s *Server) ListenAndServe() {
 	middleware := alice.New(
 		NewLoggerHandler(),
 		NewImageExtensionFilterHandler(s.config),
+	)
+
+	readMiddleware := middleware.Append(
 		NewParamsHandler(),
 		NewClientHintsHandler(),
 	)
 
+	createMiddleware := middleware.Append(
+		NewAuthHandler(s.config.Auth),
+	)
+
 	s.mux.HandleFunc("/favicon.ico", s.notFoundHandler)
 	s.mux.HandleFunc("/health", s.healthHandler)
-	s.mux.Handle("/", middleware.ThenFunc(s.imageHandler))
+	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" {
+			readMiddleware.ThenFunc(s.imageHandler).ServeHTTP(w, r)
+		} else if r.Method == "POST" {
+			createMiddleware.ThenFunc(s.uploadHandler).ServeHTTP(w, r)
+		} else {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	})
 
 	srv := &http.Server{
 		ReadTimeout:  5 * time.Second,

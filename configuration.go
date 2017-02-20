@@ -5,9 +5,12 @@
 package main
 
 import (
+	"strings"
+
+	"time"
+
 	"github.com/rs/xlog"
 	"github.com/spf13/viper"
-	"strings"
 )
 
 var (
@@ -19,10 +22,13 @@ func init() {
 	viper.SetDefault("logger.prefix", AppName)
 	viper.SetDefault("server.host", "")
 	viper.SetDefault("server.port", 8080)
+	viper.SetDefault("auth.secret", "")
 	viper.SetDefault("image.source.provider", "fs")
 	viper.SetDefault("image.source.fs.path", basePath+"/source")
 	viper.SetDefault("image.cache.provider", "fs")
 	viper.SetDefault("image.cache.fs.path", basePath+"/cache")
+	viper.SetDefault("image.cache.fs.life_time", "1w")
+	viper.SetDefault("image.cache.fs.clean_interval", "1h")
 	viper.SetDefault("image.support.extensions", map[string]bool{
 		"jpg":  true,
 		"jpeg": true,
@@ -55,7 +61,9 @@ type ImageSourceConfiguration struct {
 }
 
 type CacheFSConfiguration struct {
-	Path string
+	Path          string
+	LifeTime      time.Duration
+	CleanInterval time.Duration
 }
 
 type ImageCacheConfiguration struct {
@@ -89,10 +97,15 @@ type LoggerConfiguration struct {
 	Prefix string
 }
 
+type AuthConfiguration struct {
+	Secret string
+}
+
 type Configuration struct {
 	Logger *LoggerConfiguration
 	Server *ServerConfiguration
 	Image  *ImageConfiguration
+	Auth   *AuthConfiguration
 }
 
 // NewConfiguration constructor
@@ -116,12 +129,17 @@ func NewConfiguration() *Configuration {
 			Cache: &ImageCacheConfiguration{
 				Provider: viper.GetString("image.cache.provider"),
 				FS: &CacheFSConfiguration{
-					Path: viper.GetString("image.cache.fs.path"),
+					Path:          viper.GetString("image.cache.fs.path"),
+					LifeTime:      viper.GetDuration("image.cache.fs.life_time"),
+					CleanInterval: viper.GetDuration("image.cache.fs.clean_interval"),
 				},
 			},
 			Support: &ImageSupportConfiguration{
 				Extensions: viper.GetStringMap("image.support.extensions"),
 			},
+		},
+		Auth: &AuthConfiguration{
+			Secret: viper.GetString("auth.secret"),
 		},
 	}
 }

@@ -10,6 +10,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/rs/xlog"
 )
 
 type FileSystemSourceProvider struct {
@@ -22,8 +24,28 @@ func NewFileSystemSourceProvider(config *SourceFSConfiguration) *FileSystemSourc
 	}
 }
 
-func (p FileSystemSourceProvider) Get(file string) (*Resource, error) {
-	if containsDotDot(file) {
+func (p FileSystemSourceProvider) Set(resource *Resource) error {
+	path := p.path + "/" + strings.TrimPrefix(resource.Path, "/")
+
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	n, err := file.Write(resource.Body)
+	if err != nil {
+		return err
+	}
+
+	xlog.Debugf("Write source file size: %d", n)
+
+	return nil
+}
+
+func (p FileSystemSourceProvider) Get(resource *Resource) (*Resource, error) {
+	if containsDotDot(resource.Path) {
 		// Too many programs use r.URL.Path to construct the argument to
 		// serveFile. Reject the request under the assumption that happened
 		// here and ".." may not be wanted.
@@ -33,7 +55,7 @@ func (p FileSystemSourceProvider) Get(file string) (*Resource, error) {
 		return nil, fmt.Errorf("Invalid URL path")
 	}
 
-	path := p.path + "/" + strings.TrimPrefix(file, "/")
+	path := p.path + "/" + strings.TrimPrefix(resource.Path, "/")
 
 	f, err := os.Open(path)
 	if err != nil {
@@ -47,7 +69,7 @@ func (p FileSystemSourceProvider) Get(file string) (*Resource, error) {
 	}
 
 	if d.IsDir() {
-		return nil, fmt.Errorf("%s is not a file", file)
+		return nil, fmt.Errorf("%s is not a file", resource.Path)
 	}
 
 	body, err := ioutil.ReadAll(f)
@@ -55,10 +77,11 @@ func (p FileSystemSourceProvider) Get(file string) (*Resource, error) {
 		return nil, err
 	}
 
-	_, name := filepath.Split(file)
+	_, name := filepath.Split(resource.Path)
 
 	return &Resource{
-		Path:       file,
+		Path:       resource.Path,
+		Options:    resource.Options,
 		Name:       name,
 		Body:       body,
 		ModifiedAt: d.ModTime(),

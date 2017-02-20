@@ -11,13 +11,15 @@ import (
 
 	"fmt"
 
+	"crypto/subtle"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/euskadi31/image-service/httputil"
 	"github.com/rs/xlog"
 	"github.com/whitedevops/colors"
 	"gopkg.in/h2non/bimg.v1"
-	"path/filepath"
-	"strings"
-	"time"
 )
 
 var (
@@ -91,6 +93,34 @@ func NewParamsHandler() func(http.Handler) http.Handler {
 			params := ParseParams(r.URL.Query())
 
 			r = r.WithContext(NewParamsContext(r.Context(), params))
+
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
+// NewAuthHandler authenticate by key
+func NewAuthHandler(config *AuthConfiguration) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			s := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
+			if len(s) != 2 {
+				http.Error(w, "Not authorized", 401)
+
+				return
+			}
+
+			if s[0] != "Bearer" {
+				http.Error(w, "Not authorized", 401)
+
+				return
+			}
+
+			if subtle.ConstantTimeCompare([]byte(s[1]), []byte(config.Secret)) == 0 {
+				http.Error(w, "Not authorized", 401)
+
+				return
+			}
 
 			next.ServeHTTP(w, r)
 		})

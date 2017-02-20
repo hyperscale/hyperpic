@@ -1,3 +1,6 @@
+logger:
+  level: info
+
 server:
   host: ~
   port: 8574
@@ -11,9 +14,14 @@ image:
     provider: fs
     fs:
       path: ./var/lib/image-service/cache
+      life_time: 1w
+      clean_interval: 1h
   support:
     extensions:
       jpg: true
       jpeg: true
       png: true
       webp: true
+
+auth:
+  secret: ~

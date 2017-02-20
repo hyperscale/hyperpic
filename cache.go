@@ -5,7 +5,9 @@
 package main
 
 type CacheProvider interface {
-	Get(file string, options *ImageOptions) (*Resource, bool)
+	Get(resource *Resource) (*Resource, bool)
 
 	Set(resource *Resource) error
+
+	Del(resource *Resource) bool
 }

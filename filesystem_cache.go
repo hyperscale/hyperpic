@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"io/ioutil"
 
@@ -17,27 +18,82 @@ import (
 )
 
 type FileSystemCacheProvider struct {
-	path string
+	config *CacheFSConfiguration
 }
 
+// NewFileSystemCacheProvider constructor of FS Cache provider
 func NewFileSystemCacheProvider(config *CacheFSConfiguration) *FileSystemCacheProvider {
-	return &FileSystemCacheProvider{
-		path: config.Path,
+	p := &FileSystemCacheProvider{
+		config: config,
 	}
+
+	p.Run()
+
+	return p
 }
 
-func (p FileSystemCacheProvider) Get(file string, options *ImageOptions) (*Resource, bool) {
-	if containsDotDot(file) {
+func (p *FileSystemCacheProvider) removeOldCacheFile(path string, f os.FileInfo, err error) error {
+	now := time.Now()
+
+	if f.IsDir() == false && now.After(f.ModTime().Add(p.config.LifeTime)) {
+		xlog.Debugf("Remove file %s", path)
+		if err := os.Remove(path); err != nil {
+			xlog.Error(err)
+		}
+	}
+
+	return nil
+}
+
+func (p *FileSystemCacheProvider) Run() {
+	xlog.Debug("Cleanner running")
+	ticker := time.NewTicker(p.config.CleanInterval)
+	// defer ticker.Stop()
+
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				xlog.Debug("Start cleaning")
+				err := filepath.Walk(p.config.Path, p.removeOldCacheFile)
+				if err != nil {
+					xlog.Error(err)
+				}
+				xlog.Debug("End cleaning")
+			}
+		}
+	}()
+}
+
+// Del all cache files for source file
+func (p FileSystemCacheProvider) Del(resource *Resource) bool {
+	if containsDotDot(resource.Path) {
+		xlog.Error("Invalid URL path")
+
+		return false
+	}
+	path := p.config.Path + "/" + strings.TrimPrefix(resource.Path, "/")
+
+	if err := os.RemoveAll(path); err != nil {
+		return false
+	}
+
+	return true
+}
+
+// Get cached file
+func (p FileSystemCacheProvider) Get(resource *Resource) (*Resource, bool) {
+	if containsDotDot(resource.Path) {
 		xlog.Error("Invalid URL path")
 
 		return nil, false
 	}
 
-	path := p.path + "/" + strings.TrimPrefix(file, "/") + "/" + options.Hash()
+	path := p.config.Path + "/" + strings.TrimPrefix(resource.Path, "/") + "/" + resource.Options.Hash()
 
 	f, err := os.Open(path)
 	if os.IsNotExist(err) {
-		xlog.Debugf("File %s is not found in cache", file)
+		xlog.Debugf("File %s is not found in cache", resource.Path)
 
 		return nil, false
 	}
@@ -69,19 +125,20 @@ func (p FileSystemCacheProvider) Get(file string, options *ImageOptions) (*Resou
 		return nil, false
 	}
 
-	_, name := filepath.Split(path)
+	_, name := filepath.Split(resource.Path)
 
 	return &Resource{
-		Path:       file,
+		Path:       resource.Path,
 		Name:       name,
-		Options:    options,
+		Options:    resource.Options,
 		Body:       body,
 		ModifiedAt: d.ModTime(),
 	}, true
 }
 
+// Set file to cache
 func (p FileSystemCacheProvider) Set(resource *Resource) error {
-	path := p.path + "/" + strings.TrimPrefix(resource.Path, "/")
+	path := p.config.Path + "/" + strings.TrimPrefix(resource.Path, "/")
 	filename := path + "/" + resource.Options.Hash()
 
 	if err := os.MkdirAll(path, 0777); err != nil {
@@ -99,7 +156,7 @@ func (p FileSystemCacheProvider) Set(resource *Resource) error {
 		return err
 	}
 
-	xlog.Debugf("Write cache size: %d", n)
+	xlog.Debugf("Write cache file size: %d", n)
 
 	return nil
 }

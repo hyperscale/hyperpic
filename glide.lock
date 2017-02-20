@@ -1,5 +1,5 @@
-hash: de03c4cd3baefa2397618846dfe7c6e4877a62874a5ecc0f372cebf4380dc99c
-updated: 2017-02-20T13:51:53.536032028+01:00
+hash: 37b2c9417d114b4926834ec10b3ccbbce020068241b5235452ae10bee7cb692b
+updated: 2017-02-21T00:18:27.090354944+01:00
 imports:
 - name: github.com/fsnotify/fsnotify
   version: a904159b9206978bb6d53fcc7a769e5cd726c737
@@ -44,6 +44,10 @@ imports:
   version: 9ff6c6923cfffbcd502984b8e0c80539a94968b7
 - name: github.com/spf13/viper
   version: 5ed0fc31f7f453625df314d8e66b9791e8d13003
+- name: github.com/stretchr/testify
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
+  subpackages:
+  - assert
 - name: github.com/tj/go-debug
   version: ff4a55a20a86994118644bbddc6a216da193cc13
 - name: github.com/whitedevops/colors
@@ -70,4 +74,12 @@ imports:
   - types
 - name: gopkg.in/yaml.v2
   version: a3f3340b5840cee44f372bddb5880fcbc419b46a
-testImports: []
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 04cdfd42973bb9c8589fd6a731800cf222fde1a9
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
