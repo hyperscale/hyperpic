@@ -7,6 +7,7 @@ package main
 import (
 	"github.com/rs/xlog"
 	"github.com/spf13/viper"
+	"strings"
 )
 
 var (
@@ -15,6 +16,7 @@ var (
 
 func init() {
 	viper.SetDefault("logger.level", "info")
+	viper.SetDefault("logger.prefix", AppName)
 	viper.SetDefault("server.host", "")
 	viper.SetDefault("server.port", 8080)
 	viper.SetDefault("image.source.provider", "fs")
@@ -39,6 +41,7 @@ func init() {
 		xlog.Info(err)
 	}
 	viper.SetEnvPrefix("IS")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 }
 
@@ -82,7 +85,8 @@ type ServerConfiguration struct {
 }
 
 type LoggerConfiguration struct {
-	Level string
+	Level  string
+	Prefix string
 }
 
 type Configuration struct {
@@ -95,7 +99,8 @@ type Configuration struct {
 func NewConfiguration() *Configuration {
 	return &Configuration{
 		Logger: &LoggerConfiguration{
-			Level: viper.GetString("logger.level"),
+			Level:  viper.GetString("logger.level"),
+			Prefix: viper.GetString("logger.prefix"),
 		},
 		Server: &ServerConfiguration{
 			Host: viper.GetString("server.host"),

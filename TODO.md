@@ -1,8 +1,6 @@
 TODO
 ====
 
-* Configuration by file, argument and env variable.
-* Setup xlog config level
 * Detect if image source is alpha, if yes use format supported alpha (webp if accepted or png)
 * Create inteligent compression algo and choose best format by context
 * Adjust quality by dpr. Ex: w=400&dpr=1 => quality=75 and w=400&dpr=2 => quality=55
@@ -22,6 +20,13 @@ TODO
 * Add Hot cache for best images (memory cache provider ?)
 * Add cluster mode (???) or use DB distributed (own ??)
 * Add UI (???)
+
+
+Done
+----
+
+* Configuration by file and env variable.
+* Setup xlog config level
 
 Articles
 --------

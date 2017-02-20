@@ -9,3 +9,4 @@ import:
   version: ^1.0.0
 - package: github.com/spf13/viper
 - package: github.com/whitedevops/colors
+- package: github.com/spf13/pflag

@@ -11,6 +11,8 @@ var (
 func main() {
 	config := NewConfiguration()
 
+	ConfigLogger(config.Logger)
+
 	server := NewServer(config)
 
 	server.ListenAndServe()
