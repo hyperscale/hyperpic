@@ -27,6 +27,12 @@ func NewFileSystemSourceProvider(config *SourceFSConfiguration) *FileSystemSourc
 func (p FileSystemSourceProvider) Set(resource *Resource) error {
 	path := p.path + "/" + strings.TrimPrefix(resource.Path, "/")
 
+	dir, _ := filepath.Split(resource.Path)
+
+	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+		return err
+	}
+
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		return err

@@ -27,7 +27,7 @@ VOLUME /var/lib/image-service
 EXPOSE ${PORT}
 ADD config.yml.dist /etc/image-service/config.yml
 
-RUN go get -u github.com/euskadi31/image-service
+RUN go get -u  github.com/euskadi31/image-service
 
 HEALTHCHECK --interval=1m --timeout=3s CMD curl -f http://localhost:${PORT}/health > /dev/null 2>&1 || exit 1
 

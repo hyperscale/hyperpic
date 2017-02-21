@@ -141,7 +141,7 @@ func (p FileSystemCacheProvider) Set(resource *Resource) error {
 	path := p.config.Path + "/" + strings.TrimPrefix(resource.Path, "/")
 	filename := path + "/" + resource.Options.Hash()
 
-	if err := os.MkdirAll(path, 0777); err != nil {
+	if err := os.MkdirAll(path, os.ModePerm); err != nil {
 		return err
 	}
 

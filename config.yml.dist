@@ -3,17 +3,17 @@ logger:
 
 server:
   host: ~
-  port: 8574
+  port: 8080
 
 image:
   source:
     provider: fs
     fs:
-      path: ./var/lib/image-service/source
+      path: /var/lib/image-service/source
   cache:
     provider: fs
     fs:
-      path: ./var/lib/image-service/cache
+      path: /var/lib/image-service/cache
       life_time: 1w
       clean_interval: 1h
   support:
