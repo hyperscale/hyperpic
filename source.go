@@ -7,4 +7,5 @@ package main
 type SourceProvider interface {
 	Get(resource *Resource) (*Resource, error)
 	Set(resource *Resource) error
+	Del(resource *Resource) bool
 }

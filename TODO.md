@@ -19,6 +19,11 @@ TODO
 * Add cluster mode (???) or use DB distributed (own ??)
 * Add UI (???)
 
+Doing
+-----
+
+* Swagger doc
+
 
 Done
 ----

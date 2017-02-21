@@ -87,3 +87,19 @@ func (p FileSystemSourceProvider) Get(resource *Resource) (*Resource, error) {
 		ModifiedAt: d.ModTime(),
 	}, nil
 }
+
+// Del source files
+func (p FileSystemSourceProvider) Del(resource *Resource) bool {
+	if containsDotDot(resource.Path) {
+		xlog.Error("Invalid URL path")
+
+		return false
+	}
+	path := p.path + "/" + strings.TrimPrefix(resource.Path, "/")
+
+	if err := os.Remove(path); err != nil {
+		return false
+	}
+
+	return true
+}

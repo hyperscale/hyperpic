@@ -1,0 +1,97 @@
+swagger: "2.0"
+schemes:
+  - "http"
+  - "https"
+produces:
+  - "application/json"
+consumes:
+  - "application/json"
+info:
+  title: "Image Service API"
+  description: Fast HTTP microservice for high-level image processing.
+
+definitions:
+  ErrorResponse:
+    description: "Represents an error."
+    type: "object"
+    required: ["message"]
+    properties:
+      message:
+        description: "The error message."
+        type: "string"
+        x-nullable: false
+    example:
+      message: "Something went wrong."
+
+paths:
+  /{file}:
+    delete:
+      summary: "delete image"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "no error"
+        500:
+          description: "server error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      parameters:
+        - name: "file"
+          in: "path"
+          required: true
+          description: "The path and name of file."
+          type: "string"
+        - name: "from"
+          in: "query"
+          type: "string"
+          description: "Set cache, source or all"
+    get:
+      summary: "display image"
+      produces:
+        - "image/jpeg"
+        - "image/webp"
+        - "image/png"
+        - "image/gif"
+        - "image/tiff"
+      responses:
+        200:
+          description: "no error"
+        400:
+          description: "bad request"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        500:
+          description: "server error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      parameters:
+        - name: "file"
+          in: "path"
+          required: true
+          description: "The path and name of file."
+          type: "string"
+        - name: "w"
+          in: "query"
+          type: "integer"
+          description: "Sets the width of the image, in pixels."
+        - name: "h"
+          in: "query"
+          type: "integer"
+          description: "Sets the height of the image, in pixels."
+        - name: "fit"
+          in: "query"
+          type: "string"
+          description: "Sets how the image is fitted to its target dimensions."
+        - name: "dpr"
+          in: "query"
+          type: "integer"
+          description: "Multiples the overall image size."
+        - name: "q"
+          in: "query"
+          type: "integer"
+          description: "Defines the quality of the image."
+        - name: "fm"
+          in: "query"
+          type: "string"
+          description: "Encodes the image to a specific format."

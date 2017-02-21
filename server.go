@@ -75,6 +75,46 @@ func (s Server) notFoundHandler(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Not Found", http.StatusNotFound)
 }
 
+func (s Server) deleteHandler(w http.ResponseWriter, r *http.Request) {
+	if containsDotDot(r.URL.Path) {
+		// Too many programs use r.URL.Path to construct the argument to
+		// serveFile. Reject the request under the assumption that happened
+		// here and ".." may not be wanted.
+		// Note that name might not contain "..", for example if code (still
+		// incorrectly) used filepath.Join(myDir, r.URL.Path).
+
+		httputil.Failure(w, http.StatusBadRequest, httputil.ErrorMessage{
+			Code:    0,
+			Message: "Invalid URL path",
+		})
+
+		return
+	}
+
+	resource := &Resource{
+		Path: r.URL.Path,
+	}
+
+	response := map[string]bool{
+		"cache":  false,
+		"source": false,
+	}
+
+	if from := r.URL.Query().Get("from"); from != "" {
+		switch from {
+		case "all":
+			response["cache"] = s.cache.Del(resource)
+			response["source"] = s.source.Del(resource)
+		case "source":
+			response["source"] = s.source.Del(resource)
+		case "cache":
+			response["cache"] = s.cache.Del(resource)
+		}
+	}
+
+	httputil.JSON(w, http.StatusOK, resource)
+}
+
 func (s Server) uploadHandler(w http.ResponseWriter, r *http.Request) {
 	if containsDotDot(r.URL.Path) {
 		// Too many programs use r.URL.Path to construct the argument to
@@ -229,18 +269,21 @@ func (s *Server) ListenAndServe() {
 		NewClientHintsHandler(),
 	)
 
-	createMiddleware := middleware.Append(
+	authMiddleware := middleware.Append(
 		NewAuthHandler(s.config.Auth),
 	)
 
 	s.mux.HandleFunc("/favicon.ico", s.notFoundHandler)
 	s.mux.HandleFunc("/health", s.healthHandler)
 	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "GET" {
+		switch r.Method {
+		case http.MethodGet:
 			readMiddleware.ThenFunc(s.imageHandler).ServeHTTP(w, r)
-		} else if r.Method == "POST" {
-			createMiddleware.ThenFunc(s.uploadHandler).ServeHTTP(w, r)
-		} else {
+		case http.MethodPost:
+			authMiddleware.ThenFunc(s.uploadHandler).ServeHTTP(w, r)
+		case http.MethodDelete:
+			authMiddleware.ThenFunc(s.deleteHandler).ServeHTTP(w, r)
+		default:
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		}
 	})
