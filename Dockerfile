@@ -1,5 +1,6 @@
 FROM marcbachmann/libvips:latest
 MAINTAINER Axel Etcheverry <axel@etcheverry.biz>
+ENV PORT 8080
 # Go version to use
 ENV GOLANG_VERSION 1.8
 ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
@@ -23,7 +24,7 @@ RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 WORKDIR $GOPATH
 
 VOLUME /var/lib/image-service
-EXPOSE 8080
+EXPOSE ${PORT}
 ADD config.yml.dist /etc/image-service/config.yml
 
 RUN go get -u github.com/euskadi31/image-service

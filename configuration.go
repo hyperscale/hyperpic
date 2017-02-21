@@ -9,6 +9,8 @@ import (
 
 	"time"
 
+	"os"
+
 	"github.com/rs/xlog"
 	"github.com/spf13/viper"
 )
@@ -47,8 +49,10 @@ func init() {
 		xlog.Info(err)
 	}
 
-	viper.RegisterAlias("port", "server.port")
-	viper.BindEnv("PORT")
+	if port := os.Getenv("PORT"); port != "" {
+		os.Setenv("IS_SERVER_PORT", port)
+	}
+
 	viper.SetEnvPrefix("IS")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
