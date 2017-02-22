@@ -1,34 +1,54 @@
-FROM marcbachmann/libvips:latest
+FROM golang:1.8-alpine
 MAINTAINER Axel Etcheverry <axel@etcheverry.biz>
 ENV PORT 8080
-# Go version to use
-ENV GOLANG_VERSION 1.8
-ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
-ENV GOLANG_DOWNLOAD_SHA256 53ab94104ee3923e228a2cb2116e5e462ad3ebaeea06ff04463479d7f12d27ca
-ENV GOPATH /go
+# Environment Variables
+ARG LIBVIPS_VERSION_MAJOR_MINOR=8.4
+ARG LIBVIPS_VERSION_PATCH=5
+ARG MOZJPEG_VERSION="v3.1"
 
-# gcc for cgo
-RUN apt-get update && apt-get install -y \
-    gcc curl git libc6-dev make ca-certificates \
-    --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
+# Install dependencies
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.5/community" >> /etc/apk/repositories && \
+    apk update && \
+    apk upgrade && \
+    apk add \
+    zlib libxml2 libxslt glib libexif lcms2 fftw ca-certificates curl git \
+    giflib libpng libwebp orc tiff poppler-glib librsvg && \
 
-RUN curl -fsSL --insecure "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
-    && echo "$GOLANG_DOWNLOAD_SHA256 golang.tar.gz" | sha256sum -c - \
-    && tar -C /usr/local -xzf golang.tar.gz \
-    && rm golang.tar.gz
+    apk add --no-cache --virtual .build-dependencies autoconf automake build-base \
+    git libtool nasm zlib-dev libxml2-dev libxslt-dev glib-dev \
+    libexif-dev lcms2-dev fftw-dev giflib-dev libpng-dev libwebp-dev orc-dev tiff-dev \
+    poppler-dev librsvg-dev && \
 
-ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+# Install mozjpeg
+    cd /tmp && \
+    git clone git://github.com/mozilla/mozjpeg.git && \
+    cd /tmp/mozjpeg && \
+    git checkout ${MOZJPEG_VERSION} && \
+    autoreconf -fiv && ./configure --prefix=/usr && make install && \
 
-RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
-WORKDIR $GOPATH
+# Install libvips
+    wget -O- http://www.vips.ecs.soton.ac.uk/supported/${LIBVIPS_VERSION_MAJOR_MINOR}/vips-${LIBVIPS_VERSION_MAJOR_MINOR}.${LIBVIPS_VERSION_PATCH}.tar.gz | tar xzC /tmp && \
+    cd /tmp/vips-${LIBVIPS_VERSION_MAJOR_MINOR}.${LIBVIPS_VERSION_PATCH} && \
+    ./configure --prefix=/usr \
+                --without-python \
+                --without-gsf \
+                --enable-debug=no \
+                --disable-dependency-tracking \
+                --disable-static \
+                --enable-silent-rules && \
+    make -s install-strip && \
+    cd $OLDPWD && \
 
-VOLUME /var/lib/image-service
-EXPOSE ${PORT}
-ADD config.yml.dist /etc/image-service/config.yml
+    go get -u github.com/euskadi31/image-service && \
 
-RUN go get -u github.com/euskadi31/image-service
+# Cleanup
+    rm -rf /tmp/vips-${LIBVIPS_VERSION_MAJOR_MINOR}.${LIBVIPS_VERSION_PATCH} && \
+    rm -rf /tmp/mozjpeg && \
+    apk del --purge .build-dependencies && \
+    rm -rf /var/cache/apk/*
 
 HEALTHCHECK --interval=1m --timeout=3s CMD curl -f http://localhost:${PORT}/health > /dev/null 2>&1 || exit 1
-
-ENTRYPOINT ["/go/bin/image-service"]
+EXPOSE ${PORT}
+VOLUME /var/lib/image-service
+ADD config.yml.dist /etc/image-service/config.yml
+CMD ["/go/bin/image-service"]

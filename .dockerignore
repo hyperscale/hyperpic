@@ -1,6 +1,4 @@
 .git/*
-ui/*
-!ui/dist
 var/*
 config.yml
 !config.yml.dist
