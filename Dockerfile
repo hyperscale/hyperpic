@@ -50,5 +50,5 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.5/community" >> /etc/apk/repos
 HEALTHCHECK --interval=1m --timeout=3s CMD curl -f http://localhost:${PORT}/health > /dev/null 2>&1 || exit 1
 EXPOSE ${PORT}
 VOLUME /var/lib/image-service
-ADD config.yml.dist /etc/image-service/config.yml
+ADD https://raw.githubusercontent.com/euskadi31/image-service/master/config.yml.dist /etc/image-service/config.yml
 CMD ["/go/bin/image-service"]
