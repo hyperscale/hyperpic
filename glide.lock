@@ -1,5 +1,5 @@
-hash: 7710d399022f3382d45b1bc4de24486d308cb12967aa56b89ab7f6cb7f4cc8a6
-updated: 2017-04-15T18:49:20.487170022+02:00
+hash: 42abe1cf2fd7dcb2453086c4733247a56b6b31cff7705a88e080d7b2ca89d873
+updated: 2017-04-16T01:35:42.708534971+02:00
 imports:
 - name: github.com/fsnotify/fsnotify
   version: 7d7316ed6e1ed2de075aab8dfc76de5d158d66e1
@@ -26,6 +26,8 @@ imports:
   version: c37440a7cf42ac63b919c752ca73a85067e05992
 - name: github.com/pelletier/go-toml
   version: 13d49d4606eb801b8f01ae542b4afc4c6ee3d84a
+- name: github.com/rs/cors
+  version: a62a804a8a009876ca59105f7899938a1349f4b3
 - name: github.com/rs/xhandler
   version: ed27b6fd65218132ee50cd95f38474a3d8a2cd12
 - name: github.com/rs/xid

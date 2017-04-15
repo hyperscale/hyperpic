@@ -18,7 +18,14 @@ import (
 	"github.com/euskadi31/image-service/httputil"
 	"github.com/justinas/alice"
 	"github.com/rs/xlog"
+	"github.com/rs/cors"
 )
+
+c := cors.New(cors.Options{
+	AllowedOrigins: []string{"*"},
+	AllowedMethods: []string{"GET", "POST", "DELETE"},
+	AllowedHeaders: []string{"*"},
+})
 
 // Server struct
 type Server struct {
@@ -246,8 +253,7 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("X-Image-From", "source")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Link", `</worker/client-hints.js>; rel="serviceworker"; scope="/"`)
+	w.Header().Set("Link", `</worker/client-hints.js>; rel="serviceworker"`)
 
 	ServeImage(w, r, resource)
 
@@ -299,6 +305,7 @@ func (s *Server) ListenAndServe() {
 	middleware := alice.New(
 		NewLoggerHandler(),
 		NewImageExtensionFilterHandler(s.config),
+		c.Handler,
 	)
 
 	readMiddleware := middleware.Append(
