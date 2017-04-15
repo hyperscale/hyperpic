@@ -17,11 +17,11 @@ import (
 
 	"github.com/euskadi31/image-service/httputil"
 	"github.com/justinas/alice"
-	"github.com/rs/xlog"
 	"github.com/rs/cors"
+	"github.com/rs/xlog"
 )
 
-c := cors.New(cors.Options{
+var c = cors.New(cors.Options{
 	AllowedOrigins: []string{"*"},
 	AllowedMethods: []string{"GET", "POST", "DELETE"},
 	AllowedHeaders: []string{"*"},
