@@ -247,6 +247,8 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("X-Image-From", "source")
 
+	w.Header().Set("Link", `</worker/client-hints.js>; rel="serviceworker"; scope="/"`)
+
 	ServeImage(w, r, resource)
 
 	// save resource in cache
@@ -255,6 +257,41 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 			xlog.Error(err)
 		}
 	}(resource)
+}
+
+func (s Server) serviceWorker(w http.ResponseWriter, r *http.Request) {
+	js := `
+self.addEventListener('install', function(event) {
+    console.log('Service Worker installing.');
+});
+
+self.addEventListener('activate', function(event) {
+    console.log('Service Worker activating.');
+});
+
+// Listen to fetch events
+self.addEventListener('fetch', function(event) {
+    console.log(event.request.url);
+    //throw JSON.stringify({data: event.request.url});
+
+    if (/\.(jpg|jpeg|png)(\?+)?$/.test(event.request.url)) {
+        console.log('Client-Hint');
+
+        // Clone the request
+		var req = event.request.clone();
+
+        req.headers.set('DPR', window.devicePixelRatio);
+        req.url = req.url + '&dpr=' + window.devicePixelRatio;
+
+        event.respondWith(fetch(req/*, {
+            mode: 'no-cors',
+            headers: headers
+        }*/));
+    }
+});
+`
+	w.Header().Set("Content-Type", "application/javascript; charset=utf-8")
+	w.Write([]byte(js))
 }
 
 // ListenAndServe service
@@ -275,6 +312,7 @@ func (s *Server) ListenAndServe() {
 
 	s.mux.HandleFunc("/favicon.ico", s.notFoundHandler)
 	s.mux.HandleFunc("/health", s.healthHandler)
+	s.mux.HandleFunc("/worker/client-hints.js", s.serviceWorker)
 	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:

@@ -1,10 +1,12 @@
-hash: 37b2c9417d114b4926834ec10b3ccbbce020068241b5235452ae10bee7cb692b
-updated: 2017-02-21T00:18:27.090354944+01:00
+hash: 7710d399022f3382d45b1bc4de24486d308cb12967aa56b89ab7f6cb7f4cc8a6
+updated: 2017-04-15T18:49:20.487170022+02:00
 imports:
 - name: github.com/fsnotify/fsnotify
-  version: a904159b9206978bb6d53fcc7a769e5cd726c737
+  version: 7d7316ed6e1ed2de075aab8dfc76de5d158d66e1
+- name: github.com/h2non/bimg
+  version: 9bb3ae10c5ce30e72f7ac0834368536fc095d6a7
 - name: github.com/hashicorp/hcl
-  version: 372e8ddaa16fd67e371e9323807d056b799360af
+  version: 630949a3c5fa3c613328e1b8256052cbc2327c9b
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -19,31 +21,31 @@ imports:
 - name: github.com/magiconair/properties
   version: b3b15ef068fd0b17ddf408a23669f20811d194d2
 - name: github.com/mitchellh/mapstructure
-  version: db1efb556f84b25a0a13a04aad883943538ad2e0
+  version: 53818660ed4955e899c0bcafa97299a388bd7c8e
 - name: github.com/pelletier/go-buffruneio
-  version: df1e16fde7fc330a0ca68167c23bf7ed6ac31d6d
+  version: c37440a7cf42ac63b919c752ca73a85067e05992
 - name: github.com/pelletier/go-toml
-  version: c9506ee96398e7571356462217b9e24d6a628d71
+  version: 13d49d4606eb801b8f01ae542b4afc4c6ee3d84a
 - name: github.com/rs/xhandler
   version: ed27b6fd65218132ee50cd95f38474a3d8a2cd12
 - name: github.com/rs/xid
-  version: e39c3571542a72a9d44559fc96e2a80ed896682b
+  version: 0c3fc84215f5aed2aa490b8b1638869cea0bd337
 - name: github.com/rs/xlog
-  version: ee33a676e5f4bbda5b80dace72043f7e3b61ebda
+  version: aa34124233703a8d23d7bf70772cecac4d8073f5
   subpackages:
   - internal/term
 - name: github.com/spf13/afero
-  version: 72b31426848c6ef12a7a8e216708cb0d1530f074
+  version: 9be650865eab0c12963d8753212f4f9c66cdcf12
   subpackages:
   - mem
 - name: github.com/spf13/cast
-  version: d1139bab1c07d5ad390a65e7305876b3c1a8370b
+  version: ce135a4ebeee6cfe9a26c93ee0d37825f26113c7
 - name: github.com/spf13/jwalterweatherman
   version: fa7ca7e836cf3a8bb4ebf799f472c12d7e903d66
 - name: github.com/spf13/pflag
   version: 9ff6c6923cfffbcd502984b8e0c80539a94968b7
 - name: github.com/spf13/viper
-  version: 5ed0fc31f7f453625df314d8e66b9791e8d13003
+  version: 7538d73b4eb9511d85a9f1dfef202eeb8ac260f4
 - name: github.com/stretchr/testify
   version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
   subpackages:
@@ -53,20 +55,18 @@ imports:
 - name: github.com/whitedevops/colors
   version: c998952eaed08f982f86a90b7c87c5ecd37a51d8
 - name: golang.org/x/net
-  version: 236b8f043b920452504e263bc21d354427127473
+  version: d379faa25cbdc04d653984913a2ceb43b0bc46d7
   subpackages:
   - context
 - name: golang.org/x/sys
-  version: e24f485414aeafb646f6fca458b0bf869c0880a1
+  version: d67a3279aecd76a65c4c9e6c352c888f5b3a574a
   subpackages:
   - unix
 - name: golang.org/x/text
-  version: 85c29909967d7f171f821e7a42e7b7af76fb9598
+  version: f28f36722d5ef2f9655ad3de1f248e3e52ad5ebd
   subpackages:
   - transform
   - unicode/norm
-- name: gopkg.in/h2non/bimg.v1
-  version: 9bb3ae10c5ce30e72f7ac0834368536fc095d6a7
 - name: gopkg.in/h2non/filetype.v0
   version: caab3653a0a5ff729cb3eea293d1d26a24781455
   subpackages:
@@ -76,7 +76,7 @@ imports:
   version: a3f3340b5840cee44f372bddb5880fcbc419b46a
 testImports:
 - name: github.com/davecgh/go-spew
-  version: 04cdfd42973bb9c8589fd6a731800cf222fde1a9
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
   subpackages:
   - spew
 - name: github.com/pmezard/go-difflib

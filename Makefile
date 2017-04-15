@@ -53,7 +53,7 @@ $(EXECUTABLE): $(wildcard *.go)
 build: $(EXECUTABLE)
 
 run: docker
-	@sudo docker run -e "IS_AUTH_SECRET=c8da8ded-f9a2-429c-8811-9b2a07de8ede" -p 8182:8080 -v $(shell pwd)/var/lib/image-service:/var/lib/image-service --rm $(IMAGE)
+	@sudo docker run -e "IS_AUTH_SECRET=c8da8ded-f9a2-429c-8811-9b2a07de8ede" -p 8574:8080 -v $(shell pwd)/var/lib/image-service:/var/lib/image-service --rm $(IMAGE)
 
 dev: $(EXECUTABLE)
 	@./$(EXECUTABLE)

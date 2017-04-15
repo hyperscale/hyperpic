@@ -1,6 +1,6 @@
 package: github.com/euskadi31/image-service
 import:
-- package: gopkg.in/h2non/bimg.v1
+- package: github.com/h2non/bimg
   version: ^1
 - package: gopkg.in/h2non/filetype.v0
   version: caab3653a0a5ff729cb3eea293d1d26a24781455

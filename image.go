@@ -11,7 +11,7 @@ import (
 
 	"fmt"
 
-	bimg "gopkg.in/h2non/bimg.v1"
+	"github.com/h2non/bimg"
 	filetype "gopkg.in/h2non/filetype.v0"
 )
 

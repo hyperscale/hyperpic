@@ -14,8 +14,8 @@ import (
 
 	// "github.com/rs/xlog"
 
+	"github.com/h2non/bimg"
 	"github.com/rs/xlog"
-	bimg "gopkg.in/h2non/bimg.v1"
 )
 
 var (

@@ -13,7 +13,7 @@ import (
 
 	"regexp"
 
-	bimg "gopkg.in/h2non/bimg.v1"
+	"github.com/h2non/bimg"
 )
 
 var (

@@ -17,9 +17,9 @@ import (
 	"time"
 
 	"github.com/euskadi31/image-service/httputil"
+	"github.com/h2non/bimg"
 	"github.com/rs/xlog"
 	"github.com/whitedevops/colors"
-	"gopkg.in/h2non/bimg.v1"
 )
 
 var (
