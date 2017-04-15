@@ -40,7 +40,7 @@ test:
 	@for PKG in $(PACKAGES); do go test -cover -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || exit 1; done;
 
 docker:
-	@sudo docker build --rm -t $(IMAGE) .
+	@sudo docker build --no-cache=true --rm -t $(IMAGE) .
 
 publish: docker
 	@sudo docker tag $(IMAGE) $(IMAGE):latest

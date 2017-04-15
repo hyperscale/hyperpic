@@ -246,7 +246,7 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("X-Image-From", "source")
-
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Link", `</worker/client-hints.js>; rel="serviceworker"; scope="/"`)
 
 	ServeImage(w, r, resource)
