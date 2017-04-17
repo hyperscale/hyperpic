@@ -34,6 +34,10 @@ func IsImageMimeTypeSupported(mime string) bool {
 		format = "svg"
 	}
 
+	if format == "jpg" {
+		format = "jpeg"
+	}
+
 	return bimg.IsTypeNameSupported(format)
 }
 

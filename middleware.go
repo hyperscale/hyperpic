@@ -139,11 +139,7 @@ func NewClientHintsHandler() func(http.Handler) http.Handler {
 				return
 			}
 
-			xlog.Infof("params: %#v", params)
-
 			if params.Format != bimg.UNKNOWN {
-				xlog.Infof("Format (query): %s", params.Format)
-
 				next.ServeHTTP(w, r)
 
 				return
@@ -158,13 +154,9 @@ func NewClientHintsHandler() func(http.Handler) http.Handler {
 					"image/png",
 				}, "image/jpg")
 
-				xlog.Infof("Accept: %s", mime)
-
 				format := ExtractImageTypeFromMime(mime)
 
-				xlog.Infof("Format: %s", format)
-
-				if !bimg.IsTypeNameSupported(format) {
+				if !IsImageMimeTypeSupported(format) {
 					http.Error(w, fmt.Sprintf("Format not supported"), http.StatusUnsupportedMediaType)
 
 					return
