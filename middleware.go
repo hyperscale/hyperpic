@@ -145,8 +145,6 @@ func NewClientHintsHandler() func(http.Handler) http.Handler {
 				return
 			}
 
-			w.Header().Set("Accept-CH", "DPR, Width, Save-Data")
-
 			if params.Format == bimg.UNKNOWN {
 				mime := httputil.NegotiateContentType(r, []string{
 					"image/jpg",
@@ -156,7 +154,11 @@ func NewClientHintsHandler() func(http.Handler) http.Handler {
 					"image/png",
 				}, "image/jpg")
 
+				xlog.Infof("Accept: %s", mime)
+
 				format := ExtractImageTypeFromMime(mime)
+
+				xlog.Infof("Format: %s", format)
 
 				if !bimg.IsTypeNameSupported(format) {
 					http.Error(w, fmt.Sprintf("Format not supported"), http.StatusUnsupportedMediaType)

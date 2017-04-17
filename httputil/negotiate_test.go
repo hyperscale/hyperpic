@@ -55,6 +55,7 @@ var negotiateContentTypeTests = []struct {
 	{"image/png, image/*", []string{"image/gif", "image/jpg"}, "", "image/gif"},
 	{"image/png, image/*", []string{"image/gif", "image/png"}, "", "image/png"},
 	{"image/png, image/*", []string{"image/png", "image/gif"}, "", "image/png"},
+	{"*/*", []string{"image/jpg", "image/webp", "image/jpeg", "image/tiff", "image/png"}, "image/jpg", "image/jpg"},
 }
 
 func TestNegotiateContentType(t *testing.T) {
