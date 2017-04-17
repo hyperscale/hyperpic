@@ -149,9 +149,9 @@ func NewClientHintsHandler() func(http.Handler) http.Handler {
 
 			if params.Format == bimg.UNKNOWN {
 				mime := httputil.NegotiateContentType(r, []string{
+					"image/jpg",
 					"image/webp",
 					"image/jpeg",
-					"image/jpg",
 					"image/tiff",
 					"image/png",
 				}, "image/jpg")

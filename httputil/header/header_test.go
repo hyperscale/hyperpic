@@ -120,6 +120,8 @@ var parseAcceptTests = []struct {
 	{"da, q, en-gb;q=0.8", []AcceptSpec{{"da", 1}, {"q", 1}, {"en-gb", 0.8}}},
 	{"image/png, image/*;q=0.5", []AcceptSpec{{"image/png", 1}, {"image/*", 0.5}}},
 
+	{"*/*", []AcceptSpec{{"*/*", 1}}},
+
 	// bad cases
 	{"value1; q=0.1.2", []AcceptSpec{{"value1", 0.1}}},
 	{"da, en-gb;q=foo", []AcceptSpec{{"da", 1}}},
