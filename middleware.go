@@ -139,7 +139,11 @@ func NewClientHintsHandler() func(http.Handler) http.Handler {
 				return
 			}
 
+			xlog.Infof("params: %#v", params)
+
 			if params.Format != bimg.UNKNOWN {
+				xlog.Infof("Format (query): %s", params.Format)
+
 				next.ServeHTTP(w, r)
 
 				return
