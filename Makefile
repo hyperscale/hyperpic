@@ -37,7 +37,11 @@ vet:
 	@go vet $(PACKAGES)
 
 test:
-	@for PKG in $(PACKAGES); do go test -cover -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || exit 1; done;
+	@for PKG in $(PACKAGES); do go test -ldflags '-s -w $(LDFLAGS)' -cover -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || exit 1; done;
+
+cover: test
+	@echo ""
+	@for PKG in $(PACKAGES); do go tool cover -func $$GOPATH/src/$$PKG/coverage.out; echo ""; done;
 
 docker:
 	@sudo docker build --no-cache=true --rm -t $(IMAGE) .
@@ -48,7 +52,7 @@ publish: docker
 
 $(EXECUTABLE): $(wildcard *.go)
 	@echo "Building $(EXECUTABLE)..."
-	@CGO_ENABLED=0 go build -ldflags '-s -w $(LDFLAGS)'
+	@CGO_ENABLED=1 go build -ldflags '-s -w $(LDFLAGS)'
 
 build: $(EXECUTABLE)
 

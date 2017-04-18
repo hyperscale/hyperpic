@@ -156,7 +156,9 @@ func NewClientHintsHandler() func(http.Handler) http.Handler {
 
 				format := ExtractImageTypeFromMime(mime)
 
-				if !IsImageMimeTypeSupported(format) {
+				xlog.Debugf("Format extracted form mime: %s => %s", mime, format)
+
+				if !IsFormatSupported(format) {
 					http.Error(w, fmt.Sprintf("Format not supported"), http.StatusUnsupportedMediaType)
 
 					return

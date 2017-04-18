@@ -58,12 +58,37 @@ func TestIsImageTypeSupported(t *testing.T) {
 	}
 }
 
+func TestIsFormatSupported(t *testing.T) {
+	files := []struct {
+		name     string
+		expected bool
+	}{
+		{"jpeg", true},
+		{"jpg", true},
+		{"png", true},
+		{"webp", bimg.IsTypeSupported(bimg.WEBP)},
+		{"JPEG", false},
+		{"json", false},
+		{"gif", bimg.IsTypeSupported(bimg.GIF)},
+		{"xml", bimg.IsTypeSupported(bimg.SVG)},
+		{"svg", bimg.IsTypeSupported(bimg.SVG)},
+		{"tiff", bimg.IsTypeSupported(bimg.TIFF)},
+	}
+
+	for _, file := range files {
+		if IsFormatSupported(file.name) != file.expected {
+			t.Fatalf("Invalid type: %s != %t", file.name, file.expected)
+		}
+	}
+}
+
 func TestImageType(t *testing.T) {
 	files := []struct {
 		name     string
 		expected bimg.ImageType
 	}{
 		{"jpeg", bimg.JPEG},
+		{"jpg", bimg.JPEG},
 		{"png", bimg.PNG},
 		{"webp", bimg.WEBP},
 		{"tiff", bimg.TIFF},

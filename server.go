@@ -219,6 +219,8 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 		Options: options,
 	}
 
+	w.Header().Set("Link", `</worker/client-hints.js>; rel="serviceworker"`)
+
 	// fetch from cache
 	if resource, ok := s.cache.Get(resource); ok {
 		w.Header().Set("X-Image-From", "cache")
@@ -253,7 +255,6 @@ func (s Server) imageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("X-Image-From", "source")
-	w.Header().Set("Link", `</worker/client-hints.js>; rel="serviceworker"`)
 
 	ServeImage(w, r, resource)
 
