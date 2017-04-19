@@ -30,7 +30,7 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.5/community" >> /etc/apk/repos
 # Install libvips
     #wget -O- https://github.com/jcupitt/libvips/tarball/${LIBVIPS_VERSION} | tar xzC /tmp && \
     wget -O- https://github.com/jcupitt/libvips/releases/download/v${LIBVIPS_VERSION}/vips-${LIBVIPS_VERSION}.tar.gz | tar xzC /tmp && \
-    cd /tmp/$(ls /tmp/ | grep libvips) && \
+    cd /tmp/vips-${LIBVIPS_VERSION} && \
     ./configure --prefix=/usr \
                 --without-python \
                 --without-gsf \
@@ -44,7 +44,7 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.5/community" >> /etc/apk/repos
     go get -u github.com/euskadi31/image-service && \
 
 # Cleanup
-    rm -rf /tmp/$(ls /tmp/ | grep libvips) && \
+    rm -rf /tmp/vips-${LIBVIPS_VERSION} && \
     rm -rf /tmp/mozjpeg && \
     apk del --purge .build-dependencies && \
     rm -rf /var/cache/apk/*
