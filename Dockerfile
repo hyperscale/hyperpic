@@ -13,7 +13,7 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.5/community" >> /etc/apk/repos
     apk upgrade && \
     apk add \
     zlib libxml2 libxslt glib libexif lcms2 fftw ca-certificates curl git \
-    giflib libpng libwebp orc tiff poppler-glib librsvg && \
+    giflib libpng libwebp orc tiff poppler-glib librsvg wget && \
 
     apk add --no-cache --virtual .build-dependencies autoconf automake build-base \
     libtool nasm zlib-dev libxml2-dev libxslt-dev glib-dev \
