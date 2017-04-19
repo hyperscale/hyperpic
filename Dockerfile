@@ -28,11 +28,8 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.5/community" >> /etc/apk/repos
     autoreconf -fiv && ./configure --prefix=/usr && make install && \
 
 # Install libvips
-    cd /tmp && \
-    git clone git://github.com/jcupitt/libvips.git && \
-    cd /tmp/libvips && \
-    git checkout ${LIBVIPS_VERSION} && \
-    ./autogen.sh && \
+    wget -O- https://github.com/jcupitt/libvips/tarball/${LIBVIPS_VERSION} | tar xzC /tmp && \
+    cd /tmp/$(ls /tmp/ | grep libvips) && \
     ./configure --prefix=/usr \
                 --without-python \
                 --without-gsf \
