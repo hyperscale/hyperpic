@@ -16,9 +16,11 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.5/community" >> /etc/apk/repos
     giflib libpng libwebp orc tiff poppler-glib librsvg && \
 
     apk add --no-cache --virtual .build-dependencies autoconf automake build-base \
-    git libtool nasm zlib-dev libxml2-dev libxslt-dev glib-dev \
+    libtool nasm zlib-dev libxml2-dev libxslt-dev glib-dev \
     libexif-dev lcms2-dev fftw-dev giflib-dev libpng-dev libwebp-dev orc-dev tiff-dev \
-    poppler-dev librsvg-dev swig gtk-doc gobject-introspection && \
+    poppler-dev librsvg-dev && \
+
+    update-ca-certificates && \
 
 # Install mozjpeg
     cd /tmp && \
