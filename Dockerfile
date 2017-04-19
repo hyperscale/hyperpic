@@ -32,6 +32,7 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.5/community" >> /etc/apk/repos
     git clone git://github.com/jcupitt/libvips.git && \
     cd /tmp/libvips && \
     git checkout ${LIBVIPS_VERSION} && \
+    ./autogen.sh && \
     ./configure --prefix=/usr \
                 --without-python \
                 --without-gsf \
