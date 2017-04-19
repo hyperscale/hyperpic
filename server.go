@@ -323,8 +323,8 @@ func (s Server) docHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeContent(
 		w,
 		r,
-		info.Name,
-		info.ModTime,
+		info.Name(),
+		info.ModTime(),
 		memfs.NewBuffer(&body),
 	)
 }

@@ -4,6 +4,7 @@ ENV PORT 8080
 # Environment Variables
 ARG LIBVIPS_VERSION_MAJOR_MINOR=8.4
 ARG LIBVIPS_VERSION_PATCH=5
+ARG LIBVIPS_VERSION="8.5.3"
 ARG MOZJPEG_VERSION="v3.1"
 
 # Install dependencies
@@ -27,8 +28,10 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.5/community" >> /etc/apk/repos
     autoreconf -fiv && ./configure --prefix=/usr && make install && \
 
 # Install libvips
-    wget -O- http://www.vips.ecs.soton.ac.uk/supported/${LIBVIPS_VERSION_MAJOR_MINOR}/vips-${LIBVIPS_VERSION_MAJOR_MINOR}.${LIBVIPS_VERSION_PATCH}.tar.gz | tar xzC /tmp && \
-    cd /tmp/vips-${LIBVIPS_VERSION_MAJOR_MINOR}.${LIBVIPS_VERSION_PATCH} && \
+    #wget -O- http://www.vips.ecs.soton.ac.uk/supported/${LIBVIPS_VERSION_MAJOR_MINOR}/vips-${LIBVIPS_VERSION_MAJOR_MINOR}.${LIBVIPS_VERSION_PATCH}.tar.gz | tar xzC /tmp && \
+    #cd /tmp/vips-${LIBVIPS_VERSION_MAJOR_MINOR}.${LIBVIPS_VERSION_PATCH} && \
+    wget -O- https://github.com/jcupitt/libvips/releases/download/v${LIBVIPS_VERSION}/vips-${LIBVIPS_VERSION}.tar.gz | tar xzC /tmp && \
+    cd /tmp/vips-${LIBVIPS_VERSION} && \
     ./configure --prefix=/usr \
                 --without-python \
                 --without-gsf \
