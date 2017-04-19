@@ -38,6 +38,7 @@ func init() {
 		"png":  true,
 		"tiff": true,
 	})
+	viper.SetDefault("doc.enable", true)
 
 	viper.SetConfigName("config")
 	viper.AddConfigPath("/etc/" + AppName + "/")   // path to look for the config file in
@@ -108,11 +109,16 @@ type AuthConfiguration struct {
 	Secret string
 }
 
+type DocConfiguration struct {
+	Enable bool
+}
+
 type Configuration struct {
 	Logger *LoggerConfiguration
 	Server *ServerConfiguration
 	Image  *ImageConfiguration
 	Auth   *AuthConfiguration
+	Doc    *DocConfiguration
 }
 
 // NewConfiguration constructor
@@ -147,6 +153,9 @@ func NewConfiguration() *Configuration {
 		},
 		Auth: &AuthConfiguration{
 			Secret: viper.GetString("auth.secret"),
+		},
+		Doc: &DocConfiguration{
+			Enable: viper.GetBool("doc.enable"),
 		},
 	}
 }

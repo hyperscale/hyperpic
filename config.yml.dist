@@ -25,3 +25,6 @@ image:
 
 auth:
   secret: ~
+
+doc:
+  enable: true

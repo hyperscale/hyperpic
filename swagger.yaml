@@ -2,36 +2,119 @@ swagger: "2.0"
 schemes:
   - "http"
   - "https"
+host: "image.your-domain.tld"
+basePath: "/"
 produces:
   - "application/json"
 consumes:
   - "application/json"
 info:
   title: "Image Service API"
+  version: "v0.0.1"
   description: Fast HTTP microservice for high-level image processing.
+  license:
+    name: "MIT"
+    url: "https://github.com/euskadi31/image-service/blob/master/LICENSE.md"
+
+tags:
+  - name: "Image"
+    x-displayName: "Image"
+    description: "Create and manage image"
+  - name: "Health"
+    x-displayName: "Health"
+    description: "Health check server"
 
 definitions:
+  HealthResponse:
+    type: "object"
+    required: ["status"]
+    properties:
+      status:
+        type: "bool"
+        description: "The status of server"
+    example:
+      status: true
+  ImageDeleteResponse:
+    type: "object"
+    required: ["cache", "source"]
+    properties:
+      cache:
+        type: "bool"
+        description: "The status of cache file"
+      source:
+        type: "bool"
+        description: "The status of source file"
+    example:
+      cache: true
+      source: false
+  ImageUploadResponse:
+    type: "object"
+    required: ["file", "size", "type", "hash"]
+    properties:
+      file:
+        type: "string"
+        description: "The path of uploaded image."
+      size:
+        type: "integer"
+        description: "The size of uploaded image."
+      type:
+        type: "string"
+        description: "The mime type of uploaded image."
+      hash:
+        type: "string"
+        description: "The md5 hash of uploaded image."
+    example:
+      file: "/test.jpg"
+      size: 125545
+      type: "image/jpeg"
+      hash: "7f76ff8615d64e788ea5e9633def1625"
   ErrorResponse:
     description: "Represents an error."
     type: "object"
-    required: ["message"]
+    required: ["error"]
     properties:
-      message:
-        description: "The error message."
-        type: "string"
-        x-nullable: false
+      error:
+        description: "The error."
+        type: "object"
+        properties:
+          code:
+            type: "integer"
+            description: "The code of error."
+          message:
+            type: "string"
+            description: "The message of error."
+
     example:
-      message: "Something went wrong."
+      error:
+        code: 102
+        message: "Something went wrong."
 
 paths:
-  /{file}:
-    delete:
-      summary: "delete image"
+  /health:
+    get:
+      summary: "healthcheck endpoint"
       produces:
         - "application/json"
       responses:
         200:
           description: "no error"
+          schema:
+            $ref: "#/definitions/HealthResponse"
+        500:
+          description: "server error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      tags: ["Health"]
+  /{file}:
+    delete:
+      summary: "Delete image"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "no error"
+          schema:
+            $ref: "#/definitions/ImageDeleteResponse"
         500:
           description: "server error"
           schema:
@@ -45,7 +128,39 @@ paths:
         - name: "from"
           in: "query"
           type: "string"
-          description: "Set cache, source or all"
+          description: "Remove cache file or source with cache file"
+          default: cache
+          enum:
+            - cache
+            - source
+      tags: ["Image"]
+    post:
+      summary: "Upload image"
+      prouces:
+        - "application/json"
+      consumes:
+        - multipart/form-data
+      responses:
+        200:
+          description: "no error"
+          schema:
+            $ref: "#/definitions/ImageUploadResponse"
+        500:
+          description: "server error"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+      parameters:
+        - name: "file"
+          in: "path"
+          required: true
+          description: "The path and name of file."
+          type: "string"
+        - name: "image"
+          in: "fromDate"
+          type: "file"
+          required: true
+          description: "The uploaded image data."
+      tags: ["Image"]
     get:
       summary: "display image"
       produces:
@@ -95,3 +210,4 @@ paths:
           in: "query"
           type: "string"
           description: "Encodes the image to a specific format."
+      tags: ["Image"]

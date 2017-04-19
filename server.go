@@ -75,7 +75,8 @@ func (s Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte("OK"))
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(`{"status": true}`))
 }
 
 func (s Server) notFoundHandler(w http.ResponseWriter, r *http.Request) {
@@ -109,12 +110,10 @@ func (s Server) deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	if from := r.URL.Query().Get("from"); from != "" {
 		switch from {
-		case "all":
+		case "source":
 			response["cache"] = s.cache.Del(resource)
 			response["source"] = s.source.Del(resource)
-		case "source":
-			response["source"] = s.source.Del(resource)
-		case "cache":
+		default:
 			response["cache"] = s.cache.Del(resource)
 		}
 	}
@@ -301,6 +300,12 @@ self.addEventListener('fetch', function(event) {
 	w.Write([]byte(js))
 }
 
+func (s Server) swaggerHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/x-yaml")
+
+	http.ServeFile(w, r, r.URL.Path[1:])
+}
+
 // ListenAndServe service
 func (s *Server) ListenAndServe() {
 	middleware := alice.New(
@@ -321,6 +326,14 @@ func (s *Server) ListenAndServe() {
 	s.mux.HandleFunc("/favicon.ico", s.notFoundHandler)
 	s.mux.HandleFunc("/health", s.healthHandler)
 	s.mux.HandleFunc("/worker/client-hints.js", s.serviceWorker)
+
+	if s.config.Doc.Enable {
+		s.mux.HandleFunc("/swagger.yaml", s.swaggerHandler)
+
+		fs := http.FileServer(http.Dir("doc"))
+		s.mux.Handle("/doc/", http.StripPrefix("/doc/", fs))
+	}
+
 	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
