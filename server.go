@@ -16,6 +16,7 @@ import (
 	"io/ioutil"
 
 	"github.com/euskadi31/image-service/httputil"
+	"github.com/euskadi31/image-service/memfs"
 	"github.com/justinas/alice"
 	"github.com/rs/cors"
 	"github.com/rs/xlog"
@@ -300,10 +301,60 @@ self.addEventListener('fetch', function(event) {
 	w.Write([]byte(js))
 }
 
+func (s Server) docHandler(w http.ResponseWriter, r *http.Request) {
+	name := "doc/index.html"
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	body, err := Asset(name)
+	if err != nil {
+		httputil.FailureFromError(w, 0, err)
+
+		return
+	}
+
+	info, err := AssetInfo(name)
+	if err != nil {
+		httputil.FailureFromError(w, 0, err)
+
+		return
+	}
+
+	http.ServeContent(
+		w,
+		r,
+		info.Name,
+		info.ModTime,
+		memfs.NewBuffer(&body),
+	)
+}
+
 func (s Server) swaggerHandler(w http.ResponseWriter, r *http.Request) {
+	name := "swagger.yaml"
+
 	w.Header().Set("Content-Type", "application/x-yaml")
 
-	http.ServeFile(w, r, r.URL.Path[1:])
+	body, err := Asset(name)
+	if err != nil {
+		httputil.FailureFromError(w, 0, err)
+
+		return
+	}
+
+	info, err := AssetInfo(name)
+	if err != nil {
+		httputil.FailureFromError(w, 0, err)
+
+		return
+	}
+
+	http.ServeContent(
+		w,
+		r,
+		info.Name,
+		info.ModTime,
+		memfs.NewBuffer(&body),
+	)
 }
 
 // ListenAndServe service
@@ -329,9 +380,10 @@ func (s *Server) ListenAndServe() {
 
 	if s.config.Doc.Enable {
 		s.mux.HandleFunc("/swagger.yaml", s.swaggerHandler)
+		s.mux.HandleFunc("/doc/", s.docHandler)
 
-		fs := http.FileServer(http.Dir("doc"))
-		s.mux.Handle("/doc/", http.StripPrefix("/doc/", fs))
+		/*fs := http.FileServer(http.Dir("doc"))
+		s.mux.Handle("/doc/", http.StripPrefix("/doc/", fs))*/
 	}
 
 	s.mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

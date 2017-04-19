@@ -50,6 +50,10 @@ publish: docker
 	@sudo docker tag $(IMAGE) $(IMAGE):latest
 	@sudo docker push $(IMAGE)
 
+bindata.go: doc/index.html swagger.yaml
+	@echo "Bin data..."
+	@go-bindata doc/ swagger.yaml
+
 $(EXECUTABLE): $(wildcard *.go)
 	@echo "Building $(EXECUTABLE)..."
 	@CGO_ENABLED=1 go build -ldflags '-s -w $(LDFLAGS)'
