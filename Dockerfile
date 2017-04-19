@@ -2,9 +2,7 @@ FROM golang:1.8-alpine
 MAINTAINER Axel Etcheverry <axel@etcheverry.biz>
 ENV PORT 8080
 # Environment Variables
-ARG LIBVIPS_VERSION_MAJOR_MINOR=8.4
-ARG LIBVIPS_VERSION_PATCH=5
-ARG LIBVIPS_VERSION="v8.5.3"
+ARG LIBVIPS_VERSION="8.5.3"
 ARG MOZJPEG_VERSION="v3.1"
 
 # Install dependencies
@@ -30,7 +28,8 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.5/community" >> /etc/apk/repos
     autoreconf -fiv && ./configure --prefix=/usr && make install && \
 
 # Install libvips
-    wget -O- https://github.com/jcupitt/libvips/tarball/${LIBVIPS_VERSION} | tar xzC /tmp && \
+    #wget -O- https://github.com/jcupitt/libvips/tarball/${LIBVIPS_VERSION} | tar xzC /tmp && \
+    wget -O- https://github.com/jcupitt/libvips/releases/download/v${LIBVIPS_VERSION}/vips-${LIBVIPS_VERSION}.tar.gz | tar xzC /tmp && \
     cd /tmp/$(ls /tmp/ | grep libvips) && \
     ./configure --prefix=/usr \
                 --without-python \
@@ -45,7 +44,7 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.5/community" >> /etc/apk/repos
     go get -u github.com/euskadi31/image-service && \
 
 # Cleanup
-    rm -rf /tmp/vips-${LIBVIPS_VERSION_MAJOR_MINOR}.${LIBVIPS_VERSION_PATCH} && \
+    rm -rf /tmp/$(ls /tmp/ | grep libvips) && \
     rm -rf /tmp/mozjpeg && \
     apk del --purge .build-dependencies && \
     rm -rf /var/cache/apk/*
