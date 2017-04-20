@@ -12,9 +12,9 @@ go:
 install:
   - go get golang.org/x/tools/cmd/cover
   - go get github.com/mattn/goveralls
-  - add-apt-repository ppa:masterminds/glide
-  - apt-get update
-  - apt-get install glide
+  - sudo add-apt-repository ppa:masterminds/glide
+  - sudo apt-get update
+  - sudo apt-get install glide
   - glide install
 
 script:
