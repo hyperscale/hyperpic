@@ -45,7 +45,7 @@ addons:
 
 before_install:
   - wget https://github.com/jcupitt/libvips/archive/v$LIBVIPS.zip
-  - unzip libvips-$LIBVIPS
+  - unzip v$LIBVIPS
   - cd libvips-$LIBVIPS
   - test -f autogen.sh && ./autogen.sh || ./bootstrap.sh
   - >
