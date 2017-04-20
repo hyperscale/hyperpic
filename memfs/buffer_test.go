@@ -5,11 +5,10 @@
 package memfs
 
 import (
+	"io"
 	"os"
 	"reflect"
 	"strings"
-
-	"io"
 	"testing"
 )
 

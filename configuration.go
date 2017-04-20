@@ -5,11 +5,9 @@
 package main
 
 import (
-	"strings"
-
-	"time"
-
 	"os"
+	"strings"
+	"time"
 
 	"github.com/rs/xlog"
 	"github.com/spf13/viper"

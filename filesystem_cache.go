@@ -6,14 +6,13 @@ package main
 
 import (
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"io/ioutil"
-
-	"github.com/euskadi31/image-service/memfs"
+	"github.com/hyperscale/hyperpic/memfs"
 	"github.com/rs/xlog"
 )
 

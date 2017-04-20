@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/euskadi31/image-service/httputil/header"
+	"github.com/hyperscale/hyperpic/httputil/header"
 )
 
 // NegotiateContentEncoding returns the best offered content encoding for the

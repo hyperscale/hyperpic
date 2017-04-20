@@ -1,7 +1,7 @@
 .PHONY: all clean deps fmt vet test docker
 
-EXECUTABLE ?= image-service
-IMAGE ?= euskadi31/$(EXECUTABLE)
+EXECUTABLE ?= hyperpic
+IMAGE ?= hyperscale/$(EXECUTABLE)
 VERSION ?= $(shell git describe --match 'v[0-9]*' --dirty='-dev' --always)
 COMMIT ?= $(shell git rev-parse --short HEAD)
 
@@ -39,6 +39,9 @@ vet:
 test:
 	@for PKG in $(PACKAGES); do go test -ldflags '-s -w $(LDFLAGS)' -cover -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || exit 1; done;
 
+travis:
+	@for PKG in $(PACKAGES); do go test -ldflags '-s -w $(LDFLAGS)' -cover -covermode=count -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || exit 1; done;
+
 cover: test
 	@echo ""
 	@for PKG in $(PACKAGES); do go tool cover -func $$GOPATH/src/$$PKG/coverage.out; echo ""; done;
@@ -61,7 +64,7 @@ $(EXECUTABLE): $(wildcard *.go)
 build: $(EXECUTABLE)
 
 run: docker
-	@sudo docker run -e "IS_AUTH_SECRET=c8da8ded-f9a2-429c-8811-9b2a07de8ede" -p 8574:8080 -v $(shell pwd)/var/lib/image-service:/var/lib/image-service --rm $(IMAGE)
+	@sudo docker run -e "IS_AUTH_SECRET=c8da8ded-f9a2-429c-8811-9b2a07de8ede" -p 8574:8080 -v $(shell pwd)/var/lib/hyperpic:/var/lib/hyperpic --rm $(IMAGE)
 
 dev: $(EXECUTABLE)
 	@./$(EXECUTABLE)

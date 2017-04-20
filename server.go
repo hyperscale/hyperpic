@@ -15,8 +15,8 @@ import (
 
 	"io/ioutil"
 
-	"github.com/euskadi31/image-service/httputil"
-	"github.com/euskadi31/image-service/memfs"
+	"github.com/hyperscale/hyperpic/httputil"
+	"github.com/hyperscale/hyperpic/memfs"
 	"github.com/justinas/alice"
 	"github.com/rs/cors"
 	"github.com/rs/xlog"

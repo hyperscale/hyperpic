@@ -2,8 +2,8 @@
 vendor/
 docker-manager
 var/
-!var/lib/image-service/source/.gitkeep
-!var/lib/image-service/cache/.gitkeep
+!var/lib/hyperpic/source/.gitkeep
+!var/lib/hyperpic/cache/.gitkeep
 *.out
-image-service
+hyperpic
 config.yml

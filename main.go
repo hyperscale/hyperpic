@@ -5,7 +5,7 @@
 package main
 
 var (
-	AppName = "image-service"
+	AppName = "hyperpic"
 )
 
 func main() {

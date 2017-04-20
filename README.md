@@ -1,5 +1,5 @@
-Image Service
-=============
+Hyperpic
+========
 
 Fast HTTP microservice for high-level image processing.
 

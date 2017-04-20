@@ -9,12 +9,12 @@ produces:
 consumes:
   - "application/json"
 info:
-  title: "Image Service API"
+  title: "Hyperpic API"
   version: "v0.0.1"
   description: Fast HTTP microservice for high-level image processing.
   license:
     name: "MIT"
-    url: "https://github.com/euskadi31/image-service/blob/master/LICENSE.md"
+    url: "https://github.com/hyperscale/hyperpic/blob/master/LICENSE.md"
 
 tags:
   - name: "Image"

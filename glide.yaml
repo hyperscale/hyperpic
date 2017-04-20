@@ -1,4 +1,4 @@
-package: github.com/euskadi31/image-service
+package: github.com/hyperscale/hyperpic
 import:
 - package: github.com/h2non/bimg
   version: ^1

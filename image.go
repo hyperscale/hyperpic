@@ -6,13 +6,11 @@ package main
 
 import (
 	"errors"
-	"net/http"
-	"strings"
-
 	"fmt"
-
 	"github.com/h2non/bimg"
 	filetype "gopkg.in/h2non/filetype.v0"
+	"net/http"
+	"strings"
 )
 
 // Image stores an image binary buffer and its MIME type

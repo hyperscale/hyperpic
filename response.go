@@ -7,7 +7,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/euskadi31/image-service/memfs"
+	"github.com/hyperscale/hyperpic/memfs"
 )
 
 func ServeImage(w http.ResponseWriter, r *http.Request, resource *Resource) {

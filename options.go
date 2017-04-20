@@ -7,15 +7,10 @@ package main
 import (
 	"crypto/md5"
 	"encoding/hex"
-
-	"regexp"
-
 	"fmt"
-
-	// "github.com/rs/xlog"
-
 	"github.com/h2non/bimg"
 	"github.com/rs/xlog"
+	"regexp"
 )
 
 var (
