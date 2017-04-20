@@ -302,7 +302,7 @@ self.addEventListener('fetch', function(event) {
 }
 
 func (s Server) docHandler(w http.ResponseWriter, r *http.Request) {
-	name := "doc/index.html"
+	name := "docs/index.html"
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
@@ -330,7 +330,7 @@ func (s Server) docHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s Server) swaggerHandler(w http.ResponseWriter, r *http.Request) {
-	name := "swagger.yaml"
+	name := "docs/swagger.yaml"
 
 	w.Header().Set("Content-Type", "application/x-yaml")
 
@@ -379,8 +379,8 @@ func (s *Server) ListenAndServe() {
 	s.mux.HandleFunc("/worker/client-hints.js", s.serviceWorker)
 
 	if s.config.Doc.Enable {
-		s.mux.HandleFunc("/swagger.yaml", s.swaggerHandler)
-		s.mux.HandleFunc("/doc/", s.docHandler)
+		s.mux.HandleFunc("/docs/swagger.yaml", s.swaggerHandler)
+		s.mux.HandleFunc("/docs/", s.docHandler)
 
 		/*fs := http.FileServer(http.Dir("doc"))
 		s.mux.Handle("/doc/", http.StripPrefix("/doc/", fs))*/
