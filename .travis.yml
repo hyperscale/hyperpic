@@ -10,19 +10,19 @@ go:
   - tip
 
 env:
-  - LIBVIPS=7.42
-  - LIBVIPS=8.2
-  - LIBVIPS=8.3
-  - LIBVIPS=8.4
+  - LIBVIPS=8.2.2
+  - LIBVIPS=8.3.0
+  - LIBVIPS=8.4.2
+  - LIBVIPS=8.5.3
   - LIBVIPS=master
 
 matrix:
   allow_failures:
     - go: master
     - go: tip
-    - env: LIBVIPS=7.42
-    - env: LIBVIPS=8.2
-    - env: LIBVIPS=8.3
+    - env: LIBVIPS=8.2.2
+    - env: LIBVIPS=8.3.0
+    - env: LIBVIPS=master
 
 cache: apt
 
@@ -44,7 +44,7 @@ addons:
       - libwebp-dev
 
 before_install:
-  - wget https://github.com/jcupitt/libvips/archive/$LIBVIPS.zip
+  - wget https://github.com/jcupitt/libvips/archive/v$LIBVIPS.zip
   - unzip $LIBVIPS
   - cd libvips-$LIBVIPS
   - test -f autogen.sh && ./autogen.sh || ./bootstrap.sh
