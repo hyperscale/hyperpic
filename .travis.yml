@@ -4,7 +4,6 @@ sudo: required
 dist: trusty
 
 go:
-  - 1.6
   - 1.7
   - 1.8
   - master
@@ -19,6 +18,8 @@ env:
 
 matrix:
   allow_failures:
+    - go: master
+    - go: tip
     - env: LIBVIPS=7.42
     - env: LIBVIPS=8.2
     - env: LIBVIPS=8.3
