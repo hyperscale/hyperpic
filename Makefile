@@ -21,7 +21,11 @@ release:
 	@sed -e "s/version: .*/version: \"v$(version)\"/g" docs/swagger.yaml > docs/swagger.yaml.new && rm -rf docs/swagger.yaml && mv docs/swagger.yaml.new docs/swagger.yaml
 	@git add .version docs/swagger.yaml
 	@git commit -m "feat(project): update version file" .version docs/swagger.yaml
-	@git flow release finish $(version) -p -m "Release v$(version)"
+	@git flow release finish $(version)
+	@git push
+	@git push --tags
+	@git checkout master
+	@git push
 	@git checkout develop
 	@echo "Release v$(version) finished."
 
