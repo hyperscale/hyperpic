@@ -4,7 +4,7 @@ Hyperpic ![Last release](https://img.shields.io/github/release/hyperscale/hyperp
 ![Reactive logo](_resources/hyperpic.png?raw=true "Hyperpic logo")
 
 
-[[![Go Report Card](https://goreportcard.com/badge/github.com/hyperscale/hyperpic)](https://goreportcard.com/report/github.com/hyperscale/hyperpic)](https://goreportcard.com/report/github.com/hyperscale/hyperpic)
+[![Go Report Card](https://goreportcard.com/badge/github.com/hyperscale/hyperpic)](https://goreportcard.com/report/github.com/hyperscale/hyperpic)
 
 | Branch  | Status | Coverage |
 |---------|--------|----------|
