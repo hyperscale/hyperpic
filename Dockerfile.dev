@@ -46,6 +46,8 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.5/community" >> /etc/apk/repos
     rm -rf /tmp/mozjpeg && \
     rm -rf /var/cache/apk/*
 
+RUN go get -u github.com/jteeuwen/go-bindata/...
+
 WORKDIR /go/src/github.com/hyperscale/hyperpic/
 COPY ./ /go/src/github.com/hyperscale/hyperpic/
 CMD ["make", "dev"]

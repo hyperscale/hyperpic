@@ -81,4 +81,4 @@ dev-test: dev-test-docker
 	@sudo docker run --rm $(IMAGE_TEST)
 
 dev-run: dev-run-docker
-	@sudo docker run --rm $(IMAGE_DEV)
+	@sudo docker run -e "HYPERPIC_AUTH_SECRET=c8da8ded-f9a2-429c-8811-9b2a07de8ede" -p 8574:8080 -v $(shell pwd)/var/lib/hyperpic:/var/lib/hyperpic --rm $(IMAGE_DEV)

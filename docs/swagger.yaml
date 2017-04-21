@@ -11,11 +11,18 @@ consumes:
 info:
   title: "Hyperpic API"
   version: "v0.0.1"
+  x-logo:
+    url: "https://cdn.rawgit.com/hyperscale/hyperpic/master/_resources/hyperpic.svg"
   description: Fast HTTP microservice for high-level image processing.
   license:
     name: "MIT"
     url: "https://github.com/hyperscale/hyperpic/blob/master/LICENSE.md"
-
+securityDefinitions:
+  Bearer:
+    description: Secret key
+    type: apiKey
+    name: Authorization
+    in: header
 tags:
   - name: "Image"
     x-displayName: "Image"
@@ -23,7 +30,6 @@ tags:
   - name: "Health"
     x-displayName: "Health"
     description: "Health check server"
-
 definitions:
   HealthResponse:
     type: "object"
@@ -83,12 +89,10 @@ definitions:
           message:
             type: "string"
             description: "The message of error."
-
     example:
       error:
         code: 102
         message: "Something went wrong."
-
 paths:
   /health:
     get:
@@ -108,6 +112,8 @@ paths:
   /{file}:
     delete:
       summary: "Delete image"
+      security:
+        - Bearer: []
       produces:
         - "application/json"
       responses:
@@ -136,6 +142,8 @@ paths:
       tags: ["Image"]
     post:
       summary: "Upload image"
+      security:
+        - Bearer: []
       prouces:
         - "application/json"
       consumes:
@@ -211,3 +219,7 @@ paths:
           type: "string"
           description: "Encodes the image to a specific format."
       tags: ["Image"]
+      x-code-samples:
+        - lang: html
+          source: |
+            <img src="https://image.your-domain.tld/test.jpg?w=150&h=150&fit=crop&dpr=2&q=85" alt="" />
