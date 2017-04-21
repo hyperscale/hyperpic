@@ -7,19 +7,17 @@ package main
 import (
 	"crypto/md5"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
-
-	filetype "gopkg.in/h2non/filetype.v0"
-
-	"io/ioutil"
 
 	"github.com/hyperscale/hyperpic/httputil"
 	"github.com/hyperscale/hyperpic/memfs"
 	"github.com/justinas/alice"
 	"github.com/rs/cors"
 	"github.com/rs/xlog"
+	filetype "gopkg.in/h2non/filetype.v0"
 )
 
 var c = cors.New(cors.Options{
@@ -367,6 +365,7 @@ func (s *Server) ListenAndServe() {
 
 	readMiddleware := middleware.Append(
 		NewParamsHandler(),
+		NewContentTypeHandler(),
 		NewClientHintsHandler(),
 	)
 

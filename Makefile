@@ -2,6 +2,8 @@
 
 EXECUTABLE ?= hyperpic
 IMAGE ?= hyperscale/$(EXECUTABLE)
+IMAGE_TEST ?= $(IMAGE)-test
+IMAGE_DEV ?= $(IMAGE)-dev
 VERSION ?= $(shell git describe --match 'v[0-9]*' --dirty='-dev' --always)
 COMMIT ?= $(shell git rev-parse --short HEAD)
 
@@ -49,6 +51,12 @@ cover: test
 docker:
 	@sudo docker build --no-cache=true --rm -t $(IMAGE) .
 
+dev-test-docker:
+	@sudo docker build -f Dockerfile.test --rm -t $(IMAGE_TEST) .
+
+dev-run-docker:
+	@sudo docker build -f Dockerfile.dev --rm -t $(IMAGE_DEV) .
+
 publish: docker
 	@sudo docker tag $(IMAGE) $(IMAGE):latest
 	@sudo docker push $(IMAGE)
@@ -64,7 +72,13 @@ $(EXECUTABLE): $(wildcard *.go)
 build: $(EXECUTABLE)
 
 run: docker
-	@sudo docker run -e "IS_AUTH_SECRET=c8da8ded-f9a2-429c-8811-9b2a07de8ede" -p 8574:8080 -v $(shell pwd)/var/lib/hyperpic:/var/lib/hyperpic --rm $(IMAGE)
+	@sudo docker run -e "HYPERPIC_AUTH_SECRET=c8da8ded-f9a2-429c-8811-9b2a07de8ede" -p 8574:8080 -v $(shell pwd)/var/lib/hyperpic:/var/lib/hyperpic --rm $(IMAGE)
 
 dev: $(EXECUTABLE)
 	@./$(EXECUTABLE)
+
+dev-test: dev-test-docker
+	@sudo docker run --rm $(IMAGE_TEST)
+
+dev-run: dev-run-docker
+	@sudo docker run --rm $(IMAGE_DEV)

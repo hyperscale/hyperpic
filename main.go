@@ -5,6 +5,7 @@
 package main
 
 var (
+	// AppName var
 	AppName = "hyperpic"
 )
 

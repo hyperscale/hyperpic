@@ -8,18 +8,23 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"regexp"
+
 	"github.com/h2non/bimg"
 	"github.com/rs/xlog"
-	"regexp"
 )
 
 var (
 	cropMatcher = regexp.MustCompile("^crop-(\\d+)-(\\d+)")
 )
 
+// FitType type
 type FitType int
+
+// FilterType type
 type FilterType int
 
+// Fit
 const (
 	FitContain FitType = iota
 	FitMax
@@ -37,6 +42,7 @@ const (
 	FitCropFocalPoint
 )
 
+// Filter
 const (
 	FilterGreyscale FilterType = iota
 	FilterSepia
@@ -75,6 +81,7 @@ var filterToType = map[string]FilterType{
 	"sepia":     FilterSepia,
 }
 
+// CropType struct
 type CropType struct {
 	Width  int
 	Height int

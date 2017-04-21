@@ -7,10 +7,11 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/h2non/bimg"
-	filetype "gopkg.in/h2non/filetype.v0"
 	"net/http"
 	"strings"
+
+	"github.com/h2non/bimg"
+	filetype "gopkg.in/h2non/filetype.v0"
 )
 
 // Image stores an image binary buffer and its MIME type
@@ -19,6 +20,7 @@ type Image struct {
 	Mime string
 }
 
+// Process image
 func Process(buf []byte, opts bimg.Options) (out Image, err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -44,6 +46,7 @@ func Process(buf []byte, opts bimg.Options) (out Image, err error) {
 	return Image{Body: buf, Mime: mime}, nil
 }
 
+// ProcessImage from resource
 func ProcessImage(resource *Resource) error {
 	// Infer the body MIME type via mimesniff algorithm
 	mimeType := http.DetectContentType(resource.Body)

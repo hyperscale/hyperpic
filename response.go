@@ -10,6 +10,7 @@ import (
 	"github.com/hyperscale/hyperpic/memfs"
 )
 
+// ServeImage from resource
 func ServeImage(w http.ResponseWriter, r *http.Request, resource *Resource) {
 	http.ServeContent(
 		w,

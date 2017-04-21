@@ -14,16 +14,19 @@ import (
 	"github.com/rs/xlog"
 )
 
+// FileSystemSourceProvider struct
 type FileSystemSourceProvider struct {
 	path string
 }
 
+// NewFileSystemSourceProvider func
 func NewFileSystemSourceProvider(config *SourceFSConfiguration) *FileSystemSourceProvider {
 	return &FileSystemSourceProvider{
 		path: config.Path,
 	}
 }
 
+// Set resource to file system
 func (p FileSystemSourceProvider) Set(resource *Resource) error {
 	path := p.path + "/" + strings.TrimPrefix(resource.Path, "/")
 
@@ -50,6 +53,7 @@ func (p FileSystemSourceProvider) Set(resource *Resource) error {
 	return nil
 }
 
+// Get resource from file system
 func (p FileSystemSourceProvider) Get(resource *Resource) (*Resource, error) {
 	if containsDotDot(resource.Path) {
 		// Too many programs use r.URL.Path to construct the argument to

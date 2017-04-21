@@ -4,6 +4,7 @@
 
 package main
 
+// SourceProvider interface
 type SourceProvider interface {
 	Get(resource *Resource) (*Resource, error)
 	Set(resource *Resource) error

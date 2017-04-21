@@ -16,6 +16,7 @@ import (
 	"github.com/rs/xlog"
 )
 
+// FileSystemCacheProvider struct
 type FileSystemCacheProvider struct {
 	config *CacheFSConfiguration
 }
@@ -44,6 +45,7 @@ func (p *FileSystemCacheProvider) removeOldCacheFile(path string, f os.FileInfo,
 	return nil
 }
 
+// Run cleanner
 func (p *FileSystemCacheProvider) Run() {
 	xlog.Debug("Cleanner running")
 	ticker := time.NewTicker(p.config.CleanInterval)

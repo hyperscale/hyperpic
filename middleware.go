@@ -105,22 +105,69 @@ func NewAuthHandler(config *AuthConfiguration) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			s := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
 			if len(s) != 2 {
-				http.Error(w, "Not authorized", 401)
+				http.Error(w, "Not authorized", http.StatusUnauthorized)
 
 				return
 			}
 
 			if s[0] != "Bearer" {
-				http.Error(w, "Not authorized", 401)
+				http.Error(w, "Not authorized", http.StatusUnauthorized)
 
 				return
 			}
 
 			if subtle.ConstantTimeCompare([]byte(s[1]), []byte(config.Secret)) == 0 {
-				http.Error(w, "Not authorized", 401)
+				http.Error(w, "Not authorized", http.StatusUnauthorized)
 
 				return
 			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
+// NewContentTypeHandler negotiate content type
+func NewContentTypeHandler() func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			params, err := ParamsFromContext(r.Context())
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+
+				return
+			}
+
+			if params.Format != bimg.UNKNOWN {
+				next.ServeHTTP(w, r)
+
+				return
+			}
+
+			mime := httputil.NegotiateContentType(r, []string{
+				"image/jpg",
+				"image/webp",
+				"image/jpeg",
+				"image/tiff",
+				"image/png",
+			}, "image/jpg")
+
+			format := ExtractImageTypeFromMime(mime)
+
+			xlog.Debugf("Format extracted form mime: %s => %s", mime, format)
+
+			/*if !IsFormatSupported(format) {
+				http.Error(w, fmt.Sprintf("Format not supported"), http.StatusUnsupportedMediaType)
+
+				return
+			}*/
+
+			params.Format = ImageType(format)
+
+			w.Header().Set("Content-Type", mime)
+			w.Header().Add("Vary", "Accept")
+
+			r = r.WithContext(NewParamsContext(r.Context(), params))
 
 			next.ServeHTTP(w, r)
 		})
@@ -139,52 +186,29 @@ func NewClientHintsHandler() func(http.Handler) http.Handler {
 				return
 			}
 
-			if params.Format != bimg.UNKNOWN {
-				next.ServeHTTP(w, r)
-
-				return
-			}
-
-			if params.Format == bimg.UNKNOWN {
-				mime := httputil.NegotiateContentType(r, []string{
-					"image/jpg",
-					"image/webp",
-					"image/jpeg",
-					"image/tiff",
-					"image/png",
-				}, "image/jpg")
-
-				format := ExtractImageTypeFromMime(mime)
-
-				xlog.Debugf("Format extracted form mime: %s => %s", mime, format)
-
-				if !IsFormatSupported(format) {
-					http.Error(w, fmt.Sprintf("Format not supported"), http.StatusUnsupportedMediaType)
-
-					return
-				}
-
-				params.Format = ImageType(format)
-				w.Header().Set("Content-Type", mime)
-				w.Header().Add("Vary", "Accept")
-			}
+			vary := []string{}
 
 			if dpr := r.Header.Get("DPR"); dpr != "" {
 				params.DPR = parseFloat(dpr)
 
-				w.Header().Set("Content-DPR", fmt.Sprintf("%f", params.DPR))
-				w.Header().Add("Vary", "DPR")
+				w.Header().Set("Content-DPR", fmt.Sprintf("%.1f", params.DPR))
+				vary = append(vary, "DPR")
+				//w.Header().Add("Vary", "DPR")
 			}
 
 			if width := r.Header.Get("Width"); width != "" {
 				params.Width = parseInt(width)
-				w.Header().Add("Vary", "Width")
+				vary = append(vary, "Width")
+				//w.Header().Add("Vary", "Width")
 			}
 
 			if saveData := r.Header.Get("Save-Data"); saveData == "on" {
 				params.Quality = 65
-				w.Header().Add("Vary", "Save-Data")
+				vary = append(vary, "Save-Data")
+				//w.Header().Add("Vary", "Save-Data")
 			}
+
+			w.Header().Set("Vary", strings.Join(vary, ", "))
 
 			r = r.WithContext(NewParamsContext(r.Context(), params))
 

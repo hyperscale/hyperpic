@@ -39,6 +39,7 @@ var allowedParams = map[string]string{
 	// "filt":  "filter",
 }
 
+// ParseParams from URL query
 func ParseParams(query url.Values) *ImageOptions {
 	params := make(map[string]interface{})
 

@@ -49,68 +49,80 @@ func init() {
 	}
 
 	if port := os.Getenv("PORT"); port != "" {
-		os.Setenv("IS_SERVER_PORT", port)
+		os.Setenv("HYPERPIC_SERVER_PORT", port)
 	}
 
-	viper.SetEnvPrefix("IS")
+	viper.SetEnvPrefix("HYPERPIC")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 }
 
+// SourceFSConfiguration struct
 type SourceFSConfiguration struct {
 	Path string
 }
 
+// ImageSourceConfiguration struct
 type ImageSourceConfiguration struct {
 	Provider string
 	FS       *SourceFSConfiguration
 }
 
+// CacheFSConfiguration struct
 type CacheFSConfiguration struct {
 	Path          string
 	LifeTime      time.Duration
 	CleanInterval time.Duration
 }
 
+// ImageCacheConfiguration struct
 type ImageCacheConfiguration struct {
 	Provider string
 	FS       *CacheFSConfiguration
 }
 
+// ImageSupportConfiguration struct
 type ImageSupportConfiguration struct {
 	Extensions map[string]interface{}
 }
 
+// IsExtSupported return true if ext is supported
 func (c ImageSupportConfiguration) IsExtSupported(ext string) bool {
 	enable, ok := c.Extensions[ext]
 
 	return (ok && enable.(bool))
 }
 
+// ImageConfiguration struct
 type ImageConfiguration struct {
 	Source  *ImageSourceConfiguration
 	Cache   *ImageCacheConfiguration
 	Support *ImageSupportConfiguration
 }
 
+// ServerConfiguration struct
 type ServerConfiguration struct {
 	Host string
 	Port int
 }
 
+// LoggerConfiguration struct
 type LoggerConfiguration struct {
 	Level  string
 	Prefix string
 }
 
+// AuthConfiguration struct
 type AuthConfiguration struct {
 	Secret string
 }
 
+// DocConfiguration struct
 type DocConfiguration struct {
 	Enable bool
 }
 
+// Configuration struct
 type Configuration struct {
 	Logger *LoggerConfiguration
 	Server *ServerConfiguration

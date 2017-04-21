@@ -4,6 +4,7 @@
 
 package main
 
+// CacheProvider interface
 type CacheProvider interface {
 	Get(resource *Resource) (*Resource, bool)
 
