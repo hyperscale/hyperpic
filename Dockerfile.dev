@@ -50,4 +50,5 @@ RUN go get -u github.com/jteeuwen/go-bindata/...
 
 WORKDIR /go/src/github.com/hyperscale/hyperpic/
 COPY ./ /go/src/github.com/hyperscale/hyperpic/
+ADD https://raw.githubusercontent.com/hyperscale/hyperpic/develop/config.yml.dist /etc/hyperpic/config.yml
 CMD ["make", "dev"]
