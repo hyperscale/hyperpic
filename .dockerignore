@@ -1,4 +1,3 @@
 .git/*
 var/*
-config.yml
-!config.yml.dist
+

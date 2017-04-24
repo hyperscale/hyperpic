@@ -14,15 +14,14 @@ env:
   - LIBVIPS=8.3.0
   - LIBVIPS=8.4.2
   - LIBVIPS=8.5.3
-  - LIBVIPS=master
 
 matrix:
+  fast_finish: true
   allow_failures:
     - go: master
     - go: tip
     - env: LIBVIPS=8.2.2
     - env: LIBVIPS=8.3.0
-    - env: LIBVIPS=master
 
 cache: apt
 
