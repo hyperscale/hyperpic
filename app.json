@@ -1,0 +1,23 @@
+{
+    "name": "Hyperpic",
+    "description": "Fast HTTP microservice for high-level image processing.",
+    "keywords": [
+        "image",
+        "processing",
+        "go",
+        "microservice",
+        "api",
+        "libvips",
+        "vips"
+    ],
+    "repository": "https://github.com/hyperscale/hyperpic",
+    "logo": "https://cdn.rawgit.com/hyperscale/hyperpic/master/_resources/hyperpic.svg",
+    "success_url": "/",
+    "image": "heroku/go",
+    "mount_dir": "src/github.com/hyperscale/hyperpic",
+    "buildpacks": [
+        {
+            "url": "https://github.com/h2non/heroku-buildpack-imaginary.git"
+        }
+    ]
+}

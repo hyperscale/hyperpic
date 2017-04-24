@@ -44,6 +44,13 @@ Run hyperpic
 ./hyperpic
 ```
 
+### Heroku
+
+Click on the Heroku button to easily deploy your app:
+
+[![Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+
+
 Documentation
 -------------
 
