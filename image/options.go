@@ -199,7 +199,7 @@ func (o Options) ToBimg() bimg.Options {
 		}
 	}
 
-	log.Info().Msgf("options bimg: %#v", opts)
+	log.Debug().Msgf("options bimg: %#v", opts)
 
 	return opts
 }
