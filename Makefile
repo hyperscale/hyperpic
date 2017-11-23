@@ -66,11 +66,11 @@ publish: docker
 	@sudo docker tag $(IMAGE) $(IMAGE):latest
 	@sudo docker push $(IMAGE)
 
-bindata.go: docs/index.html docs/swagger.yaml
+asset/bindata.go: docs/index.html docs/swagger.yaml
 	@echo "Bin data..."
-	@go-bindata docs/
+	@go-bindata -pkg asset -o asset/bindata.go docs/
 
-$(EXECUTABLE): $(wildcard *.go)
+$(EXECUTABLE): $(shell find . -type f -print | grep -v vendor | grep "\.go") asset/bindata.go
 	@echo "Building $(EXECUTABLE)..."
 	@CGO_ENABLED=1 go build -ldflags '-s -w $(LDFLAGS)'
 
