@@ -145,11 +145,6 @@
   revision = "0c3fc84215f5aed2aa490b8b1638869cea0bd337"
 
 [[projects]]
-  name = "github.com/rs/xlog"
-  packages = [".","internal/term"]
-  revision = "aa34124233703a8d23d7bf70772cecac4d8073f5"
-
-[[projects]]
   name = "github.com/rs/zerolog"
   packages = [".","hlog","internal/json","log"]
   revision = "3ac71fc58dbd43122668a912b755b0979ba9ce1f"

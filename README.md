@@ -29,9 +29,9 @@ Install libvips:
 brew install homebrew/science/vips --with-webp
 ```
 
-Install dependencies with glide:
+Install dependencies with golang dep:
 ```shell
-glide install
+dep ensure
 ```
 
 Build hyperpic:
@@ -44,11 +44,16 @@ Run hyperpic
 ./hyperpic
 ```
 
-### Heroku
+Example
+-------
 
-Click on the Heroku button to easily deploy your app:
+Original: `https://hyperpic.herokuapp.com/kayaks.jpg`
 
-[![Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+![Original](https://hyperpic.herokuapp.com/kayaks.jpg)
+
+Croped and Resized: `https://hyperpic.herokuapp.com/kayaks.jpg?w=400&h=400&fit=crop`
+
+![Croped and resized](https://hyperpic.herokuapp.com/kayaks.jpg?w=400&h=400&fit=crop)
 
 
 Documentation
