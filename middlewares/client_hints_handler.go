@@ -9,7 +9,6 @@ import (
 	"math"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 func parseInt(value string) int {
@@ -34,29 +33,24 @@ func NewClientHintsHandler() func(http.Handler) http.Handler {
 				return
 			}
 
-			vary := []string{}
-
 			if dpr := r.Header.Get("DPR"); dpr != "" {
 				options.DPR = parseFloat(dpr)
 
 				w.Header().Set("Content-DPR", fmt.Sprintf("%.1f", options.DPR))
-				vary = append(vary, "DPR")
-				//w.Header().Add("Vary", "DPR")
+				w.Header().Add("Vary", "DPR")
 			}
 
 			if width := r.Header.Get("Width"); width != "" {
 				options.Width = parseInt(width)
-				vary = append(vary, "Width")
-				//w.Header().Add("Vary", "Width")
+
+				w.Header().Add("Vary", "Width")
 			}
 
 			if saveData := r.Header.Get("Save-Data"); saveData == "on" {
 				options.Quality = 65
-				vary = append(vary, "Save-Data")
-				//w.Header().Add("Vary", "Save-Data")
-			}
 
-			w.Header().Set("Vary", strings.Join(vary, ", "))
+				w.Header().Add("Vary", "Save-Data")
+			}
 
 			r = r.WithContext(NewOptionsContext(r.Context(), options))
 

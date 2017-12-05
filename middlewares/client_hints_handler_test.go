@@ -67,6 +67,6 @@ func TestClientHintsHandler(t *testing.T) {
 
 	assert.Equal(t, []byte("OK"), body)
 	assert.Equal(t, "2.0", resp.Header.Get("Content-DPR"))
-	assert.Equal(t, "DPR, Width, Save-Data", resp.Header.Get("Vary"))
+	assert.Equal(t, []string{"DPR", "Width", "Save-Data"}, resp.Header["Vary"])
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }

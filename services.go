@@ -18,6 +18,7 @@ import (
 	"github.com/hyperscale/hyperpic/config"
 	"github.com/hyperscale/hyperpic/controllers"
 	"github.com/hyperscale/hyperpic/image"
+	"github.com/hyperscale/hyperpic/middlewares"
 	"github.com/hyperscale/hyperpic/provider"
 	"github.com/hyperscale/hyperpic/provider/filesystem"
 	"github.com/rs/cors"
@@ -242,6 +243,7 @@ func init() {
 		router.Use(hlog.RefererHandler("referer"))
 		router.Use(hlog.RequestIDHandler("req_id", "Request-Id"))
 		router.Use(corsHandler.Handler)
+		router.Use(middlewares.NewSecurityHandler())
 
 		router.EnableHealthCheck()
 
