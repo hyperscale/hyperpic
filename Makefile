@@ -66,11 +66,11 @@ publish: docker
 	@sudo docker tag $(IMAGE) $(IMAGE):latest
 	@sudo docker push $(IMAGE)
 
-bindata.go: docs/index.html docs/swagger.yaml
+asset/bindata.go: docs/index.html docs/swagger.yaml
 	@echo "Bin data..."
-	@go-bindata docs/
+	@go-bindata -pkg asset -o asset/bindata.go docs/
 
-$(EXECUTABLE): $(wildcard *.go)
+$(EXECUTABLE): $(shell find . -type f -print | grep -v vendor | grep "\.go") asset/bindata.go
 	@echo "Building $(EXECUTABLE)..."
 	@CGO_ENABLED=1 go build -ldflags '-s -w $(LDFLAGS)'
 
@@ -87,3 +87,7 @@ dev-test: dev-test-docker
 
 dev-run: dev-run-docker
 	@sudo docker run -e "HYPERPIC_AUTH_SECRET=c8da8ded-f9a2-429c-8811-9b2a07de8ede" -p 8574:8080 -v $(shell pwd)/var/lib/hyperpic:/var/lib/hyperpic --rm $(IMAGE_DEV)
+
+heroku:
+	@echo "Deploy Hyperpic on Heroku..."
+	@heroku container:push web --app=hyperpic
