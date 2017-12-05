@@ -15,6 +15,7 @@ import (
 	"github.com/hyperscale/hyperpic/config"
 	"github.com/hyperscale/hyperpic/httputil"
 	"github.com/hyperscale/hyperpic/image"
+	"github.com/hyperscale/hyperpic/metrics"
 	"github.com/hyperscale/hyperpic/middlewares"
 	"github.com/hyperscale/hyperpic/provider"
 	"github.com/justinas/alice"
@@ -92,6 +93,9 @@ func (c ImageController) GetHandler(w http.ResponseWriter, r *http.Request) {
 
 		httputil.ServeImage(w, r, resource)
 
+		metrics.CacheHit.With(map[string]string{}).Add(1)
+		metrics.ImageDeliveredBytes.With(map[string]string{}).Add(float64(len(resource.Body)))
+
 		return
 	}
 
@@ -132,6 +136,9 @@ func (c ImageController) GetHandler(w http.ResponseWriter, r *http.Request) {
 			log.Error().Err(err).Msg("Cache Provider")
 		}
 	}(resource)
+
+	metrics.CacheMiss.With(map[string]string{}).Add(1)
+	metrics.ImageDeliveredBytes.With(map[string]string{}).Add(float64(len(resource.Body)))
 }
 
 // PostHandler endpoint
@@ -182,12 +189,16 @@ func (c ImageController) PostHandler(w http.ResponseWriter, r *http.Request) {
 	h := md5.New()
 	h.Write(body)
 
+	lenght := len(body)
+
 	server.JSON(w, http.StatusCreated, map[string]interface{}{
 		"file": r.URL.Path,
-		"size": len(body),
+		"size": lenght,
 		"type": mimeType,
 		"hash": fmt.Sprintf("%x", h.Sum(nil)),
 	})
+
+	metrics.ImageReceivedBytes.With(map[string]string{}).Add(float64(lenght))
 }
 
 // DeleteHandler endpoint

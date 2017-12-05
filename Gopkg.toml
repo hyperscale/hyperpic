@@ -48,3 +48,11 @@
 [[constraint]]
   name = "gopkg.in/h2non/filetype.v1"
   version = "1.0.4"
+
+[[constraint]]
+  name = "github.com/euskadi31/go-service"
+  branch = "master"
+
+[[constraint]]
+  name = "github.com/euskadi31/go-server"
+  branch = "master"

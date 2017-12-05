@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/euskadi31/go-server"
 	"github.com/euskadi31/go-service"
+	"github.com/euskadi31/go-server"
 	"github.com/hyperscale/hyperpic/config"
 	"github.com/hyperscale/hyperpic/controllers"
 	"github.com/hyperscale/hyperpic/image"
@@ -246,6 +246,7 @@ func init() {
 		router.Use(middlewares.NewSecurityHandler())
 
 		router.EnableHealthCheck()
+		router.EnableMetrics()
 
 		if cfg.Doc.Enable {
 			router.AddController(docController)

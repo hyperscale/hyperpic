@@ -134,12 +134,6 @@
   version = "v1.2"
 
 [[projects]]
-  name = "github.com/rs/xhandler"
-  packages = ["."]
-  revision = "ed27b6fd65218132ee50cd95f38474a3d8a2cd12"
-  version = "v.11"
-
-[[projects]]
   name = "github.com/rs/xid"
   packages = ["."]
   revision = "0c3fc84215f5aed2aa490b8b1638869cea0bd337"
@@ -172,9 +166,10 @@
   revision = "9ff6c6923cfffbcd502984b8e0c80539a94968b7"
 
 [[projects]]
+  branch = "master"
   name = "github.com/spf13/viper"
   packages = ["."]
-  revision = "7538d73b4eb9511d85a9f1dfef202eeb8ac260f4"
+  revision = "4dddf7c62e16bce5807744018f5b753bfe21bbd2"
 
 [[projects]]
   name = "github.com/stretchr/testify"
@@ -195,11 +190,6 @@
   version = "v1.0"
 
 [[projects]]
-  name = "golang.org/x/net"
-  packages = ["context"]
-  revision = "d379faa25cbdc04d653984913a2ceb43b0bc46d7"
-
-[[projects]]
   name = "golang.org/x/sys"
   packages = ["unix"]
   revision = "d67a3279aecd76a65c4c9e6c352c888f5b3a574a"
@@ -210,15 +200,10 @@
   revision = "f28f36722d5ef2f9655ad3de1f248e3e52ad5ebd"
 
 [[projects]]
-  name = "gopkg.in/h2non/filetype.v0"
-  packages = [".","matchers","types"]
-  revision = "caab3653a0a5ff729cb3eea293d1d26a24781455"
-
-[[projects]]
   name = "gopkg.in/h2non/filetype.v1"
   packages = [".","matchers","types"]
-  revision = "22e255079ab40241c671d457081831d972f0436b"
-  version = "v1.0.3"
+  revision = "7883b4e5b02d198216f130289af4e7603f6714be"
+  version = "v1.0.4"
 
 [[projects]]
   name = "gopkg.in/yaml.v2"
@@ -228,6 +213,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "88f5ca1747bf818aae7340689f3f1ec2f3c7677f6f57c3fce482e5c6312d24df"
+  inputs-digest = "883702dfe2172af7cfef10e8cce7b3d80d8515a59954ad21f2ec723d3dd66597"
   solver-name = "gps-cdcl"
   solver-version = 1
