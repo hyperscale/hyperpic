@@ -85,6 +85,7 @@ var fitToType = map[string]FitType{
 	"crop-bottom-left":  FitCropBottomLeft,
 	"crop-bottom":       FitCropBottom,
 	"crop-bottom-right": FitCropBottomRight,
+	"crop-focal-point":  FitCropFocalPoint,
 }
 
 var filterToType = map[string]FilterType{
@@ -170,15 +171,16 @@ func (o Options) ToBimg() bimg.Options {
 	}
 
 	opts := bimg.Options{
-		Width:     int(width),
-		Height:    int(height),
-		Crop:      o.Fit == FitCropCenter,
-		Rotate:    o.Orientation,
-		NoProfile: true,
-		Embed:     o.Fit == FitFill,
-		Enlarge:   true,
-		Quality:   o.Quality,
-		Type:      o.Format,
+		Width:         int(width),
+		Height:        int(height),
+		Crop:          o.Fit == FitCropCenter,
+		Rotate:        o.Orientation,
+		NoProfile:     true,
+		StripMetadata: true,
+		Embed:         o.Fit == FitFill,
+		Enlarge:       true,
+		Quality:       o.Quality,
+		Type:          o.Format,
 		// Interlace:    true,
 		// Interpolator: bimg.Bilinear,
 	}
@@ -197,6 +199,11 @@ func (o Options) ToBimg() bimg.Options {
 			G: o.Background[1],
 			B: o.Background[2],
 		}
+	}
+
+	if o.Fit == FitCropFocalPoint {
+		opts.Crop = true
+		opts.Gravity = bimg.GravitySmart
 	}
 
 	log.Debug().Msgf("options bimg: %#v", opts)
