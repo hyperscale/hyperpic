@@ -206,6 +206,9 @@ paths:
           in: "query"
           type: "string"
           description: "Sets how the image is fitted to its target dimensions."
+          enum:
+            - "crop"
+            - "crop-focal-point"
         - name: "dpr"
           in: "query"
           type: "integer"
@@ -218,6 +221,10 @@ paths:
           in: "query"
           type: "string"
           description: "Encodes the image to a specific format."
+          enum:
+            - "jpg"
+            - "png"
+            - "webp"
       tags: ["Image"]
       x-code-samples:
         - lang: html

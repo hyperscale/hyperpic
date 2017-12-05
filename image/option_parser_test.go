@@ -13,7 +13,7 @@ import (
 )
 
 func TestOptionParserParse(t *testing.T) {
-	req := httptest.NewRequest("GET", "http://localhost:8574/stock-photo-103005233.jpg?w=400&h=400&fit=crop&dpr=2&or=45&fm=jpg", nil)
+	req := httptest.NewRequest("GET", "http://localhost:8574/stock-photo-103005233.jpg?w=400&h=400&fit=crop&dpr=2&or=45&fm=webp", nil)
 
 	parser := NewOptionParser()
 
@@ -25,5 +25,5 @@ func TestOptionParserParse(t *testing.T) {
 	assert.Equal(t, FitCropCenter, options.Fit)
 	assert.Equal(t, float64(2), options.DPR)
 	assert.Equal(t, bimg.D45, options.Orientation)
-	assert.Equal(t, bimg.JPEG, options.Format)
+	assert.Equal(t, bimg.WEBP, options.Format)
 }

@@ -65,9 +65,6 @@ var formatToType = map[string]bimg.ImageType{
 	"png":  bimg.PNG,
 	"webp": bimg.WEBP,
 	"tiff": bimg.TIFF,
-	"gif":  bimg.GIF,
-	"svg":  bimg.SVG,
-	"pdf":  bimg.PDF,
 }
 
 var fitToType = map[string]FitType{
