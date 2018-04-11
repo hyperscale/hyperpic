@@ -44,7 +44,7 @@ vet:
 	@go vet $(PACKAGES)
 
 test:
-	@for PKG in $(PACKAGES); do go test -ldflags '-s -w $(LDFLAGS)' -cover -covermode=count -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || exit 1; done;
+	@for PKG in $(PACKAGES); do CGO_LDFLAGS_ALLOW="-fopenmp" go test -ldflags '-s -w $(LDFLAGS)' -cover -covermode=count -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || exit 1; done;
 
 cover: test
 	@echo ""
