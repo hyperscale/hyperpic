@@ -70,7 +70,7 @@ script:
   - make cover
 
 after_success:
-  - goveralls -service=travis-ci
+  - goveralls -coverprofile=./coverage/test.cov -service=travis-ci
 
 #deploy:
 #  on:
