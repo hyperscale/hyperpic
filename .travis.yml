@@ -11,6 +11,7 @@ go:
 
 env:
   - LIBVIPS=8.5.9
+  - LIBVIPS=8.6.3
 
 matrix:
   fast_finish: true
@@ -18,7 +19,10 @@ matrix:
     - go: master
     - go: tip
 
-cache: apt
+cache:
+  apt:
+  directories:
+    - $HOME/libvips
 
 addons:
   apt:
@@ -54,11 +58,16 @@ before_install:
     --enable-pyvips8=no
     --without-orc
     --without-python
+    --prefix=$HOME/libvips
     $1
   - make
   - sudo make install
   - sudo ldconfig
   - cd ..
+  - export PATH=$PATH:$HOME/libvips/bin
+  - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/libvips/lib/pkgconfig
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/libvips/lib
+  - vips --vips-version
 
 install:
   - go get golang.org/x/tools/cmd/cover
