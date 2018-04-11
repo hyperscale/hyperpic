@@ -7,3 +7,4 @@ var/
 *.out
 hyperpic
 config.yml
+.coverage/

@@ -4,7 +4,8 @@ sudo: required
 dist: trusty
 
 go:
-  - 1.9
+  - 1.9.x
+  - 1.10.x
   - master
   - tip
 
@@ -66,7 +67,9 @@ install:
   - dep ensure
 
 script:
-  - make travis
+  - make cover
+
+after_success:
   - goveralls -service=travis-ci
 
 #deploy:

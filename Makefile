@@ -44,14 +44,14 @@ vet:
 	@go vet $(PACKAGES)
 
 test:
-	@for PKG in $(PACKAGES); do go test -ldflags '-s -w $(LDFLAGS)' -cover -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || exit 1; done;
-
-travis:
 	@for PKG in $(PACKAGES); do go test -ldflags '-s -w $(LDFLAGS)' -cover -covermode=count -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || exit 1; done;
 
 cover: test
 	@echo ""
-	@for PKG in $(PACKAGES); do go tool cover -func $$GOPATH/src/$$PKG/coverage.out; echo ""; done;
+	@mkdir -p .coverage/
+	@echo "mode: count" > ./.coverage/test.cov
+	@for PKG in $(PACKAGES); do if [ -f $$GOPATH/src/$$PKG/coverage.out ]; then tail -q -n +2 $$GOPATH/src/$$PKG/coverage.out >> ./.coverage/test.cov; fi; done;
+	@go tool cover -func ./.coverage/test.cov
 
 docker:
 	@sudo docker build --no-cache=true --rm -t $(IMAGE) .
