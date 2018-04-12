@@ -44,14 +44,11 @@ vet:
 	@go vet $(PACKAGES)
 
 test:
-	@for PKG in $(PACKAGES); do CGO_LDFLAGS_ALLOW="-fopenmp" go test -ldflags '-s -w $(LDFLAGS)' -cover -covermode=count -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || exit 1; done;
+	@CGO_LDFLAGS_ALLOW="-fopenmp" go test -ldflags '-s -w $(LDFLAGS)' ./...
 
-cover: test
-	@echo ""
-	@mkdir -p .coverage/
-	@echo "mode: count" > ./.coverage/test.cov
-	@for PKG in $(PACKAGES); do if [ -f $$GOPATH/src/$$PKG/coverage.out ]; then tail -q -n +2 $$GOPATH/src/$$PKG/coverage.out >> ./.coverage/test.cov; fi; done;
-	@go tool cover -func ./.coverage/test.cov
+cover:
+	@CGO_LDFLAGS_ALLOW="-fopenmp" go test -ldflags '-s -w $(LDFLAGS)' -cover -covermode=set -coverprofile=coverage.out ./...
+	@go tool cover -func ./coverage.out
 
 docker:
 	@sudo docker build --no-cache=true --rm -t $(IMAGE) .
