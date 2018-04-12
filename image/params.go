@@ -5,13 +5,13 @@
 package image
 
 import (
+	"encoding/hex"
 	"fmt"
 	"math"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
-
-	"regexp"
 
 	"github.com/h2non/bimg"
 )
@@ -124,35 +124,35 @@ func parseColor(val string) []uint8 {
 	}
 
 	if strings.Contains(val, ",") {
-		for _, num := range strings.Split(val, ",") {
+		parts := strings.Split(val, ",")
+		if len(parts) != 3 {
+			return buf
+		}
+
+		for _, num := range parts {
 			n, _ := strconv.ParseUint(strings.Trim(num, " "), 10, 8)
 			buf = append(buf, uint8(math.Min(float64(n), max)))
 		}
+
+		return buf
 	}
 
-	if length := len(val); length == 6 || length == 3 {
-		format := "%02x%02x%02x"
-		factor := 1.0 / 255.0
-
-		if length == 3 {
-			format = "%1x%1x%1x"
-			factor = 1.0 / 15.0
-		}
-
-		var r, g, b uint8
-		n, err := fmt.Sscanf(val, format, &r, &g, &b)
-		if err != nil {
-			return buf
-		}
-
-		if n != 3 {
-			return buf
-		}
-
-		buf = append(buf, uint8(math.Min(float64(r)*factor, max)))
-		buf = append(buf, uint8(math.Min(float64(g)*factor, max)))
-		buf = append(buf, uint8(math.Min(float64(b)*factor, max)))
+	if strings.HasPrefix(val, "#") {
+		val = strings.Replace(val, "#", "", 1)
 	}
+
+	if len(val) == 3 {
+		val = fmt.Sprintf("%c%c%c%c%c%c", val[0], val[0], val[1], val[1], val[2], val[2])
+	}
+
+	d, err := hex.DecodeString(val)
+	if err != nil {
+		return buf
+	}
+
+	buf = append(buf, uint8(d[0]))
+	buf = append(buf, uint8(d[1]))
+	buf = append(buf, uint8(d[2]))
 
 	return buf
 }

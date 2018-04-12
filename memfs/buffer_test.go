@@ -10,6 +10,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -20,6 +22,19 @@ const (
 var (
 	large = strings.Repeat("0123456789", 200) // 2000 bytes
 )
+
+func TestTruncate(t *testing.T) {
+	buf := make([]byte, 0, len(dots))
+	v := NewBuffer(&buf)
+
+	assert.NoError(t, v.Truncate(5))
+}
+
+func TestMakeSlice(t *testing.T) {
+	_, err := makeSlice(-1)
+
+	assert.EqualError(t, ErrTooLarge, err.Error())
+}
 
 func TestWrite(t *testing.T) {
 	buf := make([]byte, 0, len(dots))
@@ -121,6 +136,8 @@ func TestWrite(t *testing.T) {
 	if len(buf) != len(dots)+len(abc)+len(large) {
 		t.Errorf("Origin buffer did not grow: len=%d, cap=%d", len(buf), cap(buf))
 	}
+
+	v.Close()
 }
 
 func TestVolumesConcurrentAccess(t *testing.T) {

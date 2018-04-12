@@ -9,6 +9,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var getHeaderListTests = []struct {
@@ -24,6 +26,14 @@ var getHeaderListTests = []struct {
 	{s: `","`, l: []string{`","`}},
 	{s: `"\""`, l: []string{`"\""`}},
 	{s: `" "`, l: []string{`" "`}},
+}
+
+func TestCopyHeader(t *testing.T) {
+	header := http.Header{"Foo": {"bar"}}
+
+	copy := Copy(header)
+
+	assert.Equal(t, header, copy)
 }
 
 func TestGetHeaderList(t *testing.T) {
