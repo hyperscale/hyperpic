@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT
 // license that can be found in the LICENSE file.
 
-package main
+package version
 
 var (
 	// Version is the build release identifier.
@@ -10,4 +10,7 @@ var (
 
 	// Revision is the build source control revision.
 	Revision = "Unspecified"
+
+	// BuildAt date
+	BuildAt string
 )

@@ -21,6 +21,7 @@ import (
 	"github.com/hyperscale/hyperpic/middlewares"
 	"github.com/hyperscale/hyperpic/provider"
 	"github.com/hyperscale/hyperpic/provider/filesystem"
+	"github.com/hyperscale/hyperpic/version"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
@@ -55,7 +56,7 @@ func init() {
 		logger := zerolog.New(os.Stdout).With().
 			Timestamp().
 			Str("role", cfg.Logger.Prefix).
-			//Str("host", host).
+			Str("version", version.Version).
 			Logger()
 
 		zerolog.SetGlobalLevel(cfg.Logger.Level())

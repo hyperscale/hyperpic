@@ -7,7 +7,6 @@ IMAGE_DEV ?= $(IMAGE)-dev
 VERSION ?= $(shell git describe --match 'v[0-9]*' --dirty='-dev' --always)
 COMMIT ?= $(shell git rev-parse --short HEAD)
 
-LDFLAGS = -X "main.Revision=$(COMMIT)" -X "main.Version=$(VERSION)"
 PACKAGES = $(shell go list ./... | grep -v /vendor/)
 
 release:
@@ -44,10 +43,10 @@ vet:
 	@go vet $(PACKAGES)
 
 test:
-	@CGO_LDFLAGS_ALLOW="-fopenmp" go test -ldflags '-s -w $(LDFLAGS)' ./...
+	@CGO_LDFLAGS_ALLOW="-fopenmp" go test ./...
 
 cover:
-	@CGO_LDFLAGS_ALLOW="-fopenmp" go test -ldflags '-s -w $(LDFLAGS)' -cover -covermode=set -coverprofile=coverage.out ./...
+	@CGO_LDFLAGS_ALLOW="-fopenmp" go test -cover -covermode=set -coverprofile=coverage.out ./...
 	@go tool cover -func ./coverage.out
 
 docker:
@@ -69,7 +68,7 @@ asset/bindata.go: docs/index.html docs/swagger.yaml
 
 $(EXECUTABLE): $(shell find . -type f -print | grep -v vendor | grep "\.go") asset/bindata.go
 	@echo "Building $(EXECUTABLE)..."
-	@CGO_ENABLED=1 go build -ldflags '-s -w $(LDFLAGS)'
+	@CGO_ENABLED=1 go build ./cmd/hyperpic
 
 build: $(EXECUTABLE)
 
