@@ -9,6 +9,8 @@ COMMIT ?= $(shell git rev-parse --short HEAD)
 
 PACKAGES = $(shell go list ./... | grep -v /vendor/)
 
+HYPERPIC_AUTH_SECRET ?= c8da8ded-f9a2-429c-8811-9b2a07de8ede
+
 release:
 	@echo "Release v$(version)"
 	@git pull
@@ -87,3 +89,7 @@ dev-run: dev-run-docker
 heroku:
 	@echo "Deploy Hyperpic on Heroku..."
 	@heroku container:push web --app=hyperpic
+
+upload-demo:
+	@curl -F 'image=@_resources/demo/kayaks.jpg' -H "Authorization: Bearer $(HYPERPIC_AUTH_SECRET)" https://hyperpic.herokuapp.com/kayaks.jpg
+	@curl -F 'image=@_resources/demo/smartcrop.jpg' -H "Authorization: Bearer $(HYPERPIC_AUTH_SECRET)" https://hyperpic.herokuapp.com/smartcrop.jpg
