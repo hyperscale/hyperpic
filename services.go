@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/euskadi31/go-service"
 	"github.com/euskadi31/go-server"
+	"github.com/euskadi31/go-service"
 	"github.com/hyperscale/hyperpic/config"
 	"github.com/hyperscale/hyperpic/controllers"
 	"github.com/hyperscale/hyperpic/image"
@@ -206,8 +206,8 @@ func init() {
 	container.Set(ServiceRouterKey, func(c *service.Container) interface{} {
 		logger := c.Get(ServiceLoggerKey).(zerolog.Logger)
 		cfg := c.Get(ServiceConfigKey).(*config.Configuration)
-		imageController := c.Get(ServiceImageControllerKey).(*controllers.ImageController)
-		docController := c.Get(ServiceDocControllerKey).(*controllers.DocController)
+		imageController := c.Get(ServiceImageControllerKey).(server.Controller)
+		docController := c.Get(ServiceDocControllerKey).(server.Controller)
 
 		corsHandler := cors.New(cors.Options{
 			AllowCredentials: false,

@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"net/http"
 
-	server "github.com/euskadi31/go-server"
+	"github.com/euskadi31/go-server"
 	"github.com/hyperscale/hyperpic/fsutil"
 	"github.com/rs/zerolog/log"
 )

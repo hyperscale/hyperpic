@@ -8,7 +8,7 @@ import (
 	"context"
 	"net/http"
 
-	server "github.com/euskadi31/go-server"
+	"github.com/euskadi31/go-server"
 	"github.com/hyperscale/hyperpic/image"
 	"github.com/rs/zerolog/log"
 )

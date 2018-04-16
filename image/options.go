@@ -8,21 +8,13 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"regexp"
 
 	"github.com/h2non/bimg"
 	"github.com/rs/zerolog/log"
 )
 
-var (
-	cropMatcher = regexp.MustCompile("^crop-(\\d+)-(\\d+)")
-)
-
 // FitType type
 type FitType int
-
-// FilterType type
-type FilterType int
 
 // Fit
 const (
@@ -41,6 +33,9 @@ const (
 	FitCropBottomRight
 	FitCropFocalPoint
 )
+
+// FilterType type
+type FilterType int
 
 // Filter
 const (
