@@ -85,3 +85,24 @@ func TestOptionsToBimgWithFocalPoint(t *testing.T) {
 		StripMetadata: true,
 	}, o.ToBimg())
 }
+
+func TestOptionsToBimgWithBlur(t *testing.T) {
+	o := &Options{
+		Width:  200,
+		Height: 200,
+		Blur:   5,
+	}
+
+	assert.Equal(t, bimg.Options{
+		Width:         200,
+		Height:        200,
+		Crop:          false,
+		Enlarge:       true,
+		NoProfile:     true,
+		StripMetadata: true,
+		GaussianBlur: bimg.GaussianBlur{
+			Sigma:   2.5,
+			MinAmpl: 5,
+		},
+	}, o.ToBimg())
+}

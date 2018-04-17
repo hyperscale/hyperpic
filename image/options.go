@@ -177,6 +177,11 @@ func (o Options) ToBimg() bimg.Options {
 		// Interpolator: bimg.Bilinear,
 	}
 
+	if o.Blur > 0 {
+		opts.GaussianBlur.Sigma = 0.5 * float64(o.Blur)
+		opts.GaussianBlur.MinAmpl = 1.0 * float64(o.Blur)
+	}
+
 	if o.Crop.Height > 0 && o.Crop.Width > 0 {
 		opts.AreaHeight = o.Crop.Height
 		opts.AreaWidth = o.Crop.Width
