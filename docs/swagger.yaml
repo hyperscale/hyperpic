@@ -10,7 +10,7 @@ consumes:
   - "application/json"
 info:
   title: "Hyperpic API"
-  version: "v1.0.0"
+  version: "v1.1.0"
   x-logo:
     url: "https://cdn.rawgit.com/hyperscale/hyperpic/master/_resources/hyperpic.svg"
   description: Fast HTTP microservice for high-level image processing.
@@ -27,9 +27,9 @@ tags:
   - name: "Image"
     x-displayName: "Image"
     description: "Create and manage image"
-  - name: "Health"
-    x-displayName: "Health"
-    description: "Health check server"
+  - name: "Monitoring"
+    x-displayName: "Monitoring"
+    description: "Health check server and metrics"
 definitions:
   HealthResponse:
     type: "object"
@@ -94,6 +94,15 @@ definitions:
         code: 102
         message: "Something went wrong."
 paths:
+  /metrics:
+    get:
+      summary: "Prometheus metrics"
+      produces:
+        - "text/plain"
+      responses:
+        200:
+          description: "no error"
+      tags: ["Monitoring"]
   /health:
     get:
       summary: "healthcheck endpoint"
@@ -108,7 +117,7 @@ paths:
           description: "server error"
           schema:
             $ref: "#/definitions/ErrorResponse"
-      tags: ["Health"]
+      tags: ["Monitoring"]
   /{file}:
     delete:
       summary: "Delete image"
@@ -206,6 +215,9 @@ paths:
           in: "query"
           type: "string"
           description: "Sets how the image is fitted to its target dimensions."
+          enum:
+            - "crop"
+            - "crop-focal-point"
         - name: "dpr"
           in: "query"
           type: "integer"
@@ -218,6 +230,27 @@ paths:
           in: "query"
           type: "string"
           description: "Encodes the image to a specific format."
+          enum:
+            - "jpg"
+            - "png"
+            - "webp"
+        - name: "or"
+          in: "query"
+          type: "integer"
+          description: "Rotates the image."
+          enum:
+            - "0"
+            - "45"
+            - "90"
+            - "135"
+            - "180"
+            - "235"
+            - "270"
+            - "315"
+        - name: "blur"
+          in: "query"
+          type: "integer"
+          description: "Adds a blur effect to the image. Use values between 0 and 100."
       tags: ["Image"]
       x-code-samples:
         - lang: html

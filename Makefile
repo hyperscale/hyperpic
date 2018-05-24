@@ -7,8 +7,9 @@ IMAGE_DEV ?= $(IMAGE)-dev
 VERSION ?= $(shell git describe --match 'v[0-9]*' --dirty='-dev' --always)
 COMMIT ?= $(shell git rev-parse --short HEAD)
 
-LDFLAGS = -X "main.Revision=$(COMMIT)" -X "main.Version=$(VERSION)"
 PACKAGES = $(shell go list ./... | grep -v /vendor/)
+
+HYPERPIC_AUTH_SECRET ?= c8da8ded-f9a2-429c-8811-9b2a07de8ede
 
 release:
 	@echo "Release v$(version)"
@@ -44,14 +45,11 @@ vet:
 	@go vet $(PACKAGES)
 
 test:
-	@for PKG in $(PACKAGES); do go test -ldflags '-s -w $(LDFLAGS)' -cover -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || exit 1; done;
+	@CGO_LDFLAGS_ALLOW="-fopenmp" go test ./...
 
-travis:
-	@for PKG in $(PACKAGES); do go test -ldflags '-s -w $(LDFLAGS)' -cover -covermode=count -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || exit 1; done;
-
-cover: test
-	@echo ""
-	@for PKG in $(PACKAGES); do go tool cover -func $$GOPATH/src/$$PKG/coverage.out; echo ""; done;
+cover:
+	@CGO_LDFLAGS_ALLOW="-fopenmp" go test -cover -covermode=set -coverprofile=coverage.out ./...
+	@go tool cover -func ./coverage.out
 
 docker:
 	@sudo docker build --no-cache=true --rm -t $(IMAGE) .
@@ -66,13 +64,13 @@ publish: docker
 	@sudo docker tag $(IMAGE) $(IMAGE):latest
 	@sudo docker push $(IMAGE)
 
-bindata.go: docs/index.html docs/swagger.yaml
+asset/bindata.go: docs/index.html docs/swagger.yaml
 	@echo "Bin data..."
-	@go-bindata docs/
+	@go-bindata -pkg asset -o asset/bindata.go docs/
 
-$(EXECUTABLE): $(wildcard *.go)
+$(EXECUTABLE): $(shell find . -type f -print | grep -v vendor | grep "\.go") asset/bindata.go
 	@echo "Building $(EXECUTABLE)..."
-	@CGO_ENABLED=1 go build -ldflags '-s -w $(LDFLAGS)'
+	@CGO_ENABLED=1 go build ./cmd/hyperpic
 
 build: $(EXECUTABLE)
 
@@ -87,3 +85,11 @@ dev-test: dev-test-docker
 
 dev-run: dev-run-docker
 	@sudo docker run -e "HYPERPIC_AUTH_SECRET=c8da8ded-f9a2-429c-8811-9b2a07de8ede" -p 8574:8080 -v $(shell pwd)/var/lib/hyperpic:/var/lib/hyperpic --rm $(IMAGE_DEV)
+
+heroku:
+	@echo "Deploy Hyperpic on Heroku..."
+	@heroku container:push web --app=hyperpic
+
+upload-demo:
+	@curl -F 'image=@_resources/demo/kayaks.jpg' -H "Authorization: Bearer $(HYPERPIC_AUTH_SECRET)" https://hyperpic.herokuapp.com/kayaks.jpg
+	@curl -F 'image=@_resources/demo/smartcrop.jpg' -H "Authorization: Bearer $(HYPERPIC_AUTH_SECRET)" https://hyperpic.herokuapp.com/smartcrop.jpg

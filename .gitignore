@@ -6,4 +6,6 @@ var/
 !var/lib/hyperpic/cache/.gitkeep
 *.out
 hyperpic
+!cmd/hyperpic
 config.yml
+.coverage/
