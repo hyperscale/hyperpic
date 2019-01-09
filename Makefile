@@ -1,16 +1,23 @@
-.PHONY: all clean deps fmt vet test docker
-
-EXECUTABLE ?= hyperpic
-IMAGE ?= hyperscale/$(EXECUTABLE)
-IMAGE_TEST ?= $(IMAGE)-test
-IMAGE_DEV ?= $(IMAGE)-dev
+BUILD_DIR ?= build
+COMMIT = $(shell git rev-parse HEAD)
 VERSION ?= $(shell git describe --match 'v[0-9]*' --dirty='-dev' --always)
-COMMIT ?= $(shell git rev-parse --short HEAD)
+ORG := hyperscale
+PROJECT := hyperpic
+REPOPATH ?= github.com/$(ORG)/$(PROJECT)
+VERSION_PACKAGE = $(REPOPATH)/version
+IMAGE ?= $(ORG)/$(PROJECT)
 
-PACKAGES = $(shell go list ./... | grep -v /vendor/)
+GO_LDFLAGS :="
+GO_LDFLAGS += -X $(VERSION_PACKAGE).Version=$(VERSION)
+GO_LDFLAGS += -X $(VERSION_PACKAGE).BuildAt=$(shell date +'%Y-%m-%dT%H:%M:%SZ')
+GO_LDFLAGS += -X $(VERSION_PACKAGE).Revision=$(COMMIT)
+GO_LDFLAGS +="
+
+GO_FILES := $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
 HYPERPIC_AUTH_SECRET ?= c8da8ded-f9a2-429c-8811-9b2a07de8ede
 
+.PHONY: release
 release:
 	@echo "Release v$(version)"
 	@git pull
@@ -30,61 +37,81 @@ release:
 	@git checkout develop
 	@echo "Release v$(version) finished."
 
+.PHONY: all
 all: deps build test
 
+.PHONY: deps
+deps:
+	@go mod download
+
+.PHONY: clean
 clean:
 	@go clean -i ./...
 
-deps:
-	@glide install
+create-build-dir:
+	@mkdir -p $(BUILD_DIR)
 
-fmt:
-	@go fmt $(PACKAGES)
+$(BUILD_DIR)/coverage.out: $(GO_FILES) create-build-dir
+	@go test -race -cover -coverprofile $(BUILD_DIR)/coverage.out.tmp ./...
+	@cat $(BUILD_DIR)/coverage.out.tmp | grep -v '.pb.go' | grep -v 'mock_' > $(BUILD_DIR)/coverage.out
+	@rm $(BUILD_DIR)/coverage.out.tmp
 
-vet:
-	@go vet $(PACKAGES)
-
-test:
-	@CGO_LDFLAGS_ALLOW="-fopenmp" go test ./...
-
-cover:
-	@CGO_LDFLAGS_ALLOW="-fopenmp" go test -cover -covermode=set -coverprofile=coverage.out ./...
+.PHONY: ci-test
+ci-test:
+	@go test -race -cover -coverprofile ./coverage.out.tmp -v ./... | go2xunit -fail -output tests.xml
+	@cat ./coverage.out.tmp | grep -v '.pb.go' | grep -v 'mock_' > ./coverage.out
+	@rm ./coverage.out.tmp
+	@echo ""
 	@go tool cover -func ./coverage.out
 
-docker:
-	@sudo docker build --no-cache=true --rm -t $(IMAGE) .
+.PHONY: lint
+lint:
+	@golangci-lint run ./...
 
-dev-test-docker:
-	@sudo docker build -f Dockerfile.test --rm -t $(IMAGE_TEST) .
+.PHONY: test
+test: $(BUILD_DIR)/coverage.out
 
-dev-run-docker:
-	@sudo docker build -f Dockerfile.dev --rm -t $(IMAGE_DEV) .
+.PHONY: coverage
+coverage: $(BUILD_DIR)/coverage.out
+	@echo ""
+	@go tool cover -func ./$(BUILD_DIR)/coverage.out
 
-publish: docker
-	@sudo docker tag $(IMAGE) $(IMAGE):latest
-	@sudo docker push $(IMAGE)
+.PHONY: coverage-html
+coverage-html: $(BUILD_DIR)/coverage.out
+	@go tool cover -html ./$(BUILD_DIR)/coverage.out
 
 asset/bindata.go: docs/index.html docs/swagger.yaml
 	@echo "Bin data..."
 	@go-bindata -pkg asset -o asset/bindata.go docs/
 
-$(EXECUTABLE): $(shell find . -type f -print | grep -v vendor | grep "\.go") asset/bindata.go
-	@echo "Building $(EXECUTABLE)..."
-	@CGO_ENABLED=1 go build ./cmd/hyperpic
+${BUILD_DIR}/hyperpic: $(GO_FILES) asset/bindata.go
+	@echo "Building $@..."
+	@go generate ./cmd/$(subst ${BUILD_DIR}/,,$@)/
+	@go build -ldflags $(GO_LDFLAGS) -o $@ ./cmd/$(subst ${BUILD_DIR}/,,$@)/
 
-build: $(EXECUTABLE)
+.PHONY: run-hyperpic
+run-hyperpic: ${BUILD_DIR}/hyperpic
+	@echo "Running $<..."
+	@./$<
 
-run: docker
-	@sudo docker run -e "HYPERPIC_AUTH_SECRET=c8da8ded-f9a2-429c-8811-9b2a07de8ede" -p 8574:8080 -v $(shell pwd)/var/lib/hyperpic:/var/lib/hyperpic --rm $(IMAGE)
+.PHONY: run
+run: run-hyperpic
 
-dev: $(EXECUTABLE)
-	@./$(EXECUTABLE)
+.PHONY: run-docker
+run-docker: docker
+	@sudo docker run -e "HYPERPIC_AUTH_SECRET=$(HYPERPIC_AUTH_SECRET)" -p 8574:8080 -v $(shell pwd)/var/lib/hyperpic:/var/lib/hyperpic --rm $(IMAGE)
 
-dev-test: dev-test-docker
-	@sudo docker run --rm $(IMAGE_TEST)
+.PHONY: build
+build: ${BUILD_DIR}/hyperpic
 
-dev-run: dev-run-docker
-	@sudo docker run -e "HYPERPIC_AUTH_SECRET=c8da8ded-f9a2-429c-8811-9b2a07de8ede" -p 8574:8080 -v $(shell pwd)/var/lib/hyperpic:/var/lib/hyperpic --rm $(IMAGE_DEV)
+.PHONY: docker
+docker:
+	@sudo docker build --no-cache=true --rm -t $(IMAGE) .
+
+.PHONY: publish
+publish: docker
+	@sudo docker tag $(IMAGE) $(IMAGE):latest
+	@sudo docker push $(IMAGE)
 
 heroku:
 	@echo "Deploy Hyperpic on Heroku..."
