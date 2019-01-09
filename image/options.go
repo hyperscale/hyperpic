@@ -80,10 +80,12 @@ var fitToType = map[string]FitType{
 	"crop-focal-point":  FitCropFocalPoint,
 }
 
+/*
 var filterToType = map[string]FilterType{
 	"greyscale": FilterGreyscale,
 	"sepia":     FilterSepia,
 }
+*/
 
 // CropType struct
 type CropType struct {
@@ -106,13 +108,13 @@ type Options struct {
 	Gamma       float64        `schema:"gam"`
 	Sharpen     int            `schema:"sharp"`
 	Blur        int            `schema:"blur"`
-	pixel       int            `schema:"-"`
 	Filter      FilterType     `schema:"-"`
 	Background  []uint8        `schema:"bg"`
 	Quality     int            `schema:"q"`
 	Format      bimg.ImageType `schema:"fm"`
 	Compression int            `schema:"-"`
 	hash        string         `schema:"-"`
+	//pixel       int            `schema:"-"`
 }
 
 // Hash return hash of options
@@ -122,7 +124,7 @@ func (o *Options) Hash() string {
 	}
 
 	hasher := md5.New()
-	hasher.Write([]byte(fmt.Sprintf(
+	_, _ = hasher.Write([]byte(fmt.Sprintf(
 		"w=%d&h=%d&fit=%d&q=%d&fm=%d&dpr=%f&or=%d&bg=%v&bri=%d&con=%d&gam=%f&sharp=%d&blur=%d",
 		o.Width,
 		o.Height,

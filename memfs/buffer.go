@@ -7,7 +7,6 @@ package memfs
 import (
 	"errors"
 	"io"
-	"os"
 )
 
 // Buffer is a usable block of data similar to a file
@@ -49,11 +48,11 @@ func NewBuffer(buf *[]byte) *Buf {
 func (v *Buf) Seek(offset int64, whence int) (int64, error) {
 	var abs int64
 	switch whence {
-	case os.SEEK_SET: // Relative to the origin of the file
+	case io.SeekStart: // Relative to the origin of the file
 		abs = offset
-	case os.SEEK_CUR: // Relative to the current offset
+	case io.SeekCurrent: // Relative to the current offset
 		abs = int64(v.ptr) + offset
-	case os.SEEK_END: // Relative to the end
+	case io.SeekEnd: // Relative to the end
 		abs = int64(len(*v.buf)) + offset
 	default:
 		return 0, errors.New("Seek: invalid whence")

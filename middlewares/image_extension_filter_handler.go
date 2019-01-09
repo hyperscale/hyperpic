@@ -23,7 +23,7 @@ func NewImageExtensionFilterHandler(cfg *config.Configuration) func(http.Handler
 
 			log.Debug().Msgf("File ext: %s", ext)
 
-			if cfg.Image.Support.IsExtSupported(ext) == false {
+			if !cfg.Image.Support.IsExtSupported(ext) {
 				msg := fmt.Sprintf("File %s is not supported", r.URL.Path)
 
 				log.Debug().Msg(msg)
