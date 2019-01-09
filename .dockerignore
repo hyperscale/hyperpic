@@ -1,2 +1,6 @@
 var/*
-hyperpic
+build/
+_resources/
+TODO.md
+README.md
+.editorconfig

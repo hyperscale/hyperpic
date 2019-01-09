@@ -4,14 +4,14 @@ sudo: required
 dist: trusty
 
 go:
-  - 1.9.x
-  - 1.10.x
+  - 1.11.x
   - master
   - tip
 
 env:
   - LIBVIPS=8.5.9
   - LIBVIPS=8.6.3
+  - GO111MODULE=on
   global:
     - DOCKER_REGISTRY=registry.heroku.com
     - secure: MY1vayWZpblN1TtbH3bhbNobc+JyoXYdGM2AorVeNu3mUEa4tuHXQHT/hYXS4cdW2ckZJtF964zE1MN4xyg+dr7uu7knZzF5RK4Mr41hWZBHPfE+Lt7dTH7U2Wzor4Rn4bnPUS/obVXHRtNG6G/FKsz/S1De3YV7cda0KbehXsti5NJ8jj/FcXIDV/DvbDTceZcVFhQ2WCQqU110yRyLLMQJgZPEoOmLHFvVvzfV/wtfQ7kCL2HJ5QOLrT79dj579NL4AYFPIR0GCJ8V9cMSOwzy5acp/KUYxfGKGjQfgDVyQMMmVe6NOxJjcdlmdlQPfEUDW3dRviIV5Z8n8dZLTFMNS5bo3rzTOkuf7878B8ZI7ZyPaLUL9EGOSN1LWYyCkshwPwIzSqY6AEmu7DRCMoB2fwMblDbPHO9KnVWjgL9MRMnY7+FwgIIiLOxK1prNmiKeXCB7nqc44MfXgtpd1xxAxMGlfWBIbHaxrXsflCwYdqrpuD1dW2n5IVGIx6BxRaQJIB318PcqnflFkSVNPFYSArKP+PoZp7hWTu4u4EBAKCRGL0j244O1fHt4+2vgzYHGwakQPN9OXwTU5pojYP4g4MElnKp9s16hGMcjft2BWljBuVWssa46WV22vcaPJp8wjl4v/GcWdHrHI0vB/LR4q0QEjUiBrdbD+KUnV18= # DOCKER_USER
@@ -20,7 +20,6 @@ env:
 matrix:
   fast_finish: true
   allow_failures:
-    - go: 1.9.x
     - go: master
     - go: tip
 
@@ -75,16 +74,13 @@ before_install:
   - vips --vips-version
 
 install:
-  - go get golang.org/x/tools/cmd/cover
   - go get github.com/mattn/goveralls
-  - go get -u github.com/golang/dep/cmd/dep
-  - dep ensure
 
 script:
-  - make cover
+  - make coverage
 
 after_success:
-  - goveralls -coverprofile=coverage.out -service=travis-ci
+  - goveralls -coverprofile=./build/coverage.out -service=travis-ci
 #  - docker login -u $DOCKER_USER -p $DOCKER_PASS $DOCKER_REGISTRY
 
 #deploy:
