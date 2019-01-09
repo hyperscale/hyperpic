@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/h2non/bimg"
-	"gopkg.in/h2non/filetype.v1"
+	filetype "gopkg.in/h2non/filetype.v1"
 )
 
 // Image stores an image binary buffer and its MIME type
@@ -65,7 +65,7 @@ func ProcessImage(resource *Resource) error {
 	}
 
 	// Finally check if image MIME type is supported
-	if IsImageMimeTypeSupported(mimeType) == false {
+	if !IsImageMimeTypeSupported(mimeType) {
 		return fmt.Errorf("MimeType %s is not supported", mimeType)
 	}
 

@@ -6,12 +6,14 @@ package controllers
 
 import (
 	"crypto/md5"
+	"errors"
 	"fmt"
 	"io/ioutil"
+	"mime"
 	"net/http"
 	"os"
 
-	"github.com/euskadi31/go-server"
+	server "github.com/euskadi31/go-server"
 	"github.com/hyperscale/hyperpic/config"
 	"github.com/hyperscale/hyperpic/httputil"
 	"github.com/hyperscale/hyperpic/image"
@@ -20,7 +22,7 @@ import (
 	"github.com/hyperscale/hyperpic/provider"
 	"github.com/justinas/alice"
 	"github.com/rs/zerolog/log"
-	"gopkg.in/h2non/filetype.v1"
+	filetype "gopkg.in/h2non/filetype.v1"
 )
 
 // ImageController struct
@@ -141,24 +143,49 @@ func (c ImageController) GetHandler(w http.ResponseWriter, r *http.Request) {
 	metrics.ImageDeliveredBytes.With(map[string]string{}).Add(float64(len(resource.Body)))
 }
 
+func (c ImageController) parseImageFileFromRequest(r *http.Request) ([]byte, error) {
+	if r.Body == nil {
+		return nil, errors.New("missing form body")
+	}
+
+	ct := r.Header.Get("Content-Type")
+	// RFC 7231, section 3.1.1.5 - empty type
+	//   MAY be treated as application/octet-stream
+	if ct == "" {
+		ct = "application/octet-stream"
+	}
+
+	ct, _, err := mime.ParseMediaType(ct)
+	if err != nil {
+		return nil, err
+	}
+
+	switch ct {
+	case "multipart/form-data":
+		if err := r.ParseMultipartForm(32 << 20); err != nil {
+			return nil, err
+		}
+
+		file, _, err := r.FormFile("image")
+		if err != nil {
+			return nil, err
+		}
+
+		defer file.Close()
+
+		return ioutil.ReadAll(file)
+	default:
+		return ioutil.ReadAll(r.Body)
+	}
+}
+
 // PostHandler endpoint
 func (c ImageController) PostHandler(w http.ResponseWriter, r *http.Request) {
 	resource := &image.Resource{
 		Path: r.URL.Path,
 	}
 
-	r.ParseMultipartForm(32 << 20)
-
-	file, _, err := r.FormFile("image")
-	if err != nil {
-		server.FailureFromError(w, http.StatusBadRequest, err)
-
-		return
-	}
-
-	defer file.Close()
-
-	body, err := ioutil.ReadAll(file)
+	body, err := c.parseImageFileFromRequest(r)
 	if err != nil {
 		server.FailureFromError(w, http.StatusBadRequest, err)
 
@@ -174,7 +201,11 @@ func (c ImageController) PostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// delete cache from source file
-	go c.cacheProvider.Del(resource)
+	go func() {
+		if err := c.cacheProvider.Del(resource); err != nil {
+			log.Error().Err(err).Msg("CacheProvider.Del failed")
+		}
+	}()
 
 	mimeType := http.DetectContentType(body)
 
@@ -187,9 +218,7 @@ func (c ImageController) PostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h := md5.New()
-	h.Write(body)
-
-	lenght := len(body)
+	lenght, _ := h.Write(body)
 
 	server.JSON(w, http.StatusCreated, map[string]interface{}{
 		"file": r.URL.Path,

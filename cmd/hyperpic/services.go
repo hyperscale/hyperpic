@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/euskadi31/go-server"
-	"github.com/euskadi31/go-service"
+	server "github.com/euskadi31/go-server"
+	service "github.com/euskadi31/go-service"
 	"github.com/hyperscale/hyperpic/config"
 	"github.com/hyperscale/hyperpic/controllers"
 	"github.com/hyperscale/hyperpic/image"
@@ -38,19 +38,19 @@ var (
 
 // const of service name
 const (
-	ServiceLoggerKey          string = "service.logger"
-	ServiceConfigKey                 = "service.config"
-	ServiceRouterKey                 = "service.router"
-	ServiceOptionParserKey           = "service.options.parser"
-	ServiceSourceProviderKey         = "service.source.provider"
-	ServiceCacheProviderKey          = "service.cache.provider"
-	ServiceImageControllerKey        = "service.image.controller"
-	ServiceDocControllerKey          = "service.doc.controller"
+	ServiceLoggerKey          = "service.logger"
+	ServiceConfigKey          = "service.config"
+	ServiceRouterKey          = "service.router"
+	ServiceOptionParserKey    = "service.options.parser"
+	ServiceSourceProviderKey  = "service.source.provider"
+	ServiceCacheProviderKey   = "service.cache.provider"
+	ServiceImageControllerKey = "service.image.controller"
+	ServiceDocControllerKey   = "service.doc.controller"
 )
 
 func init() {
 	// Logger Service
-	container.Set(ServiceLoggerKey, func(c *service.Container) interface{} {
+	container.Set(ServiceLoggerKey, func(c service.Container) interface{} {
 		cfg := c.Get(ServiceConfigKey).(*config.Configuration)
 
 		logger := zerolog.New(os.Stdout).With().
@@ -75,13 +75,14 @@ func init() {
 	})
 
 	// Config Service
-	container.Set(ServiceConfigKey, func(c *service.Container) interface{} {
+	container.Set(ServiceConfigKey, func(c service.Container) interface{} {
 		var cfgFile string
 		cmd := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
 		cmd.StringVar(&cfgFile, "config", "", "config file (default is $HOME/config.yaml)")
 
 		// Ignore errors; cmd is set for ExitOnError.
+		//nolint: errcheck
 		cmd.Parse(os.Args[1:])
 
 		options := viper.New()
@@ -137,7 +138,7 @@ func init() {
 	})
 
 	// Source Provider Service
-	container.Set(ServiceSourceProviderKey, func(c *service.Container) interface{} {
+	container.Set(ServiceSourceProviderKey, func(c service.Container) interface{} {
 		cfg := c.Get(ServiceConfigKey).(*config.Configuration)
 
 		var source provider.SourceProvider
@@ -153,12 +154,12 @@ func init() {
 	})
 
 	// Options Parser Service
-	container.Set(ServiceOptionParserKey, func(c *service.Container) interface{} {
+	container.Set(ServiceOptionParserKey, func(c service.Container) interface{} {
 		return image.NewOptionParser()
 	})
 
 	// Cache Provider Service
-	container.Set(ServiceCacheProviderKey, func(c *service.Container) interface{} {
+	container.Set(ServiceCacheProviderKey, func(c service.Container) interface{} {
 		cfg := c.Get(ServiceConfigKey).(*config.Configuration)
 
 		var cache provider.CacheProvider
@@ -174,7 +175,7 @@ func init() {
 	})
 
 	// Doc Controller Service
-	container.Set(ServiceDocControllerKey, func(c *service.Container) interface{} {
+	container.Set(ServiceDocControllerKey, func(c service.Container) interface{} {
 		controller, err := controllers.NewDocController()
 		if err != nil {
 			log.Fatal().Err(err).Msg("Doc Controller")
@@ -184,7 +185,7 @@ func init() {
 	})
 
 	// Image Controller Service
-	container.Set(ServiceImageControllerKey, func(c *service.Container) interface{} {
+	container.Set(ServiceImageControllerKey, func(c service.Container) interface{} {
 		cfg := c.Get(ServiceConfigKey).(*config.Configuration)
 		optionParser := c.Get(ServiceOptionParserKey).(*image.OptionParser)
 		sourceProvider := c.Get(ServiceSourceProviderKey).(provider.SourceProvider)
@@ -204,7 +205,7 @@ func init() {
 	})
 
 	// Router Service
-	container.Set(ServiceRouterKey, func(c *service.Container) interface{} {
+	container.Set(ServiceRouterKey, func(c service.Container) interface{} {
 		logger := c.Get(ServiceLoggerKey).(zerolog.Logger)
 		cfg := c.Get(ServiceConfigKey).(*config.Configuration)
 		imageController := c.Get(ServiceImageControllerKey).(server.Controller)

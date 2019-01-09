@@ -94,7 +94,7 @@ func (p OptionParser) colorConverter(s string) reflect.Value {
 
 func (p OptionParser) angleConverter(s string) reflect.Value {
 	value, ok := orientationToType[s]
-	if ok == false {
+	if !ok {
 		return reflect.ValueOf(bimg.D0)
 	}
 
@@ -103,7 +103,7 @@ func (p OptionParser) angleConverter(s string) reflect.Value {
 
 func (p OptionParser) formatConverter(s string) reflect.Value {
 	value, ok := formatToType[s]
-	if ok == false {
+	if !ok {
 		return reflect.ValueOf(bimg.UNKNOWN)
 	}
 
@@ -112,7 +112,7 @@ func (p OptionParser) formatConverter(s string) reflect.Value {
 
 func (p OptionParser) fitConverter(s string) reflect.Value {
 	value, ok := fitToType[s]
-	if ok == false {
+	if !ok {
 		return reflect.ValueOf(FitContain)
 	}
 

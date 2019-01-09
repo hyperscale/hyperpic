@@ -6,9 +6,8 @@ require (
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20180315120708-ccb8e960c48f // indirect
 	github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973 // indirect
-	github.com/davecgh/go-spew v1.1.0 // indirect
 	github.com/euskadi31/go-server v0.0.0-20180110232149-06cb3249cade
-	github.com/euskadi31/go-service v1.0.0
+	github.com/euskadi31/go-service v1.3.0
 	github.com/fsnotify/fsnotify v1.4.7 // indirect
 	github.com/go-openapi/analysis v0.0.0-20180126163718-f59a71f0ece6 // indirect
 	github.com/go-openapi/errors v0.0.0-20171226161601-7bcb96a367ba // indirect
@@ -35,7 +34,6 @@ require (
 	github.com/mitchellh/mapstructure v0.0.0-20180220230111-00c29f56e238 // indirect
 	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/pelletier/go-toml v1.1.0 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v0.8.0
 	github.com/prometheus/client_model v0.0.0-20171117100541-99fa1f4be8e5 // indirect
 	github.com/prometheus/common v0.0.0-20180326160409-38c53a9f4bfc // indirect
@@ -48,7 +46,7 @@ require (
 	github.com/spf13/jwalterweatherman v0.0.0-20180109140146-7c0cea34c8ec // indirect
 	github.com/spf13/pflag v1.0.0 // indirect
 	github.com/spf13/viper v0.0.0-20180404183325-8dc2790b029d
-	github.com/stretchr/testify v1.2.1
+	github.com/stretchr/testify v1.2.2
 	github.com/zenazn/goji v0.0.0-20160507202103-64eb34159fe5 // indirect
 	golang.org/x/net v0.0.0-20180406214816-61147c48b25b // indirect
 	golang.org/x/sync v0.0.0-20181221193216-37e7f081c4d4 // indirect
