@@ -12,6 +12,7 @@ env:
   matrix:
     - LIBVIPS=8.5.9
     - LIBVIPS=8.6.3
+    - LIBVIPS=8.7.0
   global:
     - GO111MODULE=on
     - DOCKER_REGISTRY=registry.heroku.com

@@ -11,7 +11,7 @@ import (
 )
 
 func TestContainsDotDot(t *testing.T) {
-	expectes := []struct {
+	expects := []struct {
 		Value    string
 		Expected bool
 	}{
@@ -33,7 +33,7 @@ func TestContainsDotDot(t *testing.T) {
 		},
 	}
 
-	for _, item := range expectes {
+	for _, item := range expects {
 		if item.Expected {
 			assert.True(t, ContainsDotDot(item.Value))
 		} else {

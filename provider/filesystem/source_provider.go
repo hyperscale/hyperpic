@@ -110,9 +110,5 @@ func (p SourceProvider) Del(resource *image.Resource) error {
 
 	path := p.path + "/" + strings.TrimPrefix(resource.Path, "/")
 
-	if err := os.Remove(path); err != nil {
-		return err
-	}
-
-	return nil
+	return os.Remove(path)
 }

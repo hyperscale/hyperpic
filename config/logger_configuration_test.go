@@ -12,7 +12,7 @@ import (
 )
 
 func TestLoggerConfigurationLevel(t *testing.T) {
-	expectes := []struct {
+	expects := []struct {
 		Value    string
 		Expected zerolog.Level
 	}{
@@ -46,7 +46,7 @@ func TestLoggerConfigurationLevel(t *testing.T) {
 		},
 	}
 
-	for _, item := range expectes {
+	for _, item := range expects {
 		c := &LoggerConfiguration{
 			LevelName: item.Value,
 		}

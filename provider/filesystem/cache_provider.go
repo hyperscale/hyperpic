@@ -76,11 +76,7 @@ func (p CacheProvider) Del(resource *image.Resource) error {
 
 	path := p.config.Path + "/" + strings.TrimPrefix(resource.Path, "/")
 
-	if err := os.RemoveAll(path); err != nil {
-		return err
-	}
-
-	return nil
+	return os.RemoveAll(path)
 }
 
 // Get cached file
