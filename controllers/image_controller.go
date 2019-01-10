@@ -25,8 +25,7 @@ import (
 	filetype "gopkg.in/h2non/filetype.v1"
 )
 
-// ImageController struct
-type ImageController struct {
+type imageController struct {
 	cfg            *config.Configuration
 	optionParser   *image.OptionParser
 	sourceProvider provider.SourceProvider
@@ -39,8 +38,8 @@ func NewImageController(
 	optionParser *image.OptionParser,
 	sourceProvider provider.SourceProvider,
 	cacheProvider provider.CacheProvider,
-) (*ImageController, error) {
-	return &ImageController{
+) (server.Controller, error) {
+	return &imageController{
 		cfg:            cfg,
 		optionParser:   optionParser,
 		sourceProvider: sourceProvider,
@@ -49,7 +48,7 @@ func NewImageController(
 }
 
 // Mount endpoints
-func (c ImageController) Mount(r *server.Router) {
+func (c imageController) Mount(r *server.Router) {
 	chain := alice.New(
 		middlewares.NewPathHandler(),
 		middlewares.NewImageExtensionFilterHandler(c.cfg),
@@ -65,14 +64,16 @@ func (c ImageController) Mount(r *server.Router) {
 		middlewares.NewAuthHandler(c.cfg.Auth),
 	)
 
-	r.AddPrefixRoute("/", public.ThenFunc(c.GetHandler)).Methods(http.MethodGet)
-	r.AddPrefixRoute("/", private.ThenFunc(c.PostHandler)).Methods(http.MethodPost)
-	r.AddPrefixRoute("/", private.ThenFunc(c.DeleteHandler)).Methods(http.MethodDelete)
+	r.AddPrefixRoute("/", public.ThenFunc(c.getHandler)).Methods(http.MethodGet)
+	r.AddPrefixRoute("/", private.ThenFunc(c.postHandler)).Methods(http.MethodPost)
+	r.AddPrefixRoute("/", private.ThenFunc(c.deleteHandler)).Methods(http.MethodDelete)
 }
 
-// GetHandler endpoint
-func (c ImageController) GetHandler(w http.ResponseWriter, r *http.Request) {
-	options, err := middlewares.OptionsFromContext(r.Context())
+// GET /:file
+func (c imageController) getHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	options, err := middlewares.OptionsFromContext(ctx)
 	if err != nil {
 		log.Error().Err(err).Msg("Error while parsing options")
 
@@ -143,7 +144,7 @@ func (c ImageController) GetHandler(w http.ResponseWriter, r *http.Request) {
 	metrics.ImageDeliveredBytes.With(map[string]string{}).Add(float64(len(resource.Body)))
 }
 
-func (c ImageController) parseImageFileFromRequest(r *http.Request) ([]byte, error) {
+func (c imageController) parseImageFileFromRequest(r *http.Request) ([]byte, error) {
 	if r.Body == nil {
 		return nil, errors.New("missing form body")
 	}
@@ -179,8 +180,8 @@ func (c ImageController) parseImageFileFromRequest(r *http.Request) ([]byte, err
 	}
 }
 
-// PostHandler endpoint
-func (c ImageController) PostHandler(w http.ResponseWriter, r *http.Request) {
+// POST /:file
+func (c imageController) postHandler(w http.ResponseWriter, r *http.Request) {
 	resource := &image.Resource{
 		Path: r.URL.Path,
 	}
@@ -218,20 +219,20 @@ func (c ImageController) PostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h := md5.New()
-	lenght, _ := h.Write(body)
+	length, _ := h.Write(body)
 
 	server.JSON(w, http.StatusCreated, map[string]interface{}{
 		"file": r.URL.Path,
-		"size": lenght,
+		"size": length,
 		"type": mimeType,
 		"hash": fmt.Sprintf("%x", h.Sum(nil)),
 	})
 
-	metrics.ImageReceivedBytes.With(map[string]string{}).Add(float64(lenght))
+	metrics.ImageReceivedBytes.With(map[string]string{}).Add(float64(length))
 }
 
-// DeleteHandler endpoint
-func (c ImageController) DeleteHandler(w http.ResponseWriter, r *http.Request) {
+// DELETE /:file
+func (c imageController) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	resource := &image.Resource{
 		Path: r.URL.Path,
 	}
@@ -251,5 +252,5 @@ func (c ImageController) DeleteHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	server.JSON(w, http.StatusOK, resource)
+	server.JSON(w, http.StatusOK, response)
 }

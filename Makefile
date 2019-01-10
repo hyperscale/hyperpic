@@ -80,6 +80,9 @@ coverage: $(BUILD_DIR)/coverage.out
 coverage-html: $(BUILD_DIR)/coverage.out
 	@go tool cover -html ./$(BUILD_DIR)/coverage.out
 
+generate:
+	@go generate ./...
+
 asset/bindata.go: docs/index.html docs/swagger.yaml
 	@echo "Bin data..."
 	@go-bindata -pkg asset -o asset/bindata.go docs/
