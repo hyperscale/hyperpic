@@ -35,6 +35,7 @@ func NewConfiguration(options *viper.Viper) *Configuration {
 		},
 		Image: &ImageConfiguration{
 			Source: &ImageSourceConfiguration{
+				MaxSize:  int64(options.GetInt("image.source.max_size")),
 				Provider: options.GetString("image.source.provider"),
 				FS: &SourceFSConfiguration{
 					Path: options.GetString("image.source.fs.path"),

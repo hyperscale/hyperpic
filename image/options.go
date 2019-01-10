@@ -5,7 +5,7 @@
 package image
 
 import (
-	"crypto/md5"
+	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 
@@ -123,7 +123,7 @@ func (o *Options) Hash() string {
 		return o.hash
 	}
 
-	hasher := md5.New()
+	hasher := sha256.New()
 	_, _ = hasher.Write([]byte(fmt.Sprintf(
 		"w=%d&h=%d&fit=%d&q=%d&fm=%d&dpr=%f&or=%d&bg=%v&bri=%d&con=%d&gam=%f&sharp=%d&blur=%d",
 		o.Width,

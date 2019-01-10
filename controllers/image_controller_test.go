@@ -453,6 +453,9 @@ func TestImageControllerPostImageWithBadBody(t *testing.T) {
 			Secret: "foo",
 		},
 		Image: &config.ImageConfiguration{
+			Source: &config.ImageSourceConfiguration{
+				MaxSize: 10 << 20,
+			},
 			Support: &config.ImageSupportConfiguration{
 				Extensions: map[string]interface{}{
 					"jpg":  true,
@@ -490,18 +493,30 @@ func TestImageControllerParseImageFileFromRequestWithEmptyBody(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/kayaks.jpg", nil)
 	req.Body = nil
 
-	data, err := controller.parseImageFileFromRequest(req)
+	w := httptest.NewRecorder()
+
+	data, err := controller.parseImageFileFromRequest(w, req)
 	assert.Nil(t, data)
 	assert.Error(t, err)
 }
 
 func TestImageControllerParseImageFileFromRequestWithBadContentType(t *testing.T) {
-	controller := &imageController{}
+	controller := &imageController{
+		cfg: &config.Configuration{
+			Image: &config.ImageConfiguration{
+				Source: &config.ImageSourceConfiguration{
+					MaxSize: 10 << 20,
+				},
+			},
+		},
+	}
 
 	req := httptest.NewRequest(http.MethodPost, "/kayaks.jpg", nil)
 	req.Header.Set("Content-Type", "E34535;;/")
 
-	data, err := controller.parseImageFileFromRequest(req)
+	w := httptest.NewRecorder()
+
+	data, err := controller.parseImageFileFromRequest(w, req)
 	assert.Nil(t, data)
 	assert.Error(t, err)
 }
@@ -521,12 +536,22 @@ func TestImageControllerParseImageFileFromRequestMultipartWithBadField(t *testin
 
 	w.Close()
 
-	controller := &imageController{}
+	controller := &imageController{
+		cfg: &config.Configuration{
+			Image: &config.ImageConfiguration{
+				Source: &config.ImageSourceConfiguration{
+					MaxSize: 10 << 20,
+				},
+			},
+		},
+	}
 
 	req := httptest.NewRequest(http.MethodPost, "/kayaks.jpg", &b)
 	req.Header.Set("Content-Type", w.FormDataContentType())
 
-	data, err := controller.parseImageFileFromRequest(req)
+	wr := httptest.NewRecorder()
+
+	data, err := controller.parseImageFileFromRequest(wr, req)
 	assert.Nil(t, data)
 	assert.Error(t, err)
 }
@@ -546,14 +571,59 @@ func TestImageControllerParseImageFileFromRequestMultipart(t *testing.T) {
 
 	w.Close()
 
-	controller := &imageController{}
+	controller := &imageController{
+		cfg: &config.Configuration{
+			Image: &config.ImageConfiguration{
+				Source: &config.ImageSourceConfiguration{
+					MaxSize: 10 << 20,
+				},
+			},
+		},
+	}
 
 	req := httptest.NewRequest(http.MethodPost, "/kayaks.jpg", &b)
 	req.Header.Set("Content-Type", w.FormDataContentType())
 
-	data, err := controller.parseImageFileFromRequest(req)
+	wr := httptest.NewRecorder()
+
+	data, err := controller.parseImageFileFromRequest(wr, req)
 	assert.Equal(t, len(src), len(data))
 	assert.NoError(t, err)
+}
+
+func TestImageControllerParseImageFileFromRequestMultipartWithTooBigFile(t *testing.T) {
+	var b bytes.Buffer
+	w := multipart.NewWriter(&b)
+
+	src, err := ioutil.ReadFile("../_resources/demo/kayaks.jpg")
+	assert.NoError(t, err)
+
+	fw, err := w.CreateFormFile("image", "../_resources/demo/kayaks.jpg")
+	assert.NoError(t, err)
+
+	_, err = io.Copy(fw, bytes.NewReader(src))
+	assert.NoError(t, err)
+
+	w.Close()
+
+	controller := &imageController{
+		cfg: &config.Configuration{
+			Image: &config.ImageConfiguration{
+				Source: &config.ImageSourceConfiguration{
+					MaxSize: 100,
+				},
+			},
+		},
+	}
+
+	req := httptest.NewRequest(http.MethodPost, "/kayaks.jpg", &b)
+	req.Header.Set("Content-Type", w.FormDataContentType())
+
+	wr := httptest.NewRecorder()
+
+	data, err := controller.parseImageFileFromRequest(wr, req)
+	assert.Nil(t, data)
+	assert.EqualError(t, err, "http: request body too large")
 }
 
 func TestImageControllerPostImageWithFailOnSourceProviderSet(t *testing.T) {
@@ -565,6 +635,9 @@ func TestImageControllerPostImageWithFailOnSourceProviderSet(t *testing.T) {
 			Secret: "foo",
 		},
 		Image: &config.ImageConfiguration{
+			Source: &config.ImageSourceConfiguration{
+				MaxSize: 10 << 20,
+			},
 			Support: &config.ImageSupportConfiguration{
 				Extensions: map[string]interface{}{
 					"jpg":  true,
@@ -621,6 +694,9 @@ func TestImageControllerPostImage(t *testing.T) {
 			Secret: "foo",
 		},
 		Image: &config.ImageConfiguration{
+			Source: &config.ImageSourceConfiguration{
+				MaxSize: 10 << 20,
+			},
 			Support: &config.ImageSupportConfiguration{
 				Extensions: map[string]interface{}{
 					"jpg":  true,
@@ -678,7 +754,7 @@ func TestImageControllerPostImage(t *testing.T) {
 	defer resp.Body.Close()
 
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)
-	assert.JSONEq(t, `{"file": "/kayaks.jpg", "size": 256355, "type": "image/jpeg", "hash": "7f267455b649191f5e4f4d56b9766c6c"}`, string(actuel))
+	assert.JSONEq(t, `{"file": "/kayaks.jpg", "size": 256355, "type": "image/jpeg", "hash": "8138fdd61f7d8b3ac0d0f11cd2fe994fe37f8657cb93f6e8f818606294c7079e"}`, string(actuel))
 
 	cacheProvider.AssertExpectations(t)
 	sourceProvider.AssertExpectations(t)
