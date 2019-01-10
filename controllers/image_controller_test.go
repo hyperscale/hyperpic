@@ -656,7 +656,7 @@ func TestImageControllerPostImage(t *testing.T) {
 		}
 
 		return true
-	})).Return(errors.New("fail"))
+	})).Return(errors.New("fail")).Maybe()
 
 	controller, _ := NewImageController(cfg, optionsParser, sourceProvider, cacheProvider)
 
