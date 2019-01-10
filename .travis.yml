@@ -23,10 +23,10 @@ matrix:
     - go: master
     - go: tip
 
-cache:
-  apt:
-  directories:
-    - $HOME/libvips
+#cache:
+#  apt:
+#  directories:
+#    - $HOME/libvips
 
 addons:
   apt:
