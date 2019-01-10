@@ -6,6 +6,7 @@ package config
 
 // ImageSourceConfiguration struct
 type ImageSourceConfiguration struct {
+	MaxSize  int64
 	Provider string
 	FS       *SourceFSConfiguration
 }

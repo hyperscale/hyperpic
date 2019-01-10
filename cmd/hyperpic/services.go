@@ -100,6 +100,7 @@ func init() {
 		options.SetDefault("logger.level", "info")
 		options.SetDefault("logger.prefix", applicationName)
 		options.SetDefault("auth.secret", "")
+		options.SetDefault("image.source.max_size", 10<<20)
 		options.SetDefault("image.source.provider", "fs")
 		options.SetDefault("image.source.fs.path", basePath+"/source")
 		options.SetDefault("image.cache.provider", "fs")

@@ -157,8 +157,11 @@ paths:
         - "application/json"
       consumes:
         - multipart/form-data
+        - image/jpeg
+        - image/png
+        - image/webp
       responses:
-        200:
+        201:
           description: "no error"
           schema:
             $ref: "#/definitions/ImageUploadResponse"

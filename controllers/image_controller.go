@@ -5,7 +5,7 @@
 package controllers
 
 import (
-	"crypto/md5"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -144,10 +144,12 @@ func (c imageController) getHandler(w http.ResponseWriter, r *http.Request) {
 	metrics.ImageDeliveredBytes.With(map[string]string{}).Add(float64(len(resource.Body)))
 }
 
-func (c imageController) parseImageFileFromRequest(r *http.Request) ([]byte, error) {
+func (c imageController) parseImageFileFromRequest(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	if r.Body == nil {
 		return nil, errors.New("missing form body")
 	}
+
+	r.Body = http.MaxBytesReader(w, r.Body, c.cfg.Image.Source.MaxSize)
 
 	ct := r.Header.Get("Content-Type")
 	// RFC 7231, section 3.1.1.5 - empty type
@@ -163,7 +165,7 @@ func (c imageController) parseImageFileFromRequest(r *http.Request) ([]byte, err
 
 	switch ct {
 	case "multipart/form-data":
-		if err := r.ParseMultipartForm(32 << 20); err != nil {
+		if err := r.ParseMultipartForm(c.cfg.Image.Source.MaxSize); err != nil {
 			return nil, err
 		}
 
@@ -186,7 +188,7 @@ func (c imageController) postHandler(w http.ResponseWriter, r *http.Request) {
 		Path: r.URL.Path,
 	}
 
-	body, err := c.parseImageFileFromRequest(r)
+	body, err := c.parseImageFileFromRequest(w, r)
 	if err != nil {
 		server.FailureFromError(w, http.StatusBadRequest, err)
 
@@ -218,7 +220,7 @@ func (c imageController) postHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	h := md5.New()
+	h := sha256.New()
 	length, _ := h.Write(body)
 
 	server.JSON(w, http.StatusCreated, map[string]interface{}{
