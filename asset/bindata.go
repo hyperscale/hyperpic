@@ -102,7 +102,7 @@ func docsSwaggerYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "docs/swagger.yaml", size: 6759, mode: os.FileMode(420), modTime: time.Unix(1547123782, 0)}
+	info := bindataFileInfo{name: "docs/swagger.yaml", size: 6759, mode: os.FileMode(420), modTime: time.Unix(1547209621, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

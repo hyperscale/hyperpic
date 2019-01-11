@@ -189,7 +189,15 @@ func (c imageController) postHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	body, err := c.parseImageFileFromRequest(w, r)
-	if err != nil {
+	if err != nil && err.Error() == "http: request body too large" {
+		log.Error().Err(err).Msg("parseImageFileFromRequest failed")
+
+		server.FailureFromError(w, http.StatusRequestEntityTooLarge, err)
+
+		return
+	} else if err != nil {
+		log.Error().Err(err).Msg("parseImageFileFromRequest failed")
+
 		server.FailureFromError(w, http.StatusBadRequest, err)
 
 		return

@@ -685,6 +685,49 @@ func TestImageControllerPostImageWithFailOnSourceProviderSet(t *testing.T) {
 	assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 }
 
+func TestImageControllerPostImageWithTooLargeError(t *testing.T) {
+	data, err := ioutil.ReadFile("../_resources/demo/kayaks.jpg")
+	assert.NoError(t, err)
+
+	cfg := &config.Configuration{
+		Auth: &config.AuthConfiguration{
+			Secret: "foo",
+		},
+		Image: &config.ImageConfiguration{
+			Source: &config.ImageSourceConfiguration{
+				MaxSize: 1 << 10,
+			},
+			Support: &config.ImageSupportConfiguration{
+				Extensions: map[string]interface{}{
+					"jpg":  true,
+					"jpeg": true,
+					"png":  true,
+					"webp": true,
+				},
+			},
+		},
+	}
+
+	optionsParser := image.NewOptionParser()
+
+	controller, _ := NewImageController(cfg, optionsParser, nil, nil)
+
+	router := server.NewRouter()
+
+	router.AddController(controller)
+
+	req := httptest.NewRequest(http.MethodPost, "/kayaks.jpg", bytes.NewReader(data))
+	req.Header.Set("Authorization", "Bearer foo")
+
+	w := httptest.NewRecorder()
+
+	router.ServeHTTP(w, req)
+
+	resp := w.Result()
+
+	assert.Equal(t, http.StatusRequestEntityTooLarge, resp.StatusCode)
+}
+
 func TestImageControllerPostImage(t *testing.T) {
 	data, err := ioutil.ReadFile("../_resources/demo/kayaks.jpg")
 	assert.NoError(t, err)
