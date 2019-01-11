@@ -3,6 +3,9 @@ language: go
 sudo: required
 dist: trusty
 
+services:
+  - docker
+
 go:
   - 1.11.x
   - master
@@ -83,15 +86,17 @@ script:
 
 after_success:
   - goveralls -coverprofile=./build/coverage.out -service=travis-ci
-#  - docker login -u $DOCKER_USER -p $DOCKER_PASS $DOCKER_REGISTRY
 
-#deploy:
-#  - provider: script
-#    script: scripts/deploy.sh $TRAVIS_TAG
-#    on:
-#      tags: true
-#      branch: master
+before_deploy:
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
 
-#deploy:
-#  on:
-#    condition: $TRAVIS_GO_VERSION =~ ^1\.8\.[0-9]+$
+deploy:
+  - provider: script
+    script: scripts/deploy.sh
+    on:
+      tags: true
+  - provider: script
+    script: scripts/deploy.sh
+    on:
+      tags: false
+      branch: develop
