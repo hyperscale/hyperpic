@@ -62,6 +62,7 @@ fi
 
 # pushing only in CI mode
 if [ "$CI" == "true" ]; then
+    docker login -u $DOCKER_USER -p $DOCKER_PASS
     echo "Pushing $DOCKER_ORGANISATION/$DOCKER_REPO:$DOCKER_TAG..."
     docker push "$DOCKER_ORGANISATION/$DOCKER_REPO:$DOCKER_TAG"
 
