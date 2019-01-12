@@ -3,13 +3,14 @@ ARG VERSION
 ARG VCS_URL
 ARG VCS_REF
 ARG BUILD_DATE
+ENV GO111MODULE on
 ENV GOPATH /go
 RUN echo "http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
-RUN apk --no-cache --update add vips-dev go make git musl-dev fftw-dev
+RUN echo "http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories
+RUN apk --no-cache --force-overwrite --update add vips-dev go make git libc6-compat build-base fftw-dev --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --repository http://dl-3.alpinelinux.org/alpine/edge/main
+RUN go version
 WORKDIR /go/src/github.com/hyperscale/hyperpic/
-RUN go get -u github.com/golang/dep/cmd/dep
 COPY . .
-RUN /go/bin/dep ensure
 RUN go build -ldflags "-X github.com/hyperscale/hyperpic/version.Version=${VERSION} -X github.com/hyperscale/hyperpic/version.Revision=${VCS_REF} -X github.com/hyperscale/hyperpic/version.BuildAt=${BUILD_DATE}" ./cmd/hyperpic/
 
 FROM alpine:edge
@@ -22,7 +23,8 @@ HEALTHCHECK --interval=10s --timeout=3s CMD curl -f http://localhost:${PORT}/hea
 EXPOSE ${PORT}
 VOLUME /var/lib/hyperpic
 RUN echo "http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
-RUN apk --no-cache --update add ca-certificates curl vips
+RUN echo "http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories
+RUN apk --no-cache --force-overwrite --update add ca-certificates curl vips expat libc6-compat --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --repository http://dl-3.alpinelinux.org/alpine/edge/main
 WORKDIR /root/
 COPY --from=builder /go/src/github.com/hyperscale/hyperpic/hyperpic .
 COPY --from=builder /go/src/github.com/hyperscale/hyperpic/config.yml.dist /etc/hyperpic/config.yml

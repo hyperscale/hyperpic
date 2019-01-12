@@ -5,13 +5,15 @@
 package controllers
 
 import (
-	"crypto/md5"
+	"crypto/sha256"
+	"errors"
 	"fmt"
 	"io/ioutil"
+	"mime"
 	"net/http"
 	"os"
 
-	"github.com/euskadi31/go-server"
+	server "github.com/euskadi31/go-server"
 	"github.com/hyperscale/hyperpic/config"
 	"github.com/hyperscale/hyperpic/httputil"
 	"github.com/hyperscale/hyperpic/image"
@@ -20,11 +22,10 @@ import (
 	"github.com/hyperscale/hyperpic/provider"
 	"github.com/justinas/alice"
 	"github.com/rs/zerolog/log"
-	"gopkg.in/h2non/filetype.v1"
+	filetype "gopkg.in/h2non/filetype.v1"
 )
 
-// ImageController struct
-type ImageController struct {
+type imageController struct {
 	cfg            *config.Configuration
 	optionParser   *image.OptionParser
 	sourceProvider provider.SourceProvider
@@ -37,8 +38,8 @@ func NewImageController(
 	optionParser *image.OptionParser,
 	sourceProvider provider.SourceProvider,
 	cacheProvider provider.CacheProvider,
-) (*ImageController, error) {
-	return &ImageController{
+) (server.Controller, error) {
+	return &imageController{
 		cfg:            cfg,
 		optionParser:   optionParser,
 		sourceProvider: sourceProvider,
@@ -47,7 +48,7 @@ func NewImageController(
 }
 
 // Mount endpoints
-func (c ImageController) Mount(r *server.Router) {
+func (c imageController) Mount(r *server.Router) {
 	chain := alice.New(
 		middlewares.NewPathHandler(),
 		middlewares.NewImageExtensionFilterHandler(c.cfg),
@@ -63,14 +64,16 @@ func (c ImageController) Mount(r *server.Router) {
 		middlewares.NewAuthHandler(c.cfg.Auth),
 	)
 
-	r.AddPrefixRoute("/", public.ThenFunc(c.GetHandler)).Methods(http.MethodGet)
-	r.AddPrefixRoute("/", private.ThenFunc(c.PostHandler)).Methods(http.MethodPost)
-	r.AddPrefixRoute("/", private.ThenFunc(c.DeleteHandler)).Methods(http.MethodDelete)
+	r.AddPrefixRoute("/", public.ThenFunc(c.getHandler)).Methods(http.MethodGet)
+	r.AddPrefixRoute("/", private.ThenFunc(c.postHandler)).Methods(http.MethodPost)
+	r.AddPrefixRoute("/", private.ThenFunc(c.deleteHandler)).Methods(http.MethodDelete)
 }
 
-// GetHandler endpoint
-func (c ImageController) GetHandler(w http.ResponseWriter, r *http.Request) {
-	options, err := middlewares.OptionsFromContext(r.Context())
+// GET /:file
+func (c imageController) getHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	options, err := middlewares.OptionsFromContext(ctx)
 	if err != nil {
 		log.Error().Err(err).Msg("Error while parsing options")
 
@@ -141,25 +144,60 @@ func (c ImageController) GetHandler(w http.ResponseWriter, r *http.Request) {
 	metrics.ImageDeliveredBytes.With(map[string]string{}).Add(float64(len(resource.Body)))
 }
 
-// PostHandler endpoint
-func (c ImageController) PostHandler(w http.ResponseWriter, r *http.Request) {
+func (c imageController) parseImageFileFromRequest(w http.ResponseWriter, r *http.Request) ([]byte, error) {
+	if r.Body == nil {
+		return nil, errors.New("missing form body")
+	}
+
+	r.Body = http.MaxBytesReader(w, r.Body, c.cfg.Image.Source.MaxSize)
+
+	ct := r.Header.Get("Content-Type")
+	// RFC 7231, section 3.1.1.5 - empty type
+	//   MAY be treated as application/octet-stream
+	if ct == "" {
+		ct = "application/octet-stream"
+	}
+
+	ct, _, err := mime.ParseMediaType(ct)
+	if err != nil {
+		return nil, err
+	}
+
+	switch ct {
+	case "multipart/form-data":
+		if err := r.ParseMultipartForm(c.cfg.Image.Source.MaxSize); err != nil {
+			return nil, err
+		}
+
+		file, _, err := r.FormFile("image")
+		if err != nil {
+			return nil, err
+		}
+
+		defer file.Close()
+
+		return ioutil.ReadAll(file)
+	default:
+		return ioutil.ReadAll(r.Body)
+	}
+}
+
+// POST /:file
+func (c imageController) postHandler(w http.ResponseWriter, r *http.Request) {
 	resource := &image.Resource{
 		Path: r.URL.Path,
 	}
 
-	r.ParseMultipartForm(32 << 20)
+	body, err := c.parseImageFileFromRequest(w, r)
+	if err != nil && err.Error() == "http: request body too large" {
+		log.Error().Err(err).Msg("parseImageFileFromRequest failed")
 
-	file, _, err := r.FormFile("image")
-	if err != nil {
-		server.FailureFromError(w, http.StatusBadRequest, err)
+		server.FailureFromError(w, http.StatusRequestEntityTooLarge, err)
 
 		return
-	}
+	} else if err != nil {
+		log.Error().Err(err).Msg("parseImageFileFromRequest failed")
 
-	defer file.Close()
-
-	body, err := ioutil.ReadAll(file)
-	if err != nil {
 		server.FailureFromError(w, http.StatusBadRequest, err)
 
 		return
@@ -174,7 +212,11 @@ func (c ImageController) PostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// delete cache from source file
-	go c.cacheProvider.Del(resource)
+	go func() {
+		if err := c.cacheProvider.Del(resource); err != nil {
+			log.Error().Err(err).Msg("CacheProvider.Del failed")
+		}
+	}()
 
 	mimeType := http.DetectContentType(body)
 
@@ -186,23 +228,21 @@ func (c ImageController) PostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	h := md5.New()
-	h.Write(body)
-
-	lenght := len(body)
+	h := sha256.New()
+	length, _ := h.Write(body)
 
 	server.JSON(w, http.StatusCreated, map[string]interface{}{
 		"file": r.URL.Path,
-		"size": lenght,
+		"size": length,
 		"type": mimeType,
 		"hash": fmt.Sprintf("%x", h.Sum(nil)),
 	})
 
-	metrics.ImageReceivedBytes.With(map[string]string{}).Add(float64(lenght))
+	metrics.ImageReceivedBytes.With(map[string]string{}).Add(float64(length))
 }
 
-// DeleteHandler endpoint
-func (c ImageController) DeleteHandler(w http.ResponseWriter, r *http.Request) {
+// DELETE /:file
+func (c imageController) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	resource := &image.Resource{
 		Path: r.URL.Path,
 	}
@@ -222,5 +262,5 @@ func (c ImageController) DeleteHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	server.JSON(w, http.StatusOK, resource)
+	server.JSON(w, http.StatusOK, response)
 }

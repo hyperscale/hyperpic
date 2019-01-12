@@ -9,6 +9,7 @@ import (
 )
 
 // SourceProvider interface
+//go:generate mockery -case=underscore -inpkg -name=SourceProvider
 type SourceProvider interface {
 	Get(resource *image.Resource) (*image.Resource, error)
 

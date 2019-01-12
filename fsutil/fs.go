@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// ContainsDotDot return true if string contains ..
 func ContainsDotDot(v string) bool {
 	if !strings.Contains(v, "..") {
 		return false

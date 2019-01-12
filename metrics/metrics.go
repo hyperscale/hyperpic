@@ -36,8 +36,8 @@ var CacheMiss = prometheus.NewCounterVec(
 // ImageDeliveredBytes counter
 var ImageDeliveredBytes = prometheus.NewCounterVec(
 	prometheus.CounterOpts{
-		Name: "image_delivere_bytes",
-		Help: "The bytes of image delivere.",
+		Name: "image_delivered_bytes",
+		Help: "The bytes of image delivered.",
 	},
 	[]string{},
 )

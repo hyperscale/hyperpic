@@ -26,7 +26,9 @@ func parseFloat(value string) float64 {
 func NewClientHintsHandler() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			options, err := OptionsFromContext(r.Context())
+			ctx := r.Context()
+
+			options, err := OptionsFromContext(ctx)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 
@@ -52,7 +54,7 @@ func NewClientHintsHandler() func(http.Handler) http.Handler {
 				w.Header().Add("Vary", "Save-Data")
 			}
 
-			r = r.WithContext(NewOptionsContext(r.Context(), options))
+			r = r.WithContext(NewOptionsContext(ctx, options))
 
 			next.ServeHTTP(w, r)
 		})

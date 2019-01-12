@@ -17,10 +17,10 @@ func TestOptionsHash(t *testing.T) {
 		Height: 400,
 	}
 
-	assert.Equal(t, "da5ceb1b0d0efd7b6df45877aab6ed9c", o.Hash())
+	assert.Equal(t, "619a9e108e52e84031672a4ce9e1588bda14b54a3a2bd3b95267544e59753014", o.Hash())
 
 	// Test static cache
-	assert.Equal(t, "da5ceb1b0d0efd7b6df45877aab6ed9c", o.Hash())
+	assert.Equal(t, "619a9e108e52e84031672a4ce9e1588bda14b54a3a2bd3b95267544e59753014", o.Hash())
 }
 
 func TestOptionsToBimg(t *testing.T) {

@@ -9,6 +9,7 @@ import (
 )
 
 // CacheProvider interface
+//go:generate mockery -case=underscore -inpkg -name=CacheProvider
 type CacheProvider interface {
 	Get(resource *image.Resource) (*image.Resource, error)
 

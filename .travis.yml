@@ -3,24 +3,27 @@ language: go
 sudo: required
 dist: trusty
 
+services:
+  - docker
+
 go:
-  - 1.9.x
-  - 1.10.x
+  - 1.11.x
   - master
   - tip
 
 env:
-  - LIBVIPS=8.5.9
-  - LIBVIPS=8.6.3
+  matrix:
+    - LIBVIPS=8.5.9
+    - LIBVIPS=8.6.3
+    - LIBVIPS=8.7.0
   global:
-    - DOCKER_REGISTRY=registry.heroku.com
-    - secure: MY1vayWZpblN1TtbH3bhbNobc+JyoXYdGM2AorVeNu3mUEa4tuHXQHT/hYXS4cdW2ckZJtF964zE1MN4xyg+dr7uu7knZzF5RK4Mr41hWZBHPfE+Lt7dTH7U2Wzor4Rn4bnPUS/obVXHRtNG6G/FKsz/S1De3YV7cda0KbehXsti5NJ8jj/FcXIDV/DvbDTceZcVFhQ2WCQqU110yRyLLMQJgZPEoOmLHFvVvzfV/wtfQ7kCL2HJ5QOLrT79dj579NL4AYFPIR0GCJ8V9cMSOwzy5acp/KUYxfGKGjQfgDVyQMMmVe6NOxJjcdlmdlQPfEUDW3dRviIV5Z8n8dZLTFMNS5bo3rzTOkuf7878B8ZI7ZyPaLUL9EGOSN1LWYyCkshwPwIzSqY6AEmu7DRCMoB2fwMblDbPHO9KnVWjgL9MRMnY7+FwgIIiLOxK1prNmiKeXCB7nqc44MfXgtpd1xxAxMGlfWBIbHaxrXsflCwYdqrpuD1dW2n5IVGIx6BxRaQJIB318PcqnflFkSVNPFYSArKP+PoZp7hWTu4u4EBAKCRGL0j244O1fHt4+2vgzYHGwakQPN9OXwTU5pojYP4g4MElnKp9s16hGMcjft2BWljBuVWssa46WV22vcaPJp8wjl4v/GcWdHrHI0vB/LR4q0QEjUiBrdbD+KUnV18= # DOCKER_USER
-    - secure: Fd5cCYLvIcjc0eNMOrkXsR5ySzGQaAox9QBIF62Z1vo2sx9LzxW2O+oaPB+rEJmfE+l1MXACl3yioGir9EZuFLgNbKz1lJ0pJcnTu/rVt46AmMKx+ZgmRA/xDMYabehlYb9rrWt1vitLPFCZPKOiSvqbGoLFAbq+A40s86MLJkdhV4Z7VuMy8EiWBLGTe35WbmgwXLhgW+TTcgF8VGbV7ns1v2iEj5k94BM/g3Yy65bkhKzTWAugPqKZ2zVobtA1CwO4FTCi4LF7B5jXQPuhrxD04w616GFBxS1KNSPywza5SBfIYRzrwcHbe216JaWeapDGkNLOSWKbNaV5dnAdzdUHTsyWUqs7L5AQjYPtJk7GF7MCroK4N7Xcu4HMW1FV6O2lODM0jfpb22xP0SW4Q+EtgQWWLFW3EiOmaT1TIbMDJVbWOeiu7yfLbdntKS7N54/QwMIzADfYPJ4jVh8diMLYXxYcdUPB44pdszuu7TucKHYkNVtcfjK9gUBUP+ooGdjFt2fkYX4EHbfo56EWDzCfJxMJjJEI3A8TQ27+Ma0zZlXbyOAeg/1iSKE1e9Zi+rKao+87u4xXc4TPb+RdGlVs6Er/jiVhDo/eEBUkHOGnzBUdAV/y9sGrdBu7fQkbEHTAWtoCs1c2sOqc60Bkb6m9eHo6gO0IvLOEWU34Myg= # DOCKER_PASS
+    - GO111MODULE=on
+    - secure: "J1RMy1EvaaETsSxKXe2T1j9KcQDAgMb3On0+3Nd+Puq2ZVbBuGgYmh8eR4bYpG5RPN9MZPf4/zfaTugAD3cT0Ks1H1aFy/1LS4/Vrh+ppxWh7Xuj/A0Y5HAzC5dFMI7s9DU4OeRp/6bE229Cg3nJFIqGuOgsr066PQ2QeXYYtNOiYWgj2BE20KGlQgHeowocTKjPYgmxbAdHHU7bqrr1mcmMPMWnjzVHyphbWj2WnafAZ0AhSk9LCABVfUCUmMXnMddHfn/J/vCMbh1Cm105eKnRKFqrlqyfg/Owb17vN/EbB4KoqNW/OIEqZMO+Frf5U1AePudLZUqy1ZuChFS0g7GdMgNDw6IkZ0nPJ76PlGyUIJrl8hpAFhHqccan0PRVnzki1DCspDL9GBU13SZmZQUwNkFf1vWehXywUJaJ6mBVgrXdeNOvpU0W9sI+QC6tOZq42FT4yTS1jYeLOYhbgcmk6TY8JJGCN3/3G/kMB2e2CONudAryo09yZdWIquFaAWK0eN4ld1k5oYcTAWsYN8Gz2Ett/twvTgdrMnEUZlwO0h9HE629FG/0r+U7vLXnnT+reeSLfJsVDaYbO/jKuMD57zMOWNbiSM2orqqFlnclShSAyRHaXuCbf55SkLqxIWdlKlDgvMwVUqNJ4VnVt6AwOgBUvLouBI11ZNOWv0k=" # DOCKER_USER
+    - secure: "Uzl9KwJUpAImAuA6ig4q3/6IotZd9LXSJxucbvZ/nZN3mGknFffLJDlDQ/+wPgqDbnNwrHKhp7HhIw2SPeyHcR+8w4HQJvdA3T1UKfERYnrxwjHti6dmM/HM0h7CqTP8GncCh3HtD6mSeluOVF4gULF06u+andEae+a7AupIuZELtxz/+aFi4uRxa3rf2Ya0FPU9NoJoI29cwclhX/ywWUtV0eMuoX4P6qGS/8M60HPLqPvMUsXfLdiwJztp2vpIJFvNg5AzZrYNjAKWyHGX6KAf4OhtMrsqkFen5iFvVuFcfJBP1COJ+kw/mxH4wESF1j4vPAXJDTyObjpuTPuLzMNTiMVet9bCJEmZkyjogIxIPMcT8o+iorgpUk+NsXpavc+IjfhTOnS11xvALWbRXZrlkXNWO6gcK0y49WvZuwQ1t46nOas5QQ3ToP6aQtarxNYUIsHZkUWQuBMifrMOURR3Gbyid9UYFDIMuDNBov5tDYClPHMVFu2s9GkOzu6Xqm4bGT8MJdQDKMQ7NA1hocyR20v7oWiZJ7niL26BngX244kGEIV53wbPvqJ94rh6Gm9YS11/QxSqUR6wk5Z6trVLqSjmWBaPYt008FmfLxSlwjxN4HAYO2fAZXr+uLifaT5La+3F8kQDYw6Pf4SnL5N6GbLlvrLmsBTeBBJVugY=" # DOCKER_PASS
 
 matrix:
   fast_finish: true
   allow_failures:
-    - go: 1.9.x
     - go: master
     - go: tip
 
@@ -28,6 +31,8 @@ cache:
   apt:
   directories:
     - $HOME/libvips
+    - $HOME/.cache/go-build
+    - $HOME/gopath/pkg/mod
 
 addons:
   apt:
@@ -75,25 +80,28 @@ before_install:
   - vips --vips-version
 
 install:
-  - go get golang.org/x/tools/cmd/cover
   - go get github.com/mattn/goveralls
-  - go get -u github.com/golang/dep/cmd/dep
-  - dep ensure
 
 script:
-  - make cover
+  - make coverage
 
 after_success:
-  - goveralls -coverprofile=coverage.out -service=travis-ci
-#  - docker login -u $DOCKER_USER -p $DOCKER_PASS $DOCKER_REGISTRY
+  - goveralls -coverprofile=./build/coverage.out -service=travis-ci
 
-#deploy:
-#  - provider: script
-#    script: scripts/deploy.sh $TRAVIS_TAG
-#    on:
-#      tags: true
-#      branch: master
+before_deploy:
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
 
-#deploy:
-#  on:
-#    condition: $TRAVIS_GO_VERSION =~ ^1\.8\.[0-9]+$
+deploy:
+  - provider: script
+    script: scripts/deploy.sh
+    skip_cleanup: true
+    on:
+      tags: true
+      condition: $LIBVIPS = 8.7.0
+  - provider: script
+    script: scripts/deploy.sh
+    skip_cleanup: true
+    on:
+      tags: false
+      branch: develop
+      condition: $LIBVIPS = 8.7.0

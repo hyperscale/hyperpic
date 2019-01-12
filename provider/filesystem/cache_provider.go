@@ -39,7 +39,7 @@ func NewCacheProvider(cfg *config.CacheFSConfiguration) *CacheProvider {
 func (p *CacheProvider) removeOldCacheFile(path string, f os.FileInfo, err error) error {
 	now := time.Now()
 
-	if f.IsDir() == false && now.After(f.ModTime().Add(p.config.LifeTime)) {
+	if !f.IsDir() && now.After(f.ModTime().Add(p.config.LifeTime)) {
 		log.Debug().Msgf("Remove file %s", path)
 		if err := os.Remove(path); err != nil {
 			return err
@@ -54,20 +54,16 @@ func (p *CacheProvider) Run() {
 	log.Debug().Msg("Cleanner running")
 
 	ticker := time.NewTicker(p.config.CleanInterval)
-	// defer ticker.Stop()
 
 	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				log.Debug().Msg("Start cleaning")
+		for range ticker.C {
+			log.Debug().Msg("Start cleaning")
 
-				if err := filepath.Walk(p.config.Path, p.removeOldCacheFile); err != nil {
-					log.Error().Err(err).Msgf("Walk on %s", p.config.Path)
-				}
-
-				log.Debug().Msg("End cleaning")
+			if err := filepath.Walk(p.config.Path, p.removeOldCacheFile); err != nil {
+				log.Error().Err(err).Msgf("Walk on %s", p.config.Path)
 			}
+
+			log.Debug().Msg("End cleaning")
 		}
 	}()
 }
@@ -80,11 +76,7 @@ func (p CacheProvider) Del(resource *image.Resource) error {
 
 	path := p.config.Path + "/" + strings.TrimPrefix(resource.Path, "/")
 
-	if err := os.RemoveAll(path); err != nil {
-		return err
-	}
-
-	return nil
+	return os.RemoveAll(path)
 }
 
 // Get cached file

@@ -1,4 +1,4 @@
-Hyperpic ![Last release](https://img.shields.io/github/release/hyperscale/hyperpic.svg) 
+Hyperpic [![Last release](https://img.shields.io/github/release/hyperscale/hyperpic.svg)](https://github.com/hyperscale/hyperpic/releases/latest) [![](https://img.shields.io/docker/pulls/hyperscale/hyperpic.svg)](https://hub.docker.com/r/hyperscale/hyperpic)
 ========
 
 ![Reactive logo](https://cdn.rawgit.com/hyperscale/hyperpic/master/_resources/hyperpic.svg "Hyperpic logo")
@@ -6,10 +6,10 @@ Hyperpic ![Last release](https://img.shields.io/github/release/hyperscale/hyperp
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/hyperscale/hyperpic)](https://goreportcard.com/report/github.com/hyperscale/hyperpic)
 
-| Branch  | Status | Coverage |
-|---------|--------|----------|
-| master  | [![Build Status](https://img.shields.io/travis/hyperscale/hyperpic/master.svg)](https://travis-ci.org/hyperscale/hyperpic) | [![Coveralls](https://img.shields.io/coveralls/hyperscale/hyperpic/master.svg)](https://coveralls.io/github/hyperscale/hyperpic?branch=master) |
-| develop | [![Build Status](https://img.shields.io/travis/hyperscale/hyperpic/develop.svg)](https://travis-ci.org/hyperscale/hyperpic) | [![Coveralls](https://img.shields.io/coveralls/hyperscale/hyperpic/develop.svg)](https://coveralls.io/github/hyperscale/hyperpic?branch=develop) |
+| Branch  | Status | Coverage | Docker |
+|---------|--------|----------|--------|
+| master  | [![Build Status](https://img.shields.io/travis/hyperscale/hyperpic/master.svg)](https://travis-ci.org/hyperscale/hyperpic) | [![Coveralls](https://img.shields.io/coveralls/hyperscale/hyperpic/master.svg)](https://coveralls.io/github/hyperscale/hyperpic?branch=master) | [![](https://img.shields.io/microbadger/image-size/hyperscale/hyperpic/latest.svg)](https://hub.docker.com/r/hyperscale/hyperpic) |
+| develop | [![Build Status](https://img.shields.io/travis/hyperscale/hyperpic/develop.svg)](https://travis-ci.org/hyperscale/hyperpic) | [![Coveralls](https://img.shields.io/coveralls/hyperscale/hyperpic/develop.svg)](https://coveralls.io/github/hyperscale/hyperpic?branch=develop) | [![](https://img.shields.io/microbadger/image-size/hyperscale/hyperpic/dev.svg)](https://hub.docker.com/r/hyperscale/hyperpic) |
 
 Fast HTTP microservice for high-level image processing.
 
@@ -27,11 +27,6 @@ docker pull hyperscale/hyperpic
 Install libvips:
 ```shell
 brew install homebrew/science/vips --with-webp
-```
-
-Install dependencies with golang dep:
-```shell
-dep ensure
 ```
 
 Build hyperpic:

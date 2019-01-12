@@ -7,45 +7,34 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/euskadi31/go-server"
+	server "github.com/euskadi31/go-server"
 	"github.com/hyperscale/hyperpic/asset"
 	"github.com/hyperscale/hyperpic/memfs"
 )
 
-// DocController struct
-type DocController struct {
+type docController struct {
 }
 
 // NewDocController func
-func NewDocController() (*DocController, error) {
-	return &DocController{}, nil
+func NewDocController() (server.Controller, error) {
+	return &docController{}, nil
 }
 
 // Mount endpoints
-func (c DocController) Mount(r *server.Router) {
-	r.AddRouteFunc("/docs/swagger.yaml", c.GetSwaggerHandler).Methods(http.MethodGet)
-	r.AddRouteFunc("/docs/", c.GetDocHandler).Methods(http.MethodGet)
+func (c docController) Mount(r *server.Router) {
+	r.AddRouteFunc("/docs/swagger.yaml", c.getSwaggerHandler).Methods(http.MethodGet)
+	r.AddRouteFunc("/docs/", c.getDocHandler).Methods(http.MethodGet)
 }
 
-// GetSwaggerHandler endpoint
-func (c DocController) GetSwaggerHandler(w http.ResponseWriter, r *http.Request) {
+// GET /docs/swagger.yaml
+func (c docController) getSwaggerHandler(w http.ResponseWriter, r *http.Request) {
 	name := "docs/swagger.yaml"
 
 	w.Header().Set("Content-Type", "application/x-yaml")
 
-	body, err := asset.Asset(name)
-	if err != nil {
-		server.FailureFromError(w, 0, err)
+	body, _ := asset.Asset(name)
 
-		return
-	}
-
-	info, err := asset.AssetInfo(name)
-	if err != nil {
-		server.FailureFromError(w, 0, err)
-
-		return
-	}
+	info, _ := asset.AssetInfo(name)
 
 	http.ServeContent(
 		w,
@@ -56,25 +45,15 @@ func (c DocController) GetSwaggerHandler(w http.ResponseWriter, r *http.Request)
 	)
 }
 
-// GetDocHandler endpoint
-func (c DocController) GetDocHandler(w http.ResponseWriter, r *http.Request) {
+// GET /docs/
+func (c docController) getDocHandler(w http.ResponseWriter, r *http.Request) {
 	name := "docs/index.html"
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	body, err := asset.Asset(name)
-	if err != nil {
-		server.FailureFromError(w, 0, err)
+	body, _ := asset.Asset(name)
 
-		return
-	}
-
-	info, err := asset.AssetInfo(name)
-	if err != nil {
-		server.FailureFromError(w, 0, err)
-
-		return
-	}
+	info, _ := asset.AssetInfo(name)
 
 	http.ServeContent(
 		w,

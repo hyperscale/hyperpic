@@ -51,9 +51,7 @@ func ExtensionToType(name string) bimg.ImageType {
 	ext := strings.ToLower(name)
 
 	switch ext {
-	case "jpeg":
-		return bimg.JPEG
-	case "jpg":
+	case "jpeg", "jpg":
 		return bimg.JPEG
 	case "png":
 		return bimg.PNG

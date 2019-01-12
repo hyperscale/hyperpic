@@ -6,6 +6,7 @@ package filesystem
 
 import "errors"
 
+// fs errors
 var (
 	ErrInvalidPath    = errors.New("invalid URL path")
 	ErrNotFile        = errors.New("is not a file")
