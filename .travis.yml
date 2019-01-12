@@ -31,6 +31,8 @@ cache:
   apt:
   directories:
     - $HOME/libvips
+    - $HOME/.cache/go-build
+    - $HOME/gopath/pkg/mod
 
 addons:
   apt:
@@ -95,9 +97,11 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
+      condition: $LIBVIPS = 8.7.0
   - provider: script
     script: scripts/deploy.sh
     skip_cleanup: true
     on:
       tags: false
       branch: develop
+      condition: $LIBVIPS = 8.7.0
