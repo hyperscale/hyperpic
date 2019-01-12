@@ -89,6 +89,9 @@ after_success:
   - goveralls -coverprofile=./build/coverage.out -service=travis-ci
 
 before_deploy:
+  - sudo apt update -y
+  - sudo apt install --only-upgrade docker-ce -y
+  - docker info
   - docker login -u $DOCKER_USER -p $DOCKER_PASS
 
 deploy:
