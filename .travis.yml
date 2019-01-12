@@ -92,10 +92,12 @@ before_deploy:
 deploy:
   - provider: script
     script: scripts/deploy.sh
+    skip_cleanup: true
     on:
       tags: true
   - provider: script
     script: scripts/deploy.sh
+    skip_cleanup: true
     on:
       tags: false
       branch: develop
