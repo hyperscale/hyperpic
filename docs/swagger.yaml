@@ -10,7 +10,7 @@ consumes:
   - "application/json"
 info:
   title: "Hyperpic API"
-  version: "v1.1.0"
+  version: "v1.2.0"
   x-logo:
     url: "https://cdn.rawgit.com/hyperscale/hyperpic/master/_resources/hyperpic.svg"
   description: Fast HTTP microservice for high-level image processing.
