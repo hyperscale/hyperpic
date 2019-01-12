@@ -16,7 +16,7 @@ else
     DOCKER_TAG="$CI_BUILD_VERSION"
 fi
 
-if [ -z "$TRAVIS_COMMIT"]; then
+if [ -z "$TRAVIS_COMMIT" ]; then
     CI_BUILD_COMMIT=$(git rev-parse HEAD)
 else
     CI_BUILD_COMMIT="$TRAVIS_COMMIT"

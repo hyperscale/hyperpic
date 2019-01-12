@@ -8,3 +8,5 @@ var/
 config.yml
 .coverage/
 build/
+libvips-*
+*.zip
