@@ -5,7 +5,7 @@ set -e
 PROJECT_WORKSPACE="$(dirname $0)/.."
 PROJECT_WORKSPACE="$(cd $PROJECT_WORKSPACE; pwd)"
 
-DOCKER_ORGANISATION="hypersclae"
+DOCKER_ORGANISATION="hyperscale"
 DOCKER_REPO="hyperpic"
 
 echo "Config:"
@@ -62,7 +62,7 @@ fi
 
 # pushing only in CI mode
 if [ "$CI" == "true" ]; then
-    docker login -u $DOCKER_USER -p $DOCKER_PASS
+    #docker login -u $DOCKER_USER -p $DOCKER_PASS
     echo "Pushing $DOCKER_ORGANISATION/$DOCKER_REPO:$DOCKER_TAG..."
     docker push "$DOCKER_ORGANISATION/$DOCKER_REPO:$DOCKER_TAG"
 
