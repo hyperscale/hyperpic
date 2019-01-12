@@ -116,9 +116,12 @@ publish: docker
 	@sudo docker tag $(IMAGE) $(IMAGE):latest
 	@sudo docker push $(IMAGE)
 
-heroku:
+heroku: docker
 	@echo "Deploy Hyperpic on Heroku..."
-	@heroku container:push web --app=hyperpic
+	@#heroku container:push web --app=hyperpic
+	@docker tag $(IMAGE) registry.heroku.com/hyperpic/web
+	@docker push registry.heroku.com/hyperpic/web
+	@heroku container:release web --app=hyperpic
 
 upload-demo:
 	@curl -F 'image=@_resources/demo/kayaks.jpg' -H "Authorization: Bearer $(HYPERPIC_AUTH_SECRET)" https://hyperpic.herokuapp.com/kayaks.jpg
