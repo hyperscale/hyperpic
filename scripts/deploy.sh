@@ -8,12 +8,15 @@ PROJECT_WORKSPACE="$(cd $PROJECT_WORKSPACE; pwd)"
 DOCKER_ORGANISATION="hyperscale"
 DOCKER_REPO="hyperpic"
 
+LATEST="false"
+
 echo "Config:"
 if [ -z "$TRAVIS_TAG" ]; then
     CI_BUILD_VERSION=$(git describe --match 'v[0-9]*' --dirty='-dev' --always)
 else
     CI_BUILD_VERSION="${TRAVIS_TAG#v}"
     DOCKER_TAG="$CI_BUILD_VERSION"
+    LATEST="true"
 fi
 
 if [ -z "$TRAVIS_COMMIT" ]; then
@@ -55,7 +58,7 @@ docker build --rm \
     "$PROJECT_WORKSPACE"
 
 # tagging latest only master branch
-if [ "$CI_BUILD_BRANCH" == "master" ]; then
+if [ "$LATEST" == "true" ]; then
     echo "Tagging $DOCKER_ORGANISATION/$DOCKER_REPO:latest.."
     docker tag "$DOCKER_ORGANISATION/$DOCKER_REPO" "$DOCKER_ORGANISATION/$DOCKER_REPO:latest"
 fi
@@ -66,7 +69,7 @@ if [ "$CI" == "true" ]; then
     echo "Pushing $DOCKER_ORGANISATION/$DOCKER_REPO:$DOCKER_TAG..."
     docker push "$DOCKER_ORGANISATION/$DOCKER_REPO:$DOCKER_TAG"
 
-    if [ "$CI_BUILD_BRANCH" == "master" ]; then
+    if [ "$LATEST" == "true" ]; then
         echo "Pushing $DOCKER_ORGANISATION/$DOCKER_REPO:latest..."
         docker push "$DOCKER_ORGANISATION/$DOCKER_REPO:latest"
     fi
