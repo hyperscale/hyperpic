@@ -60,7 +60,7 @@ docker build --rm \
 # tagging latest only master branch
 if [ "$LATEST" == "true" ]; then
     echo "Tagging $DOCKER_ORGANISATION/$DOCKER_REPO:latest.."
-    docker tag "$DOCKER_ORGANISATION/$DOCKER_REPO" "$DOCKER_ORGANISATION/$DOCKER_REPO:latest"
+    docker tag "$DOCKER_ORGANISATION/$DOCKER_REPO:$DOCKER_TAG" "$DOCKER_ORGANISATION/$DOCKER_REPO:latest"
 fi
 
 # pushing only in CI mode
