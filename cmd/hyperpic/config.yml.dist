@@ -1,0 +1,31 @@
+logger:
+  level: info
+
+server:
+  http:
+    port: 8080
+
+image:
+  source:
+    max_size: 10485760
+    provider: fs
+    fs:
+      path: /var/lib/hyperpic/source
+  cache:
+    provider: fs
+    fs:
+      path: /var/lib/hyperpic/cache
+      life_time: 24h
+      clean_interval: 1h
+  support:
+    extensions:
+      jpg: true
+      jpeg: true
+      png: true
+      webp: true
+
+auth:
+  secret: ~
+
+doc:
+  enable: true
