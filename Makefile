@@ -4,7 +4,7 @@ VERSION ?= $(shell git describe --match 'v[0-9]*' --dirty='-dev' --always)
 ORG := hyperscale
 PROJECT := hyperpic
 REPOPATH ?= github.com/$(ORG)/$(PROJECT)
-VERSION_PACKAGE = $(REPOPATH)/version
+VERSION_PACKAGE = $(REPOPATH)/pkg/$(PROJECT)/version
 IMAGE ?= $(ORG)/$(PROJECT)
 
 GO_LDFLAGS :="
@@ -83,11 +83,11 @@ coverage-html: $(BUILD_DIR)/coverage.out
 generate:
 	@go generate ./...
 
-asset/bindata.go: docs/index.html docs/swagger.yaml
+cmd/hyperpic/app/asset/bindata.go: docs/index.html docs/swagger.yaml
 	@echo "Bin data..."
-	@go-bindata -pkg asset -o asset/bindata.go docs/
+	@go-bindata -pkg asset -o cmd/hyperpic/app/asset/bindata.go docs/
 
-${BUILD_DIR}/hyperpic: $(GO_FILES) asset/bindata.go
+${BUILD_DIR}/hyperpic: $(GO_FILES) cmd/hyperpic/app/asset/bindata.go
 	@echo "Building $@..."
 	@go generate ./cmd/$(subst ${BUILD_DIR}/,,$@)/
 	@go build -ldflags $(GO_LDFLAGS) -o $@ ./cmd/$(subst ${BUILD_DIR}/,,$@)/
@@ -95,26 +95,26 @@ ${BUILD_DIR}/hyperpic: $(GO_FILES) asset/bindata.go
 .PHONY: run-hyperpic
 run-hyperpic: ${BUILD_DIR}/hyperpic
 	@echo "Running $<..."
-	@./$<
+	@./$< --config=./cmd/hyperpic/config.yml
 
 .PHONY: run
 run: run-hyperpic
 
 .PHONY: run-docker
 run-docker: docker
-	@sudo docker run -e "HYPERPIC_AUTH_SECRET=$(HYPERPIC_AUTH_SECRET)" -p 8574:8080 -v $(shell pwd)/var/lib/hyperpic:/var/lib/hyperpic --rm $(IMAGE)
+	@docker run -e "HYPERPIC_AUTH_SECRET=$(HYPERPIC_AUTH_SECRET)" -p 8574:8080 -v $(shell pwd)/var/lib/hyperpic:/var/lib/hyperpic --rm $(IMAGE)
 
 .PHONY: build
 build: ${BUILD_DIR}/hyperpic
 
 .PHONY: docker
 docker:
-	@sudo docker build --no-cache=true --rm -t $(IMAGE) .
+	@docker build -f cmd/hyperpic/Dockerfile --rm -t $(IMAGE) .
 
 .PHONY: publish
 publish: docker
-	@sudo docker tag $(IMAGE) $(IMAGE):latest
-	@sudo docker push $(IMAGE)
+	@docker tag $(IMAGE) $(IMAGE):latest
+	@docker push $(IMAGE)
 
 heroku: docker
 	@echo "Deploy Hyperpic on Heroku..."
