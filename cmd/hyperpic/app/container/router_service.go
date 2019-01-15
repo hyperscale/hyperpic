@@ -39,6 +39,9 @@ func init() {
 		router.Use(hlog.RequestIDHandler("req_id", "Request-Id"))
 
 		router.EnableCors()
+		router.EnableMetrics()
+		router.EnableHealthCheck()
+		router.EnableRecovery()
 
 		router.SetNotFoundFunc(func(w http.ResponseWriter, r *http.Request) {
 			response.Encode(w, r, http.StatusNotFound, map[string]interface{}{

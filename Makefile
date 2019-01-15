@@ -51,7 +51,7 @@ clean:
 create-build-dir:
 	@mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/coverage.out: $(GO_FILES) create-build-dir
+$(BUILD_DIR)/coverage.out: $(GO_FILES) create-build-dir go.mod go.sum
 	@go test -race -cover -coverprofile $(BUILD_DIR)/coverage.out.tmp ./...
 	@cat $(BUILD_DIR)/coverage.out.tmp | grep -v '.pb.go' | grep -v 'mock_' > $(BUILD_DIR)/coverage.out
 	@rm $(BUILD_DIR)/coverage.out.tmp
@@ -87,7 +87,7 @@ cmd/hyperpic/app/asset/bindata.go: docs/index.html docs/swagger.yaml
 	@echo "Bin data..."
 	@go-bindata -pkg asset -o cmd/hyperpic/app/asset/bindata.go docs/
 
-${BUILD_DIR}/hyperpic: $(GO_FILES) cmd/hyperpic/app/asset/bindata.go
+${BUILD_DIR}/hyperpic: $(GO_FILES) cmd/hyperpic/app/asset/bindata.go go.mod go.sum
 	@echo "Building $@..."
 	@go generate ./cmd/$(subst ${BUILD_DIR}/,,$@)/
 	@go build -ldflags $(GO_LDFLAGS) -o $@ ./cmd/$(subst ${BUILD_DIR}/,,$@)/
