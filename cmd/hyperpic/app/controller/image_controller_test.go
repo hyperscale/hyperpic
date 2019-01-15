@@ -20,6 +20,7 @@ import (
 	"github.com/hyperscale/hyperpic/pkg/hyperpic/image"
 	"github.com/hyperscale/hyperpic/pkg/hyperpic/provider"
 	"github.com/hyperscale/hyperpic/pkg/hyperpic/provider/filesystem"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -801,4 +802,71 @@ func TestImageControllerPostImage(t *testing.T) {
 
 	cacheProvider.AssertExpectations(t)
 	sourceProvider.AssertExpectations(t)
+}
+
+func BenchmarkProcessImage(b *testing.B) {
+	zerolog.SetGlobalLevel(zerolog.Disabled)
+
+	cfg := &config.Configuration{
+		Image: &config.ImageConfiguration{
+			Source: &config.ImageSourceConfiguration{
+				FS: &filesystem.SourceConfiguration{
+					Path: "../../../../_resources/demo",
+				},
+			},
+			Support: &config.ImageSupportConfiguration{
+				Extensions: map[string]interface{}{
+					"jpg":  true,
+					"jpeg": true,
+					"png":  true,
+					"webp": true,
+				},
+			},
+		},
+	}
+
+	optionsParser := image.NewOptionParser()
+	sourceProvider := filesystem.NewSourceProvider(cfg.Image.Source.FS)
+	cacheProvider := &provider.MockCacheProvider{}
+
+	cacheProvider.On("Get", mock.MatchedBy(func(res *image.Resource) bool {
+		if res.Path != "/kayaks.jpg" {
+			return false
+		}
+
+		return true
+	})).Return(nil, errors.New("not exist"))
+
+	cacheProvider.On("Set", mock.MatchedBy(func(res *image.Resource) bool {
+		if res.Path != "/kayaks.jpg" {
+			return false
+		}
+
+		if res.Name != "kayaks.jpg" {
+			return false
+		}
+
+		if res.MimeType != "image/webp" {
+			return false
+		}
+
+		return true
+	})).Return(errors.New("fail"))
+
+	controller := NewImageController(cfg, optionsParser, sourceProvider, cacheProvider)
+
+	router := server.NewRouter()
+
+	router.AddController(controller)
+
+	req := httptest.NewRequest(http.MethodGet, "/kayaks.jpg?w=40&h=40&q=85&fm=webp", nil)
+	req.Header.Set("Accept", "*/*")
+
+	for n := 0; n < b.N; n++ {
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+	}
+
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 }
