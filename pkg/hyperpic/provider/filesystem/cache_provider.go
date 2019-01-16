@@ -35,7 +35,11 @@ func NewCacheProvider(cfg *CacheConfiguration) *CacheProvider {
 	return p
 }
 
-func (p *CacheProvider) removeOldCacheFile(path string, f os.FileInfo, err error) error {
+func (p CacheProvider) removeOldCacheFile(path string, f os.FileInfo, err error) error {
+	if f == nil {
+		return nil
+	}
+
 	now := time.Now()
 
 	if !f.IsDir() && now.After(f.ModTime().Add(p.config.LifeTime)) {
@@ -49,7 +53,7 @@ func (p *CacheProvider) removeOldCacheFile(path string, f os.FileInfo, err error
 }
 
 // Run cleanner
-func (p *CacheProvider) Run() {
+func (p CacheProvider) Run() {
 	log.Debug().Msg("Cleanner running")
 
 	ticker := time.NewTicker(p.config.CleanInterval)
