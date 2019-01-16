@@ -56,7 +56,9 @@ func TestImageControllerGetNotFoundImage(t *testing.T) {
 		return true
 	})).Return(nil, errors.New("not exist"))
 
-	controller := NewImageController(cfg, optionsParser, sourceProvider, cacheProvider)
+	imageProcessor := &image.MockProcessor{}
+
+	controller := NewImageController(cfg, optionsParser, imageProcessor, sourceProvider, cacheProvider)
 
 	router := server.NewRouter()
 
@@ -109,7 +111,9 @@ func TestImageControllerGetImageWithSourceProviderError(t *testing.T) {
 		return true
 	})).Return(nil, errors.New("not exist"))
 
-	controller := NewImageController(cfg, optionsParser, sourceProvider, cacheProvider)
+	imageProcessor := &image.MockProcessor{}
+
+	controller := NewImageController(cfg, optionsParser, imageProcessor, sourceProvider, cacheProvider)
 
 	router := server.NewRouter()
 
@@ -167,7 +171,17 @@ func TestImageControllerGetImageWithProccessImageError(t *testing.T) {
 		return true
 	})).Return(nil, errors.New("not exist"))
 
-	controller := NewImageController(cfg, optionsParser, sourceProvider, cacheProvider)
+	imageProcessor := &image.MockProcessor{}
+
+	imageProcessor.On("ProcessImage", mock.MatchedBy(func(res *image.Resource) bool {
+		if res.Path != "/kayaks.jpg" {
+			return false
+		}
+
+		return true
+	})).Return(errors.New("foo"))
+
+	controller := NewImageController(cfg, optionsParser, imageProcessor, sourceProvider, cacheProvider)
 
 	router := server.NewRouter()
 
@@ -231,7 +245,9 @@ func TestImageControllerGetImageWithFormatInQueryString(t *testing.T) {
 		return true
 	})).Return(errors.New("fail"))
 
-	controller := NewImageController(cfg, optionsParser, sourceProvider, cacheProvider)
+	imageProcessor := image.NewProcessor()
+
+	controller := NewImageController(cfg, optionsParser, imageProcessor, sourceProvider, cacheProvider)
 
 	router := server.NewRouter()
 
@@ -296,7 +312,9 @@ func TestImageControllerGetImageInCache(t *testing.T) {
 		opts = res.Options
 	})
 
-	controller := NewImageController(cfg, optionsParser, sourceProvider, cacheProvider)
+	imageProcessor := &image.MockProcessor{}
+
+	controller := NewImageController(cfg, optionsParser, imageProcessor, sourceProvider, cacheProvider)
 
 	router := server.NewRouter()
 
@@ -357,7 +375,9 @@ func TestImageControllerDeleteImageCache(t *testing.T) {
 		return true
 	})).Return(nil)
 
-	controller := NewImageController(cfg, optionsParser, nil, cacheProvider)
+	imageProcessor := &image.MockProcessor{}
+
+	controller := NewImageController(cfg, optionsParser, imageProcessor, nil, cacheProvider)
 
 	router := server.NewRouter()
 
@@ -419,7 +439,9 @@ func TestImageControllerDeleteImageSource(t *testing.T) {
 		return true
 	})).Return(nil)
 
-	controller := NewImageController(cfg, optionsParser, sourceProvider, cacheProvider)
+	imageProcessor := &image.MockProcessor{}
+
+	controller := NewImageController(cfg, optionsParser, imageProcessor, sourceProvider, cacheProvider)
 
 	router := server.NewRouter()
 
@@ -470,7 +492,9 @@ func TestImageControllerPostImageWithBadBody(t *testing.T) {
 
 	optionsParser := image.NewOptionParser()
 
-	controller := NewImageController(cfg, optionsParser, nil, nil)
+	imageProcessor := &image.MockProcessor{}
+
+	controller := NewImageController(cfg, optionsParser, imageProcessor, nil, nil)
 
 	router := server.NewRouter()
 
@@ -668,7 +692,9 @@ func TestImageControllerPostImageWithFailOnSourceProviderSet(t *testing.T) {
 
 	cacheProvider := &provider.MockCacheProvider{}
 
-	controller := NewImageController(cfg, optionsParser, sourceProvider, cacheProvider)
+	imageProcessor := &image.MockProcessor{}
+
+	controller := NewImageController(cfg, optionsParser, imageProcessor, sourceProvider, cacheProvider)
 
 	router := server.NewRouter()
 
@@ -711,7 +737,9 @@ func TestImageControllerPostImageWithTooLargeError(t *testing.T) {
 
 	optionsParser := image.NewOptionParser()
 
-	controller := NewImageController(cfg, optionsParser, nil, nil)
+	imageProcessor := &image.MockProcessor{}
+
+	controller := NewImageController(cfg, optionsParser, imageProcessor, nil, nil)
 
 	router := server.NewRouter()
 
@@ -778,7 +806,9 @@ func TestImageControllerPostImage(t *testing.T) {
 		return true
 	})).Return(errors.New("fail")).Maybe()
 
-	controller := NewImageController(cfg, optionsParser, sourceProvider, cacheProvider)
+	imageProcessor := &image.MockProcessor{}
+
+	controller := NewImageController(cfg, optionsParser, imageProcessor, sourceProvider, cacheProvider)
 
 	router := server.NewRouter()
 
@@ -853,7 +883,9 @@ func BenchmarkProcessImage(b *testing.B) {
 		return true
 	})).Return(errors.New("fail"))
 
-	controller := NewImageController(cfg, optionsParser, sourceProvider, cacheProvider)
+	imageProcessor := image.NewProcessor()
+
+	controller := NewImageController(cfg, optionsParser, imageProcessor, sourceProvider, cacheProvider)
 
 	router := server.NewRouter()
 

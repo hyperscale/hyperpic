@@ -20,8 +20,20 @@ type Image struct {
 	Mime string
 }
 
-// Process image
-func Process(buf []byte, opts bimg.Options) (out Image, err error) {
+// Processor interface
+//go:generate mockery -case=underscore -inpkg -name=Processor
+type Processor interface {
+	ProcessImage(resource *Resource) error
+}
+
+type processor struct{}
+
+// NewProcessor constructor
+func NewProcessor() Processor {
+	return &processor{}
+}
+
+func (processor) process(buf []byte, opts bimg.Options) (out Image, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			switch value := r.(type) {
@@ -47,7 +59,7 @@ func Process(buf []byte, opts bimg.Options) (out Image, err error) {
 }
 
 // ProcessImage from resource
-func ProcessImage(resource *Resource) error {
+func (p *processor) ProcessImage(resource *Resource) error {
 	// Infer the body MIME type via mimesniff algorithm
 	mimeType := http.DetectContentType(resource.Body)
 
@@ -69,7 +81,7 @@ func ProcessImage(resource *Resource) error {
 		return fmt.Errorf("MimeType %s is not supported", mimeType)
 	}
 
-	img, err := Process(resource.Body, resource.Options.ToBimg())
+	img, err := p.process(resource.Body, resource.Options.ToBimg())
 	if err != nil {
 		return err
 	}

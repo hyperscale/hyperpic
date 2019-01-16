@@ -29,6 +29,7 @@ import (
 type imageController struct {
 	cfg            *config.Configuration
 	optionParser   *image.OptionParser
+	imageProcessor image.Processor
 	sourceProvider provider.SourceProvider
 	cacheProvider  provider.CacheProvider
 }
@@ -37,12 +38,14 @@ type imageController struct {
 func NewImageController(
 	cfg *config.Configuration,
 	optionParser *image.OptionParser,
+	imageProcessor image.Processor,
 	sourceProvider provider.SourceProvider,
 	cacheProvider provider.CacheProvider,
 ) server.Controller {
 	return &imageController{
 		cfg:            cfg,
 		optionParser:   optionParser,
+		imageProcessor: imageProcessor,
 		sourceProvider: sourceProvider,
 		cacheProvider:  cacheProvider,
 	}
@@ -124,7 +127,7 @@ func (c imageController) getHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := image.ProcessImage(resource); err != nil {
+	if err := c.imageProcessor.ProcessImage(resource); err != nil {
 		log.Error().Err(err).Msg("Error while processing the image")
 
 		http.Error(w, "Error while processing the image", http.StatusInternalServerError)

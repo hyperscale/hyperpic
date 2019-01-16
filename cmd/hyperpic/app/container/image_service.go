@@ -11,11 +11,16 @@ import (
 
 // Services keys
 const (
-	OptionParserKey = "service.options.parser"
+	ImageOptionParserKey = "service.image.options.parser"
+	ImageProcessorKey    = "service.image.processor"
 )
 
 func init() {
-	service.Set(OptionParserKey, func(c service.Container) interface{} {
+	service.Set(ImageOptionParserKey, func(c service.Container) interface{} {
 		return image.NewOptionParser()
+	})
+
+	service.Set(ImageProcessorKey, func(c service.Container) interface{} {
+		return image.NewProcessor()
 	})
 }

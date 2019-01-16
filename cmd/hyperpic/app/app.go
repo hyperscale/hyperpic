@@ -16,7 +16,7 @@ import (
 )
 
 // Run Hyperpic api server
-func Run() error {
+func Run() (err error) {
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
 
@@ -28,8 +28,10 @@ func Run() error {
 
 	go func() {
 		log.Info().Msg("Rinning HTTP Router")
-		if err := router.Run(); err != nil {
-			log.Error().Err(err).Msg("server.Run() failed")
+		if e := router.Run(); e != nil {
+			log.Error().Err(e).Msg("server.Run() failed")
+
+			err = e
 		}
 	}()
 

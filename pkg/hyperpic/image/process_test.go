@@ -28,7 +28,9 @@ func TestProcess(t *testing.T) {
 	in, err := ioutil.ReadAll(file)
 	assert.NoError(t, err)
 
-	out, err := Process(in, o.ToBimg())
+	p := &processor{}
+
+	out, err := p.process(in, o.ToBimg())
 	assert.NoError(t, err)
 
 	assert.Equal(t, "image/png", out.Mime)
@@ -58,7 +60,9 @@ func TestProcessImage(t *testing.T) {
 		Options: o,
 	}
 
-	assert.NoError(t, ProcessImage(res))
+	p := NewProcessor()
+
+	assert.NoError(t, p.ProcessImage(res))
 
 	assert.Equal(t, "image/png", res.MimeType)
 }
