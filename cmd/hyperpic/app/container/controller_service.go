@@ -25,13 +25,15 @@ func init() {
 
 	service.Set(ImageControllerKey, func(c service.Container) interface{} {
 		cfg := c.Get(ConfigKey).(*config.Configuration)
-		optionParser := c.Get(OptionParserKey).(*image.OptionParser)
+		imageOptionParser := c.Get(ImageOptionParserKey).(*image.OptionParser)
+		imageProcessor := c.Get(ImageProcessorKey).(image.Processor)
 		sourceProvider := c.Get(SourceProviderKey).(provider.SourceProvider)
 		cacheProvider := c.Get(CacheProviderKey).(provider.CacheProvider)
 
 		return controller.NewImageController(
 			cfg,
-			optionParser,
+			imageOptionParser,
+			imageProcessor,
 			sourceProvider,
 			cacheProvider,
 		)
