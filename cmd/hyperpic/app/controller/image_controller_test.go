@@ -12,6 +12,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	"time"
 
@@ -20,6 +21,7 @@ import (
 	"github.com/hyperscale/hyperpic/pkg/hyperpic/image"
 	"github.com/hyperscale/hyperpic/pkg/hyperpic/provider"
 	"github.com/hyperscale/hyperpic/pkg/hyperpic/provider/filesystem"
+	"github.com/hyperscale/hyperpic/pkg/hyperpic/provider/memory"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -834,8 +836,10 @@ func TestImageControllerPostImage(t *testing.T) {
 	sourceProvider.AssertExpectations(t)
 }
 
-func BenchmarkProcessImage(b *testing.B) {
+func BenchmarkProcessImageNoCache(b *testing.B) {
 	zerolog.SetGlobalLevel(zerolog.Disabled)
+
+	time.Sleep(100 * time.Millisecond)
 
 	cfg := &config.Configuration{
 		Image: &config.ImageConfiguration{
@@ -899,6 +903,125 @@ func BenchmarkProcessImage(b *testing.B) {
 
 		router.ServeHTTP(w, req)
 	}
+
+	time.Sleep(100 * time.Millisecond)
+
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+}
+
+func BenchmarkProcessImageWithFSCache(b *testing.B) {
+	zerolog.SetGlobalLevel(zerolog.Disabled)
+
+	time.Sleep(100 * time.Millisecond)
+
+	dir, err := ioutil.TempDir("", "cache-provider-bench")
+	assert.NoError(b, err)
+
+	defer os.RemoveAll(dir)
+
+	cfg := &config.Configuration{
+		Image: &config.ImageConfiguration{
+			Source: &config.ImageSourceConfiguration{
+				FS: &filesystem.SourceConfiguration{
+					Path: "../../../../_resources/demo",
+				},
+			},
+			Cache: &config.ImageCacheConfiguration{
+				FS: &filesystem.CacheConfiguration{
+					Path:          dir,
+					LifeTime:      1 * time.Minute,
+					CleanInterval: 1 * time.Minute,
+				},
+			},
+			Support: &config.ImageSupportConfiguration{
+				Extensions: map[string]interface{}{
+					"jpg":  true,
+					"jpeg": true,
+					"png":  true,
+					"webp": true,
+				},
+			},
+		},
+	}
+
+	optionsParser := image.NewOptionParser()
+	sourceProvider := filesystem.NewSourceProvider(cfg.Image.Source.FS)
+	cacheProvider := filesystem.NewCacheProvider(cfg.Image.Cache.FS)
+
+	imageProcessor := image.NewProcessor()
+
+	controller := NewImageController(cfg, optionsParser, imageProcessor, sourceProvider, cacheProvider)
+
+	router := server.NewRouter()
+
+	router.AddController(controller)
+
+	req := httptest.NewRequest(http.MethodGet, "/kayaks.jpg?w=40&h=40&q=85&fm=webp", nil)
+	req.Header.Set("Accept", "*/*")
+
+	for n := 0; n < b.N; n++ {
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+	}
+
+	time.Sleep(100 * time.Millisecond)
+
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+}
+
+func BenchmarkProcessImageWithMemoryCache(b *testing.B) {
+	zerolog.SetGlobalLevel(zerolog.Disabled)
+
+	time.Sleep(100 * time.Millisecond)
+
+	cfg := &config.Configuration{
+		Image: &config.ImageConfiguration{
+			Source: &config.ImageSourceConfiguration{
+				FS: &filesystem.SourceConfiguration{
+					Path: "../../../../_resources/demo",
+				},
+			},
+			Cache: &config.ImageCacheConfiguration{
+				Memory: &memory.CacheConfiguration{
+					LifeTime:      1 * time.Minute,
+					CleanInterval: 1 * time.Minute,
+					MemoryLimit:   10 << 20,
+				},
+			},
+			Support: &config.ImageSupportConfiguration{
+				Extensions: map[string]interface{}{
+					"jpg":  true,
+					"jpeg": true,
+					"png":  true,
+					"webp": true,
+				},
+			},
+		},
+	}
+
+	optionsParser := image.NewOptionParser()
+	sourceProvider := filesystem.NewSourceProvider(cfg.Image.Source.FS)
+	cacheProvider := memory.NewCacheProvider(cfg.Image.Cache.Memory)
+
+	imageProcessor := image.NewProcessor()
+
+	controller := NewImageController(cfg, optionsParser, imageProcessor, sourceProvider, cacheProvider)
+
+	router := server.NewRouter()
+
+	router.AddController(controller)
+
+	req := httptest.NewRequest(http.MethodGet, "/kayaks.jpg?w=40&h=40&q=85&fm=webp", nil)
+	req.Header.Set("Accept", "*/*")
+
+	for n := 0; n < b.N; n++ {
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+	}
+
+	time.Sleep(100 * time.Millisecond)
 
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 }

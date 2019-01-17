@@ -4,10 +4,14 @@
 
 package config
 
-import "github.com/hyperscale/hyperpic/pkg/hyperpic/provider/filesystem"
+import (
+	"github.com/hyperscale/hyperpic/pkg/hyperpic/provider/filesystem"
+	"github.com/hyperscale/hyperpic/pkg/hyperpic/provider/memory"
+)
 
 // ImageCacheConfiguration struct
 type ImageCacheConfiguration struct {
 	Provider string
 	FS       *filesystem.CacheConfiguration
+	Memory   *memory.CacheConfiguration
 }

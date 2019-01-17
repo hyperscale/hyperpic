@@ -17,6 +17,10 @@ image:
       path: /var/lib/hyperpic/cache
       life_time: 24h
       clean_interval: 1h
+    memory:
+      life_time: 24h
+      clean_interval: 1h
+      memory_limit: 524288000
   support:
     extensions:
       jpg: true
