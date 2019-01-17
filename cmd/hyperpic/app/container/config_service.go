@@ -12,6 +12,7 @@ import (
 
 	service "github.com/euskadi31/go-service"
 	"github.com/hyperscale/hyperpic/cmd/hyperpic/app/config"
+	"github.com/pbnjay/memory"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
@@ -58,6 +59,9 @@ func init() {
 		options.SetDefault("image.cache.fs.path", "/var/lib/"+name+"/cache")
 		options.SetDefault("image.cache.fs.life_time", "24h")
 		options.SetDefault("image.cache.fs.clean_interval", "1h")
+		options.SetDefault("image.cache.memory.life_time", "24h")
+		options.SetDefault("image.cache.memory.clean_interval", "1h")
+		options.SetDefault("image.cache.memory.memory_limit", uint64(memory.TotalMemory()/2))
 		options.SetDefault("image.support.extensions", map[string]bool{
 			"jpg":  true,
 			"jpeg": true,
