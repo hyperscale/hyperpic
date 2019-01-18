@@ -5,11 +5,13 @@
 package memory
 
 import (
+	"fmt"
 	"io/ioutil"
 	"testing"
 	"time"
 
 	"github.com/hyperscale/hyperpic/pkg/hyperpic/image"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -125,4 +127,77 @@ func TestCacheProvider(t *testing.T) {
 	assert.Nil(t, res)
 
 	time.Sleep(100 * time.Millisecond)
+}
+
+func BenchmarkCacheProviderSet(b *testing.B) {
+	zerolog.SetGlobalLevel(zerolog.Disabled)
+
+	time.Sleep(100 * time.Millisecond)
+
+	p := NewCacheProvider(&CacheConfiguration{
+		LifeTime:      30 * time.Second,
+		CleanInterval: 35 * time.Second,
+		MemoryLimit:   10 << 20,
+	})
+
+	body, err := ioutil.ReadFile("../../../../_resources/demo/kayaks.jpg")
+	assert.NoError(b, err)
+
+	for n := 0; n < b.N; n++ {
+		err := p.Set(&image.Resource{
+			Path: fmt.Sprintf("/kayaks-%d.jpg", n),
+			Body: body,
+			Size: 0, // hack for benchmark
+			Options: &image.Options{
+				Width:  200,
+				Height: 200,
+			},
+		})
+		assert.NoError(b, err)
+	}
+
+	time.Sleep(100 * time.Millisecond)
+
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+}
+
+func BenchmarkCacheProviderGet(b *testing.B) {
+	zerolog.SetGlobalLevel(zerolog.Disabled)
+
+	time.Sleep(100 * time.Millisecond)
+
+	p := NewCacheProvider(&CacheConfiguration{
+		LifeTime:      30 * time.Second,
+		CleanInterval: 35 * time.Second,
+		MemoryLimit:   10 << 20,
+	})
+
+	body, err := ioutil.ReadFile("../../../../_resources/demo/kayaks.jpg")
+	assert.NoError(b, err)
+
+	err = p.Set(&image.Resource{
+		Path: "/kayaks.jpg",
+		Body: body,
+		Size: len(body),
+		Options: &image.Options{
+			Width:  200,
+			Height: 200,
+		},
+	})
+	assert.NoError(b, err)
+
+	for n := 0; n < b.N; n++ {
+		_, err = p.Get(&image.Resource{
+			Path: "/kayaks.jpg",
+			Options: &image.Options{
+				Width:  200,
+				Height: 200,
+			},
+		})
+		assert.NoError(b, err)
+	}
+
+	time.Sleep(100 * time.Millisecond)
+
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 }
