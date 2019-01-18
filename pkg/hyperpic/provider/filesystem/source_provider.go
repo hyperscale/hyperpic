@@ -97,6 +97,7 @@ func (p SourceProvider) Get(resource *image.Resource) (*image.Resource, error) {
 		Options:    resource.Options,
 		Name:       name,
 		Body:       body,
+		Size:       len(body),
 		ModifiedAt: d.ModTime(),
 	}, nil
 }

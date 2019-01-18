@@ -6,6 +6,7 @@ package memory
 
 import (
 	"errors"
+	"fmt"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -47,7 +48,7 @@ func (p *CacheProvider) removeOldCache(path string, key string, resource *image.
 		delete(p.container[path], key)
 		p.mtx.Unlock()
 
-		atomic.AddUint64(&p.size, ^uint64(len(resource.Body)))
+		atomic.AddUint64(&p.size, ^uint64(resource.Size))
 	}
 }
 
@@ -88,9 +89,24 @@ func (p *CacheProvider) Del(resource *image.Resource) error {
 
 	path := strings.TrimPrefix(resource.Path, "/")
 
+	container, ok := p.container[path]
+	if !ok {
+		return nil
+	}
+
+	size := 0
+
+	for _, item := range container {
+		size += item.Size
+	}
+
+	log.Debug().Msgf("Remove file %s", path)
+
 	p.mtx.Lock()
 	delete(p.container, path)
 	p.mtx.Unlock()
+
+	atomic.AddUint64(&p.size, ^uint64(size))
 
 	return nil
 }
@@ -122,18 +138,17 @@ func (p *CacheProvider) Get(resource *image.Resource) (*image.Resource, error) {
 		Name:       file.Name,
 		Options:    resource.Options,
 		Body:       file.Body,
+		Size:       file.Size,
 		ModifiedAt: file.ModifiedAt,
 	}, nil
 }
 
 // Set file to cache
 func (p *CacheProvider) Set(resource *image.Resource) error {
-	size := atomic.LoadUint64(&p.size)
+	size := int(atomic.LoadUint64(&p.size))
 
-	if size >= p.config.MemoryLimit {
-		log.Warn().Msgf("memory cache provider: allowed memory size of %d bytes exhausted", p.config.MemoryLimit)
-
-		return nil
+	if (size + resource.Size) >= p.config.MemoryLimit {
+		return fmt.Errorf("memory cache provider: allowed memory size of %d bytes exhausted", p.config.MemoryLimit)
 	}
 
 	path := strings.TrimPrefix(resource.Path, "/")
@@ -147,18 +162,19 @@ func (p *CacheProvider) Set(resource *image.Resource) error {
 		p.container[path] = make(map[string]*image.Resource)
 	}
 
-	p.container[path][key] = &image.Resource{
+	res := &image.Resource{
 		Path:       resource.Path,
 		Name:       name,
 		Body:       resource.Body,
+		Size:       resource.Size,
 		ModifiedAt: time.Now(),
 	}
 
-	n := uint64(len(resource.Body))
+	p.container[path][key] = res
 
-	atomic.AddUint64(&p.size, n)
+	atomic.AddUint64(&p.size, uint64(res.Size))
 
-	log.Debug().Msgf("Write cache size in memory: %d", n)
+	log.Debug().Msgf("Write cache size in memory: %d", res.Size)
 
 	return nil
 }

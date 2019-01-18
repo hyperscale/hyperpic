@@ -103,7 +103,7 @@ func (c imageController) getHandler(w http.ResponseWriter, r *http.Request) {
 		httputil.ServeImage(w, r, resource)
 
 		metrics.CacheHit.With(map[string]string{}).Add(1)
-		metrics.ImageDeliveredBytes.With(map[string]string{}).Add(float64(len(resource.Body)))
+		metrics.ImageDeliveredBytes.With(map[string]string{}).Add(float64(resource.Size))
 
 		return
 	}
@@ -147,7 +147,7 @@ func (c imageController) getHandler(w http.ResponseWriter, r *http.Request) {
 	}(resource)
 
 	metrics.CacheMiss.With(map[string]string{}).Add(1)
-	metrics.ImageDeliveredBytes.With(map[string]string{}).Add(float64(len(resource.Body)))
+	metrics.ImageDeliveredBytes.With(map[string]string{}).Add(float64(resource.Size))
 }
 
 func (c imageController) parseImageFileFromRequest(w http.ResponseWriter, r *http.Request) ([]byte, error) {

@@ -2,11 +2,10 @@
 // Use of this source code is governed by a MIT
 // license that can be found in the LICENSE file.
 
-package filesystem
+package memory
 
 import (
 	"io/ioutil"
-	"os"
 	"testing"
 	"time"
 
@@ -15,15 +14,10 @@ import (
 )
 
 func TestCacheProvider(t *testing.T) {
-	dir, err := ioutil.TempDir("", "cache-provider-test")
-	assert.NoError(t, err)
-
-	defer os.RemoveAll(dir)
-
 	p := NewCacheProvider(&CacheConfiguration{
-		Path:          dir,
 		LifeTime:      1 * time.Second,
 		CleanInterval: 2 * time.Second,
+		MemoryLimit:   256356,
 	})
 
 	body, err := ioutil.ReadFile("../../../../_resources/demo/kayaks.jpg")
@@ -40,7 +34,28 @@ func TestCacheProvider(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
+	err = p.Set(&image.Resource{
+		Path: "/kayaks-2.jpg",
+		Body: body,
+		Size: len(body),
+		Options: &image.Options{
+			Width:  200,
+			Height: 200,
+		},
+	})
+	assert.EqualError(t, err, "memory cache provider: allowed memory size of 256356 bytes exhausted")
+
 	res, err := p.Get(&image.Resource{
+		Path: "/kayaks-2.jpg",
+		Options: &image.Options{
+			Width:  200,
+			Height: 200,
+		},
+	})
+	assert.EqualError(t, err, "file does not exist in cache")
+	assert.Nil(t, res)
+
+	res, err = p.Get(&image.Resource{
 		Path: "/..",
 		Options: &image.Options{
 			Width:  100,
@@ -69,6 +84,7 @@ func TestCacheProvider(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, body, res.Body)
+	assert.Equal(t, len(body), res.Size)
 
 	err = p.Del(&image.Resource{
 		Path: "/..",
@@ -77,6 +93,11 @@ func TestCacheProvider(t *testing.T) {
 
 	err = p.Del(&image.Resource{
 		Path: "/kayaks.jpg",
+	})
+	assert.NoError(t, err)
+
+	err = p.Del(&image.Resource{
+		Path: "/kayaks-3.jpg",
 	})
 	assert.NoError(t, err)
 

@@ -14,4 +14,5 @@ type Resource struct {
 	MimeType   string
 	ModifiedAt time.Time
 	Body       []byte
+	Size       int
 }
