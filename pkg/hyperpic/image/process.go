@@ -72,7 +72,7 @@ func (p *processor) ProcessImage(resource *Resource) error {
 	}
 
 	// Infer text/plain responses as potential SVG image
-	if strings.Contains(mimeType, "text/plain") && len(resource.Body) > 8 && bimg.IsSVGImage(resource.Body) {
+	if strings.Contains(mimeType, "text/plain") && resource.Size > 8 && bimg.IsSVGImage(resource.Body) {
 		mimeType = "image/svg+xml"
 	}
 

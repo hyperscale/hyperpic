@@ -22,6 +22,7 @@ func TestServeImage(t *testing.T) {
 		Name:       "foo.jpg",
 		ModifiedAt: time.Now().AddDate(1955, 02, 24),
 		Body:       []byte("bar"),
+		Size:       3,
 	})
 
 	resp := w.Result()
