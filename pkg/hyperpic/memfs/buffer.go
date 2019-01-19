@@ -133,7 +133,8 @@ func (v *Buf) Truncate(size int64) (err error) {
 	if size < 0 {
 		return errors.New("Truncate: size must be non-negative")
 	}
-	if bufSize := int64(len(*v.buf)); size == bufSize {
+	bufSize := int64(len(*v.buf))
+	if size == bufSize {
 		return nil
 	} else if size < bufSize {
 		*v.buf = (*v.buf)[:size]
