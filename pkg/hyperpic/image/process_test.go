@@ -65,4 +65,11 @@ func TestProcessImage(t *testing.T) {
 	assert.NoError(t, p.ProcessImage(res))
 
 	assert.Equal(t, "image/png", res.MimeType)
+
+	res = &Resource{
+		Body:    []byte{0x01},
+		Options: o,
+	}
+
+	assert.EqualError(t, p.ProcessImage(res), "MimeType application/octet-stream is not supported")
 }

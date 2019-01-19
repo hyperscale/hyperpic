@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/h2non/bimg"
 	filetype "gopkg.in/h2non/filetype.v1"
@@ -59,7 +58,7 @@ func (processor) process(buf []byte, opts bimg.Options) (out Image, err error) {
 }
 
 // ProcessImage from resource
-func (p *processor) ProcessImage(resource *Resource) error {
+func (p processor) ProcessImage(resource *Resource) error {
 	// Infer the body MIME type via mimesniff algorithm
 	mimeType := http.DetectContentType(resource.Body)
 
@@ -72,9 +71,9 @@ func (p *processor) ProcessImage(resource *Resource) error {
 	}
 
 	// Infer text/plain responses as potential SVG image
-	if strings.Contains(mimeType, "text/plain") && resource.Size > 8 && bimg.IsSVGImage(resource.Body) {
+	/*if strings.Contains(mimeType, "text/plain") && resource.Size > 8 && bimg.IsSVGImage(resource.Body) {
 		mimeType = "image/svg+xml"
-	}
+	}*/
 
 	// Finally check if image MIME type is supported
 	if !IsImageMimeTypeSupported(mimeType) {
