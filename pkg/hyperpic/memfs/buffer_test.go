@@ -28,6 +28,13 @@ func TestTruncate(t *testing.T) {
 	v := NewBuffer(&buf)
 
 	assert.NoError(t, v.Truncate(5))
+	assert.NoError(t, v.Truncate(0))
+	assert.NoError(t, v.Truncate(int64(len(dots))))
+	assert.Error(t, v.Truncate(-5))
+
+	buf = make([]byte, 0)
+	v = NewBuffer(&buf)
+	assert.NoError(t, v.Truncate(0))
 }
 
 func TestMakeSlice(t *testing.T) {
