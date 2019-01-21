@@ -53,7 +53,7 @@ docker build --rm \
     --build-arg "VCS_URL=$CI_BUILD_URL" \
     --build-arg "VCS_REF=$CI_BUILD_COMMIT" \
     --build-arg "BUILD_DATE=$CI_BUILD_DATE" \
-    -f "$PROJECT_WORKSPACE/Dockerfile" \
+    -f "$PROJECT_WORKSPACE/cmd/hyperpic/Dockerfile" \
     -t "$DOCKER_ORGANISATION/$DOCKER_REPO:$DOCKER_TAG" \
     "$PROJECT_WORKSPACE"
 
