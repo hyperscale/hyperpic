@@ -1,13 +1,13 @@
 language: go
 
 sudo: required
-dist: trusty
+dist: xenial
 
 services:
   - docker
 
 go:
-  - 1.11.x
+  - 1.12.x
   - master
   - tip
 
@@ -29,9 +29,9 @@ matrix:
 
 cache:
   apt:
-  directories:
+    directories:
     - $HOME/libvips
-    - $HOME/.cache/go-build
+    #- $HOME/.cache/go-build
     - $HOME/gopath/pkg/mod
 
 addons:
