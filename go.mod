@@ -16,7 +16,7 @@ require (
 	github.com/mailru/easyjson v0.0.0-20180323154445-8b799c424f57 // indirect
 	github.com/pbnjay/memory v0.0.0-20190104145345-974d429e7ae4
 	github.com/pkg/errors v0.8.1
-	github.com/prometheus/client_golang v0.9.2
+	github.com/prometheus/client_golang v0.9.4
 	github.com/rs/xid v1.2.1 // indirect
 	github.com/rs/zerolog v1.11.0
 	github.com/spf13/viper v1.4.0
