@@ -19,7 +19,7 @@ require (
 	github.com/prometheus/client_golang v0.9.2
 	github.com/rs/xid v1.2.1 // indirect
 	github.com/rs/zerolog v1.11.0
-	github.com/spf13/viper v1.3.1
+	github.com/spf13/viper v1.4.0
 	github.com/stretchr/testify v1.3.0
 	golang.org/x/sync v0.0.0-20181221193216-37e7f081c4d4 // indirect
 	gopkg.in/h2non/filetype.v1 v1.0.5
