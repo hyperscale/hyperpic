@@ -15,6 +15,7 @@ import (
 
 	server "github.com/euskadi31/go-server"
 	"github.com/euskadi31/go-server/response"
+	"github.com/h2non/filetype"
 	"github.com/hyperscale/hyperpic/cmd/hyperpic/app/config"
 	"github.com/hyperscale/hyperpic/cmd/hyperpic/app/metrics"
 	"github.com/hyperscale/hyperpic/pkg/hyperpic/httputil"
@@ -23,7 +24,6 @@ import (
 	"github.com/hyperscale/hyperpic/pkg/hyperpic/provider"
 	"github.com/justinas/alice"
 	"github.com/rs/zerolog/hlog"
-	filetype "gopkg.in/h2non/filetype.v1"
 )
 
 type imageController struct {

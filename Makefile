@@ -17,6 +17,11 @@ GO_FILES := $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
 HYPERPIC_AUTH_SECRET ?= c8da8ded-f9a2-429c-8811-9b2a07de8ede
 
+ifeq ($(shell uname -s), Darwin)
+	CGO_CFLAGS_ALLOW ?= "-Xpreprocessor"
+	PKG_CONFIG_PATH ?= "/usr/local/opt/libffi/lib/pkgconfig:/usr/local/opt/vips/lib/pkgconfig"
+endif
+
 .PHONY: release
 release:
 	@echo "Release v$(version)"

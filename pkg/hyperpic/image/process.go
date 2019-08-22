@@ -10,7 +10,7 @@ import (
 	"net/http"
 
 	"github.com/h2non/bimg"
-	filetype "gopkg.in/h2non/filetype.v1"
+	"github.com/h2non/filetype"
 )
 
 // Image stores an image binary buffer and its MIME type
