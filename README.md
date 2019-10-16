@@ -13,6 +13,8 @@ Hyperpic [![Last release](https://img.shields.io/github/release/hyperscale/hyper
 
 Fast HTTP microservice for high-level image processing.
 
+[![Run on Google Cloud](https://storage.googleapis.com/cloudrun/button.svg)](https://deploy.cloud.run)
+
 Install
 -------
 
