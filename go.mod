@@ -11,7 +11,7 @@ require (
 	github.com/go-openapi/validate v0.0.0-20180222165948-180bba53b988 // indirect
 	github.com/gorilla/schema v1.1.0
 	github.com/h2non/bimg v1.0.19
-	github.com/h2non/filetype v1.0.10
+	github.com/h2non/filetype v1.0.12
 	github.com/justinas/alice v0.0.0-20171023064455-03f45bd4b7da
 	github.com/mailru/easyjson v0.0.0-20180323154445-8b799c424f57 // indirect
 	github.com/pbnjay/memory v0.0.0-20190104145345-974d429e7ae4
