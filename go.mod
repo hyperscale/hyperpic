@@ -9,7 +9,7 @@ require (
 	github.com/go-openapi/spec v0.0.0-20180406021525-370d9e047557 // indirect
 	github.com/go-openapi/strfmt v0.0.0-20180407011102-481808443b00 // indirect
 	github.com/go-openapi/validate v0.0.0-20180222165948-180bba53b988 // indirect
-	github.com/gorilla/schema v1.1.0
+	github.com/gorilla/schema v1.2.0
 	github.com/h2non/bimg v1.1.2
 	github.com/h2non/filetype v1.1.0
 	github.com/justinas/alice v0.0.0-20171023064455-03f45bd4b7da
