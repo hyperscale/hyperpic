@@ -19,7 +19,9 @@ func NewImageExtensionFilterHandler(cfg *config.Configuration) func(http.Handler
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ext := strings.ToLower(filepath.Ext(r.URL.Path))
-			ext = ext[1:]
+			if ext != "" {
+				ext = ext[1:]
+			}
 
 			log.Debug().Msgf("File ext: %s", ext)
 
