@@ -28,6 +28,11 @@ func TestImageExtensionFilterHandler(t *testing.T) {
 			expectedCode: http.StatusNotFound,
 		},
 		{
+			url:          "http://example.com/foo",
+			expectedBody: "File /foo is not supported\n",
+			expectedCode: http.StatusNotFound,
+		},
+		{
 			url:          "http://example.com/foo.jpeg?w=420&q=85&dpr=1",
 			expectedBody: "OK",
 			expectedCode: http.StatusOK,

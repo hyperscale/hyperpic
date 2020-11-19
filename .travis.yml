@@ -1,21 +1,24 @@
 language: go
 
 sudo: required
-dist: xenial
+dist: focal
 
 services:
   - docker
 
 go:
-  - 1.13.x
+  - 1.15.x
   - master
   - tip
 
 env:
   matrix:
     - LIBVIPS=8.5.9
-    - LIBVIPS=8.6.3
-    - LIBVIPS=8.7.0
+    - LIBVIPS=8.6.5
+    - LIBVIPS=8.7.4
+    - LIBVIPS=8.8.4
+    - LIBVIPS=8.9.2
+    - LIBVIPS=8.10.2
   global:
     - GO111MODULE=on
     - secure: "J1RMy1EvaaETsSxKXe2T1j9KcQDAgMb3On0+3Nd+Puq2ZVbBuGgYmh8eR4bYpG5RPN9MZPf4/zfaTugAD3cT0Ks1H1aFy/1LS4/Vrh+ppxWh7Xuj/A0Y5HAzC5dFMI7s9DU4OeRp/6bE229Cg3nJFIqGuOgsr066PQ2QeXYYtNOiYWgj2BE20KGlQgHeowocTKjPYgmxbAdHHU7bqrr1mcmMPMWnjzVHyphbWj2WnafAZ0AhSk9LCABVfUCUmMXnMddHfn/J/vCMbh1Cm105eKnRKFqrlqyfg/Owb17vN/EbB4KoqNW/OIEqZMO+Frf5U1AePudLZUqy1ZuChFS0g7GdMgNDw6IkZ0nPJ76PlGyUIJrl8hpAFhHqccan0PRVnzki1DCspDL9GBU13SZmZQUwNkFf1vWehXywUJaJ6mBVgrXdeNOvpU0W9sI+QC6tOZq42FT4yTS1jYeLOYhbgcmk6TY8JJGCN3/3G/kMB2e2CONudAryo09yZdWIquFaAWK0eN4ld1k5oYcTAWsYN8Gz2Ett/twvTgdrMnEUZlwO0h9HE629FG/0r+U7vLXnnT+reeSLfJsVDaYbO/jKuMD57zMOWNbiSM2orqqFlnclShSAyRHaXuCbf55SkLqxIWdlKlDgvMwVUqNJ4VnVt6AwOgBUvLouBI11ZNOWv0k=" # DOCKER_USER

@@ -57,7 +57,7 @@ create-build-dir:
 	@mkdir -p $(BUILD_DIR)
 
 $(BUILD_DIR)/coverage.out: $(GO_FILES) create-build-dir go.mod go.sum
-	@go test -race -cover -coverprofile $(BUILD_DIR)/coverage.out.tmp ./...
+	@CGO_CFLAGS_ALLOW=-Xpreprocessor go test -race -cover -coverprofile $(BUILD_DIR)/coverage.out.tmp ./...
 	@cat $(BUILD_DIR)/coverage.out.tmp | grep -v '.pb.go' | grep -v 'mock_' > $(BUILD_DIR)/coverage.out
 	@rm $(BUILD_DIR)/coverage.out.tmp
 
@@ -94,8 +94,8 @@ cmd/hyperpic/app/asset/bindata.go: docs/index.html docs/swagger.yaml
 
 ${BUILD_DIR}/hyperpic: $(GO_FILES) cmd/hyperpic/app/asset/bindata.go go.mod go.sum
 	@echo "Building $@..."
-	@go generate ./cmd/$(subst ${BUILD_DIR}/,,$@)/
-	@go build -ldflags $(GO_LDFLAGS) -o $@ ./cmd/$(subst ${BUILD_DIR}/,,$@)/
+	@CGO_CFLAGS_ALLOW=-Xpreprocessor go generate ./cmd/$(subst ${BUILD_DIR}/,,$@)/
+	@CGO_CFLAGS_ALLOW=-Xpreprocessor go build -ldflags $(GO_LDFLAGS) -o $@ ./cmd/$(subst ${BUILD_DIR}/,,$@)/
 
 .PHONY: run-hyperpic
 run-hyperpic: ${BUILD_DIR}/hyperpic
@@ -131,3 +131,8 @@ heroku: docker
 upload-demo:
 	@curl -F 'image=@_resources/demo/kayaks.jpg' -H "Authorization: Bearer $(HYPERPIC_AUTH_SECRET)" https://hyperpic.herokuapp.com/kayaks.jpg
 	@curl -F 'image=@_resources/demo/smartcrop.jpg' -H "Authorization: Bearer $(HYPERPIC_AUTH_SECRET)" https://hyperpic.herokuapp.com/smartcrop.jpg
+
+
+upload-demo-dev:
+	@curl -F 'image=@_resources/demo/kayaks.jpg' -H "Authorization: Bearer foo" http://localhost:8574/kayaks.jpg
+	@curl -F 'image=@_resources/demo/smartcrop.jpg' -H "Authorization: Bearer foo" http://localhost:8574/smartcrop.jpg
