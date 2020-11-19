@@ -8,7 +8,7 @@ import "github.com/hyperscale/hyperpic/pkg/hyperpic/provider/filesystem"
 
 // ImageSourceConfiguration struct
 type ImageSourceConfiguration struct {
-	MaxSize  int64
+	MaxSize  int64 `mapstructure:"max_size"`
 	Provider string
 	FS       *filesystem.SourceConfiguration
 }
