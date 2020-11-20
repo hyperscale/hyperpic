@@ -13,9 +13,6 @@ go:
 
 env:
   matrix:
-    - LIBVIPS=8.5.9
-    - LIBVIPS=8.6.5
-    - LIBVIPS=8.7.4
     - LIBVIPS=8.8.4
     - LIBVIPS=8.9.2
     - LIBVIPS=8.10.2
