@@ -121,6 +121,11 @@ publish: docker
 	@docker tag $(IMAGE) $(IMAGE):latest
 	@docker push $(IMAGE)
 
+.PHONY: publish-dev
+publish-dev: docker
+	@docker tag $(IMAGE) $(IMAGE):dev
+	@docker push $(IMAGE):dev
+
 heroku: docker
 	@echo "Deploy Hyperpic on Heroku..."
 	@#heroku container:push web --app=hyperpic
