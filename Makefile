@@ -4,7 +4,7 @@ VERSION ?= $(shell git describe --match 'v[0-9]*' --dirty='-dev' --always)
 ORG := hyperscale
 PROJECT := hyperpic
 REPOPATH ?= github.com/$(ORG)/$(PROJECT)
-VERSION_PACKAGE = $(REPOPATH)/version
+VERSION_PACKAGE = $(REPOPATH)/pkg/$(PROJECT)/version
 IMAGE ?= $(ORG)/$(PROJECT)
 
 GO_LDFLAGS :="
@@ -16,6 +16,11 @@ GO_LDFLAGS +="
 GO_FILES := $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
 HYPERPIC_AUTH_SECRET ?= c8da8ded-f9a2-429c-8811-9b2a07de8ede
+
+ifeq ($(shell uname -s), Darwin)
+	CGO_CFLAGS_ALLOW ?= "-Xpreprocessor"
+	PKG_CONFIG_PATH ?= "/usr/local/opt/libffi/lib/pkgconfig:/usr/local/opt/vips/lib/pkgconfig"
+endif
 
 .PHONY: release
 release:
@@ -51,8 +56,8 @@ clean:
 create-build-dir:
 	@mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/coverage.out: $(GO_FILES) create-build-dir
-	@go test -race -cover -coverprofile $(BUILD_DIR)/coverage.out.tmp ./...
+$(BUILD_DIR)/coverage.out: $(GO_FILES) create-build-dir go.mod go.sum
+	@CGO_CFLAGS_ALLOW=-Xpreprocessor go test -race -cover -coverprofile $(BUILD_DIR)/coverage.out.tmp ./...
 	@cat $(BUILD_DIR)/coverage.out.tmp | grep -v '.pb.go' | grep -v 'mock_' > $(BUILD_DIR)/coverage.out
 	@rm $(BUILD_DIR)/coverage.out.tmp
 
@@ -83,38 +88,43 @@ coverage-html: $(BUILD_DIR)/coverage.out
 generate:
 	@go generate ./...
 
-asset/bindata.go: docs/index.html docs/swagger.yaml
+cmd/hyperpic/app/asset/bindata.go: docs/index.html docs/swagger.yaml
 	@echo "Bin data..."
-	@go-bindata -pkg asset -o asset/bindata.go docs/
+	@go-bindata -pkg asset -o cmd/hyperpic/app/asset/bindata.go docs/
 
-${BUILD_DIR}/hyperpic: $(GO_FILES) asset/bindata.go
+${BUILD_DIR}/hyperpic: $(GO_FILES) cmd/hyperpic/app/asset/bindata.go go.mod go.sum
 	@echo "Building $@..."
-	@go generate ./cmd/$(subst ${BUILD_DIR}/,,$@)/
-	@go build -ldflags $(GO_LDFLAGS) -o $@ ./cmd/$(subst ${BUILD_DIR}/,,$@)/
+	@CGO_CFLAGS_ALLOW=-Xpreprocessor go generate ./cmd/$(subst ${BUILD_DIR}/,,$@)/
+	@CGO_CFLAGS_ALLOW=-Xpreprocessor go build -ldflags $(GO_LDFLAGS) -o $@ ./cmd/$(subst ${BUILD_DIR}/,,$@)/
 
 .PHONY: run-hyperpic
 run-hyperpic: ${BUILD_DIR}/hyperpic
 	@echo "Running $<..."
-	@./$<
+	@./$< --config=./cmd/hyperpic/config.yml
 
 .PHONY: run
 run: run-hyperpic
 
 .PHONY: run-docker
 run-docker: docker
-	@sudo docker run -e "HYPERPIC_AUTH_SECRET=$(HYPERPIC_AUTH_SECRET)" -p 8574:8080 -v $(shell pwd)/var/lib/hyperpic:/var/lib/hyperpic --rm $(IMAGE)
+	@docker run -e "HYPERPIC_AUTH_SECRET=$(HYPERPIC_AUTH_SECRET)" -p 8574:8080 -v $(shell pwd)/var/lib/hyperpic:/var/lib/hyperpic --rm $(IMAGE)
 
 .PHONY: build
 build: ${BUILD_DIR}/hyperpic
 
 .PHONY: docker
 docker:
-	@sudo docker build --no-cache=true --rm -t $(IMAGE) .
+	@docker build -f cmd/hyperpic/Dockerfile --rm -t $(IMAGE) .
 
 .PHONY: publish
 publish: docker
-	@sudo docker tag $(IMAGE) $(IMAGE):latest
-	@sudo docker push $(IMAGE)
+	@docker tag $(IMAGE) $(IMAGE):latest
+	@docker push $(IMAGE)
+
+.PHONY: publish-dev
+publish-dev: docker
+	@docker tag $(IMAGE) $(IMAGE):dev
+	@docker push $(IMAGE):dev
 
 heroku: docker
 	@echo "Deploy Hyperpic on Heroku..."
@@ -126,3 +136,8 @@ heroku: docker
 upload-demo:
 	@curl -F 'image=@_resources/demo/kayaks.jpg' -H "Authorization: Bearer $(HYPERPIC_AUTH_SECRET)" https://hyperpic.herokuapp.com/kayaks.jpg
 	@curl -F 'image=@_resources/demo/smartcrop.jpg' -H "Authorization: Bearer $(HYPERPIC_AUTH_SECRET)" https://hyperpic.herokuapp.com/smartcrop.jpg
+
+
+upload-demo-dev:
+	@curl -F 'image=@_resources/demo/kayaks.jpg' -H "Authorization: Bearer foo" http://localhost:8574/kayaks.jpg
+	@curl -F 'image=@_resources/demo/smartcrop.jpg' -H "Authorization: Bearer foo" http://localhost:8574/smartcrop.jpg
