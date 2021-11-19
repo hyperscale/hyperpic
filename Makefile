@@ -137,6 +137,9 @@ upload-demo:
 	@curl -F 'image=@_resources/demo/kayaks.jpg' -H "Authorization: Bearer $(HYPERPIC_AUTH_SECRET)" https://hyperpic.herokuapp.com/kayaks.jpg
 	@curl -F 'image=@_resources/demo/smartcrop.jpg' -H "Authorization: Bearer $(HYPERPIC_AUTH_SECRET)" https://hyperpic.herokuapp.com/smartcrop.jpg
 
+upload-demo-koyeb:
+	@curl -F 'image=@_resources/demo/kayaks.jpg' -H "Authorization: Bearer $(HYPERPIC_AUTH_SECRET)" https://hyperpic-euskadi31.koyeb.app/kayaks.jpg
+	@curl -F 'image=@_resources/demo/smartcrop.jpg' -H "Authorization: Bearer $(HYPERPIC_AUTH_SECRET)" https://hyperpic-euskadi31.koyeb.app/smartcrop.jpg
 
 upload-demo-dev:
 	@curl -F 'image=@_resources/demo/kayaks.jpg' -H "Authorization: Bearer foo" http://localhost:8574/kayaks.jpg

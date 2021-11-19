@@ -46,23 +46,23 @@ Example
 
 ### Crop
 
-Original: `https://hyperpic.herokuapp.com/kayaks.jpg`
+Original: `https://hyperpic-euskadi31.koyeb.app/kayaks.jpg`
 
-![Original](https://hyperpic.herokuapp.com/kayaks.jpg)
+![Original](https://hyperpic-euskadi31.koyeb.app/kayaks.jpg)
 
-Croped and Resized: `https://hyperpic.herokuapp.com/kayaks.jpg?w=400&h=400&fit=crop`
+Croped and Resized: `https://hyperpic-euskadi31.koyeb.app/kayaks.jpg?w=400&h=400&fit=crop`
 
-![Croped and resized](https://hyperpic.herokuapp.com/kayaks.jpg?w=400&h=400&fit=crop)
+![Croped and resized](https://hyperpic-euskadi31.koyeb.app/kayaks.jpg?w=400&h=400&fit=crop)
 
 ### Crop on focal point
 
-Original: `https://hyperpic.herokuapp.com/smartcrop.jpg`
+Original: `https://hyperpic-euskadi31.koyeb.app/smartcrop.jpg`
 
-![Original](https://hyperpic.herokuapp.com/smartcrop.jpg)
+![Original](https://hyperpic-euskadi31.koyeb.app/smartcrop.jpg)
 
-Croped and Resized: `https://hyperpic.herokuapp.com/smartcrop.jpg?w=200&h=200&fit=crop-focal-point`
+Croped and Resized: `https://hyperpic-euskadi31.koyeb.app/smartcrop.jpg?w=200&h=200&fit=crop-focal-point`
 
-![Croped and resized](https://hyperpic.herokuapp.com/smartcrop.jpg?w=200&h=200&fit=crop-focal-point)
+![Croped and resized](https://hyperpic-euskadi31.koyeb.app/smartcrop.jpg?w=200&h=200&fit=crop-focal-point)
 
 Documentation
 -------------
