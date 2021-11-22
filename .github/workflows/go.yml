@@ -9,6 +9,10 @@ on:
 jobs:
 
   build:
+    strategy:
+      matrix:
+        #libvips: ["8.9.2", "8.10.6", "8.11.2"]
+        libvips: ["8.11.2"]
     name: Build
     runs-on: ubuntu-latest
     steps:
@@ -19,19 +23,156 @@ jobs:
         go-version: ^1.15
       id: go
 
+    - name: Install deps
+      run: sudo apt-get install -y build-essential unzip wget gobject-introspection gtk-doc-tools libcfitsio-dev libfftw3-dev libgif-dev libgs-dev libgsf-1-dev libmatio-dev libopenslide-dev liborc-0.4-dev libpango1.0-dev libpoppler-glib-dev libwebp-dev libjpeg-turbo8-dev libtiff5-dev libexif-dev librsvg2-dev libimagequant-dev libheif-dev
+
+    - name: Cache libvips
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/libvips-${{ matrix.libvips }}
+        key: ${{ runner.os }}-${{ matrix.libvips }}
+
+    - uses: actions/cache@v2
+      with:
+        path: |
+          ~/go/pkg/mod
+          ~/.cache/go-build
+          ~/Library/Caches/go-build
+          %LocalAppData%\go-build
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
-    #- name: Build
-    #  run: go build -race -v ./...
+    - name: Install vips
+      shell: bash
+      run: .github/install_libvips.sh ${{ matrix.libvips }}
 
-    #- name: Test
-    #  run: go test -race -cover -coverprofile ./coverage.out ./...
+    - name: Build
+      run: go build -race -v ./...
+
+    - name: Test
+      run: go test -race -cover -coverprofile ./coverage.out ./...
+
+    - name: Coverage
+      id: coverage
+      run: |
+        go tool cover -func ./coverage.out | tee -a coverage.txt
+        echo "COVERAGE_CONTENT<<EOF" >> $GITHUB_ENV
+        cat coverage.txt >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
+    - uses: actions/github-script@v4
+      if: github.event_name == 'pull_request'
+      env:
+        COVERAGE_CONTENT: "${{ env.COVERAGE_CONTENT }}"
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const output = `Code Coverage\n
+          \`\`\`\n
+          ${process.env.COVERAGE_CONTENT}
+          \`\`\`
+
+          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+          const response = await github.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+
+          var comments = response.data;
+
+          console.log(comments);
+
+          if (comments.length > 0) {
+            comments = comments.filter(comment => comment.body.includes('Code Coverage') && comment.user.type === 'Bot');
+          }
+
+          if (comments.length > 0) {
+            const comment = comments.shift();
+
+            github.issues.updateComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: comment.id,
+              body: output
+            })
+          } else {
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+          }
+
+
+    - name: Benchmark
+      id: benchmark
+      run: |
+        go test -benchmem -bench . | tee -a benchmark.txt
+        echo "BENCHMARK_CONTENT<<EOF" >> $GITHUB_ENV
+        cat benchmark.txt >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
+    - uses: actions/github-script@v4
+      if: github.event_name == 'pull_request'
+      env:
+        BENCHMARK_CONTENT: "${{ env.BENCHMARK_CONTENT }}"
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const output = `Benchmark\n
+          \`\`\`\n
+          ${process.env.BENCHMARK_CONTENT}
+          \`\`\`
+
+          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+          const response = await github.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+
+          var comments = response.data;
+
+          console.log(comments);
+
+          if (comments.length > 0) {
+            comments = comments.filter(comment => comment.body.includes('Benchmark') && comment.user.type === 'Bot');
+          }
+
+          if (comments.length > 0) {
+            const comment = comments.shift();
+
+            github.issues.updateComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: comment.id,
+              body: output
+            })
+          } else {
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+          }
 
     - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@v1.2.1
+      uses: golangci/golangci-lint-action@v2
       with:
-        version: v1.31
+        version: v1.41.1
+        skip-pkg-cache: true
 
     - name: Coveralls
       uses: shogo82148/actions-goveralls@v1
