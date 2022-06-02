@@ -5,10 +5,11 @@
 package controller
 
 import (
+	"io"
 	"net/http"
 
 	server "github.com/euskadi31/go-server"
-	"github.com/hyperscale/hyperpic/cmd/hyperpic/app/asset"
+	"github.com/hyperscale/hyperpic/docs"
 	"github.com/hyperscale/hyperpic/pkg/hyperpic/memfs"
 )
 
@@ -28,13 +29,14 @@ func (c docController) Mount(r *server.Router) {
 
 // GET /docs/swagger.yaml
 func (c docController) getSwaggerHandler(w http.ResponseWriter, r *http.Request) {
-	name := "docs/swagger.yaml"
+	name := "swagger.yaml"
 
 	w.Header().Set("Content-Type", "application/x-yaml")
 
-	body, _ := asset.Asset(name)
+	f, _ := docs.Files.Open(name)
 
-	info, _ := asset.AssetInfo(name)
+	body, _ := io.ReadAll(f)
+	info, _ := f.Stat()
 
 	http.ServeContent(
 		w,
@@ -47,13 +49,14 @@ func (c docController) getSwaggerHandler(w http.ResponseWriter, r *http.Request)
 
 // GET /docs/
 func (c docController) getDocHandler(w http.ResponseWriter, r *http.Request) {
-	name := "docs/index.html"
+	name := "index.html"
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	body, _ := asset.Asset(name)
+	f, _ := docs.Files.Open(name)
 
-	info, _ := asset.AssetInfo(name)
+	body, _ := io.ReadAll(f)
+	info, _ := f.Stat()
 
 	http.ServeContent(
 		w,

@@ -88,11 +88,7 @@ coverage-html: $(BUILD_DIR)/coverage.out
 generate:
 	@go generate ./...
 
-cmd/hyperpic/app/asset/bindata.go: docs/index.html docs/swagger.yaml
-	@echo "Bin data..."
-	@go-bindata -pkg asset -o cmd/hyperpic/app/asset/bindata.go docs/
-
-${BUILD_DIR}/hyperpic: $(GO_FILES) cmd/hyperpic/app/asset/bindata.go go.mod go.sum
+${BUILD_DIR}/hyperpic: $(GO_FILES) go.mod go.sum
 	@echo "Building $@..."
 	@CGO_CFLAGS_ALLOW=-Xpreprocessor go generate ./cmd/$(subst ${BUILD_DIR}/,,$@)/
 	@CGO_CFLAGS_ALLOW=-Xpreprocessor go build -ldflags $(GO_LDFLAGS) -o $@ ./cmd/$(subst ${BUILD_DIR}/,,$@)/
@@ -144,3 +140,8 @@ upload-demo-koyeb:
 upload-demo-dev:
 	@curl -F 'image=@_resources/demo/kayaks.jpg' -H "Authorization: Bearer foo" http://localhost:8574/kayaks.jpg
 	@curl -F 'image=@_resources/demo/smartcrop.jpg' -H "Authorization: Bearer foo" http://localhost:8574/smartcrop.jpg
+
+upload-demo-nomad:
+	@curl -F 'image=@_resources/demo/kayaks.jpg' -H "Authorization: Bearer $(HYPERPIC_AUTH_SECRET)" http://localhost:9999/kayaks.jpg
+	@curl -F 'image=@_resources/demo/smartcrop.jpg' -H "Authorization: Bearer $(HYPERPIC_AUTH_SECRET)" http://localhost:9999/smartcrop.jpg
+	@curl -F 'image=@_resources/demo/smartcrop.jpg' -H "Authorization: Bearer $(HYPERPIC_AUTH_SECRET)" http://localhost:9999/smartcrop.jpg

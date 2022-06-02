@@ -10,3 +10,4 @@ config.yml
 build/
 libvips-*
 *.zip
+.vscode/
