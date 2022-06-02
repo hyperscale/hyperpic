@@ -11,8 +11,7 @@ jobs:
   build:
     strategy:
       matrix:
-        #libvips: ["8.9.2", "8.10.6", "8.11.2"]
-        libvips: ["8.11.2"]
+        libvips: ["8.12.2"]
     name: Build
     runs-on: ubuntu-latest
     steps:

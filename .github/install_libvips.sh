@@ -3,7 +3,7 @@
 VIPS_VERSION=$1
 
 if [ ! -d "$HOME/libvips" ]; then
-    wget https://github.com/jcupitt/libvips/archive/v${VIPS_VERSION}.zip
+    wget https://github.com/libvips/libvips/archive/refs/tags/v${VIPS_VERSION}.zip
     unzip v${VIPS_VERSION}
     cd libvips-${VIPS_VERSION}
     test -f autogen.sh && ./autogen.sh || ./bootstrap.sh
