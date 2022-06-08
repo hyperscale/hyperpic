@@ -8,8 +8,8 @@ Hyperpic [![Last release](https://img.shields.io/github/release/hyperscale/hyper
 
 | Branch  | Status | Coverage | Docker |
 |---------|--------|----------|--------|
-| master  | [![Build Status](https://img.shields.io/travis/hyperscale/hyperpic/master.svg)](https://travis-ci.org/hyperscale/hyperpic) | [![Coveralls](https://img.shields.io/coveralls/hyperscale/hyperpic/master.svg)](https://coveralls.io/github/hyperscale/hyperpic?branch=master) | [![](https://img.shields.io/microbadger/image-size/hyperscale/hyperpic/latest.svg)](https://hub.docker.com/r/hyperscale/hyperpic) |
-| develop | [![Build Status](https://img.shields.io/travis/hyperscale/hyperpic/develop.svg)](https://travis-ci.org/hyperscale/hyperpic) | [![Coveralls](https://img.shields.io/coveralls/hyperscale/hyperpic/develop.svg)](https://coveralls.io/github/hyperscale/hyperpic?branch=develop) | [![](https://img.shields.io/microbadger/image-size/hyperscale/hyperpic/dev.svg)](https://hub.docker.com/r/hyperscale/hyperpic) |
+| master  | [![Go](https://github.com/hyperscale/hyperpic/actions/workflows/go.yml/badge.svg?branch=master)](https://github.com/hyperscale/hyperpic/actions/workflows/go.yml) | [![Coveralls](https://img.shields.io/coveralls/hyperscale/hyperpic/master.svg)](https://coveralls.io/github/hyperscale/hyperpic?branch=master) | [![](https://img.shields.io/microbadger/image-size/hyperscale/hyperpic/latest.svg)](https://hub.docker.com/r/hyperscale/hyperpic) |
+| develop | [![Go](https://github.com/hyperscale/hyperpic/actions/workflows/go.yml/badge.svg)](https://github.com/hyperscale/hyperpic/actions/workflows/go.yml) | [![Coveralls](https://img.shields.io/coveralls/hyperscale/hyperpic/develop.svg)](https://coveralls.io/github/hyperscale/hyperpic?branch=develop) | [![](https://img.shields.io/microbadger/image-size/hyperscale/hyperpic/dev.svg)](https://hub.docker.com/r/hyperscale/hyperpic) |
 
 Fast HTTP microservice for high-level image processing.
 
