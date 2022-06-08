@@ -3,7 +3,6 @@ ENV GO111MODULE on
 ENV GOPATH /go
 RUN apk --no-cache --update-cache --force-overwrite --update \
     add vips-dev go make git libc6-compat build-base fftw-dev
-RUN GO111MODULE=off CGO_ENABLED=0 go get -u github.com/go-bindata/go-bindata/...
 WORKDIR /go/src/github.com/hyperscale/hyperpic/
 COPY . .
 RUN make build/hyperpic
