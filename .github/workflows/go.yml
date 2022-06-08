@@ -3,7 +3,7 @@ name: Go
 on:
   push:
     branches: [ develop, master ]
-  pull_request_target:
+  pull_request:
     branches: [ develop ]
 
 jobs:
@@ -66,6 +66,7 @@ jobs:
 
     - uses: actions/github-script@v4
       if: github.event_name == 'pull_request'
+      continue-on-error: true
       env:
         COVERAGE_CONTENT: "${{ env.COVERAGE_CONTENT }}"
       with:
@@ -122,6 +123,7 @@ jobs:
 
     - uses: actions/github-script@v4
       if: github.event_name == 'pull_request'
+      continue-on-error: true
       env:
         BENCHMARK_CONTENT: "${{ env.BENCHMARK_CONTENT }}"
       with:
@@ -168,9 +170,9 @@ jobs:
           }
 
     - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@v2
+      uses: golangci/golangci-lint-action@v3.2.0
       with:
-        version: v1.41.1
+        version: v1.46.2
         skip-pkg-cache: true
 
     - name: Coveralls
