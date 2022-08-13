@@ -56,7 +56,7 @@ func TestSourceProvider(t *testing.T) {
 	})
 	assert.Error(t, err)
 
-	body, err := ioutil.ReadFile("../../../../_resources/demo/kayaks.jpg")
+	body, err := os.ReadFile("../../../../_resources/demo/kayaks.jpg")
 	assert.NoError(t, err)
 
 	err = p.Set(&image.Resource{

@@ -6,7 +6,6 @@ package middlewares
 
 import (
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -72,7 +71,7 @@ func TestOptionsHandler(t *testing.T) {
 	middleware.ThenFunc(handler).ServeHTTP(w, req)
 
 	resp := w.Result()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	assert.NoError(t, err)
 
 	assert.Equal(t, []byte("OK"), body)

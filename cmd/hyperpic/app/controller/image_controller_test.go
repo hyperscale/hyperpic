@@ -292,7 +292,7 @@ func TestImageControllerGetImageInCache(t *testing.T) {
 	sourceProvider := filesystem.NewSourceProvider(cfg.Image.Source.FS)
 	cacheProvider := &provider.MockCacheProvider{}
 
-	data, err := ioutil.ReadFile("../../../../_resources/demo/kayaks.jpg")
+	data, err := os.ReadFile("../../../../_resources/demo/kayaks.jpg")
 	assert.NoError(t, err)
 
 	var opts *image.Options
@@ -394,7 +394,7 @@ func TestImageControllerDeleteImageCache(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	resp := w.Result()
-	actuel, err := ioutil.ReadAll(resp.Body)
+	actuel, err := io.ReadAll(resp.Body)
 	assert.NoError(t, err)
 
 	defer resp.Body.Close()
@@ -458,7 +458,7 @@ func TestImageControllerDeleteImageSource(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	resp := w.Result()
-	actuel, err := ioutil.ReadAll(resp.Body)
+	actuel, err := io.ReadAll(resp.Body)
 	assert.NoError(t, err)
 
 	defer resp.Body.Close()
@@ -553,7 +553,7 @@ func TestImageControllerParseImageFileFromRequestMultipartWithBadField(t *testin
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
 
-	src, err := ioutil.ReadFile("../../../../_resources/demo/kayaks.jpg")
+	src, err := os.ReadFile("../../../../_resources/demo/kayaks.jpg")
 	assert.NoError(t, err)
 
 	fw, err := w.CreateFormFile("bad", "../../../../_resources/demo/kayaks.jpg")
@@ -588,7 +588,7 @@ func TestImageControllerParseImageFileFromRequestMultipart(t *testing.T) {
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
 
-	src, err := ioutil.ReadFile("../../../../_resources/demo/kayaks.jpg")
+	src, err := os.ReadFile("../../../../_resources/demo/kayaks.jpg")
 	assert.NoError(t, err)
 
 	fw, err := w.CreateFormFile("image", "../../../../_resources/demo/kayaks.jpg")
@@ -623,7 +623,7 @@ func TestImageControllerParseImageFileFromRequestMultipartWithTooBigFile(t *test
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
 
-	src, err := ioutil.ReadFile("../../../../_resources/demo/kayaks.jpg")
+	src, err := os.ReadFile("../../../../_resources/demo/kayaks.jpg")
 	assert.NoError(t, err)
 
 	fw, err := w.CreateFormFile("image", "../../../../_resources/demo/kayaks.jpg")
@@ -655,7 +655,7 @@ func TestImageControllerParseImageFileFromRequestMultipartWithTooBigFile(t *test
 }
 
 func TestImageControllerPostImageWithFailOnSourceProviderSet(t *testing.T) {
-	data, err := ioutil.ReadFile("../../../../_resources/demo/kayaks.jpg")
+	data, err := os.ReadFile("../../../../_resources/demo/kayaks.jpg")
 	assert.NoError(t, err)
 
 	cfg := &config.Configuration{
@@ -716,7 +716,7 @@ func TestImageControllerPostImageWithFailOnSourceProviderSet(t *testing.T) {
 }
 
 func TestImageControllerPostImageWithTooLargeError(t *testing.T) {
-	data, err := ioutil.ReadFile("../../../../_resources/demo/kayaks.jpg")
+	data, err := os.ReadFile("../../../../_resources/demo/kayaks.jpg")
 	assert.NoError(t, err)
 
 	cfg := &config.Configuration{
@@ -761,7 +761,7 @@ func TestImageControllerPostImageWithTooLargeError(t *testing.T) {
 }
 
 func TestImageControllerPostImage(t *testing.T) {
-	data, err := ioutil.ReadFile("../../../../_resources/demo/kayaks.jpg")
+	data, err := os.ReadFile("../../../../_resources/demo/kayaks.jpg")
 	assert.NoError(t, err)
 
 	cfg := &config.Configuration{
@@ -825,7 +825,7 @@ func TestImageControllerPostImage(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	resp := w.Result()
-	actuel, err := ioutil.ReadAll(resp.Body)
+	actuel, err := io.ReadAll(resp.Body)
 	assert.NoError(t, err)
 
 	defer resp.Body.Close()

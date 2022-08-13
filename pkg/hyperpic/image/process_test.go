@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"image"
 	_ "image/png"
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -25,7 +25,7 @@ func TestProcess(t *testing.T) {
 	file, err := os.Open("../../../_resources/hyperpic.png")
 	assert.NoError(t, err)
 
-	in, err := ioutil.ReadAll(file)
+	in, err := io.ReadAll(file)
 	assert.NoError(t, err)
 
 	p := &processor{}
@@ -52,7 +52,7 @@ func TestProcessImage(t *testing.T) {
 	file, err := os.Open("../../../_resources/hyperpic.png")
 	assert.NoError(t, err)
 
-	in, err := ioutil.ReadAll(file)
+	in, err := io.ReadAll(file)
 	assert.NoError(t, err)
 
 	res := &Resource{

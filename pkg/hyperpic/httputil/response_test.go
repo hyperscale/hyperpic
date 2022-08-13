@@ -5,7 +5,7 @@
 package httputil
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http/httptest"
 	"testing"
 	"time"
@@ -26,7 +26,7 @@ func TestServeImage(t *testing.T) {
 	})
 
 	resp := w.Result()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 200, resp.StatusCode)

@@ -8,7 +8,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"mime"
 	"net/http"
 	"os"
@@ -182,9 +182,9 @@ func (c imageController) parseImageFileFromRequest(w http.ResponseWriter, r *htt
 
 		defer file.Close()
 
-		return ioutil.ReadAll(file)
+		return io.ReadAll(file)
 	default:
-		return ioutil.ReadAll(r.Body)
+		return io.ReadAll(r.Body)
 	}
 }
 

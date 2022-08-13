@@ -7,7 +7,6 @@ package filesystem
 import (
 	"errors"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -113,7 +112,7 @@ func (p CacheProvider) Get(resource *image.Resource) (*image.Resource, error) {
 		return nil, ErrNotFile
 	}
 
-	body, err := ioutil.ReadAll(f)
+	body, err := io.ReadAll(f)
 	if err != nil {
 		return nil, err
 	}

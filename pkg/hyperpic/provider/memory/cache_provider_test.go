@@ -6,7 +6,7 @@ package memory
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
@@ -22,7 +22,7 @@ func TestCacheProvider(t *testing.T) {
 		MemoryLimit:   256356,
 	})
 
-	body, err := ioutil.ReadFile("../../../../_resources/demo/kayaks.jpg")
+	body, err := os.ReadFile("../../../../_resources/demo/kayaks.jpg")
 	assert.NoError(t, err)
 
 	err = p.Set(&image.Resource{
@@ -140,7 +140,7 @@ func BenchmarkCacheProviderSet(b *testing.B) {
 		MemoryLimit:   10 << 20,
 	})
 
-	body, err := ioutil.ReadFile("../../../../_resources/demo/kayaks.jpg")
+	body, err := os.ReadFile("../../../../_resources/demo/kayaks.jpg")
 	assert.NoError(b, err)
 
 	for n := 0; n < b.N; n++ {
@@ -172,7 +172,7 @@ func BenchmarkCacheProviderGet(b *testing.B) {
 		MemoryLimit:   10 << 20,
 	})
 
-	body, err := ioutil.ReadFile("../../../../_resources/demo/kayaks.jpg")
+	body, err := os.ReadFile("../../../../_resources/demo/kayaks.jpg")
 	assert.NoError(b, err)
 
 	err = p.Set(&image.Resource{

@@ -30,7 +30,7 @@ func TestHandler2xx(t *testing.T) {
 
 	Handler(req, http.StatusOK, 45, 2*time.Millisecond)
 
-	actual, err := ioutil.ReadFile(tmpfile.Name())
+	actual, err := os.ReadFile(tmpfile.Name())
 	assert.NoError(t, err)
 
 	assert.Equal(t, "{\"level\":\"info\",\"method\":\"GET\",\"url\":\"http://foo.com/health\",\"status\":200,\"size\":45,\"duration\":2,\"message\":\"GET /health\"}\n", string(actual))
@@ -50,7 +50,7 @@ func TestHandler3xx(t *testing.T) {
 
 	Handler(req, http.StatusPermanentRedirect, 45, 2*time.Millisecond)
 
-	actual, err := ioutil.ReadFile(tmpfile.Name())
+	actual, err := os.ReadFile(tmpfile.Name())
 	assert.NoError(t, err)
 
 	assert.Equal(t, "{\"level\":\"info\",\"method\":\"GET\",\"url\":\"http://foo.com/health\",\"status\":308,\"size\":45,\"duration\":2,\"message\":\"GET /health\"}\n", string(actual))
@@ -70,7 +70,7 @@ func TestHandler4xx(t *testing.T) {
 
 	Handler(req, http.StatusNotFound, 45, 2*time.Millisecond)
 
-	actual, err := ioutil.ReadFile(tmpfile.Name())
+	actual, err := os.ReadFile(tmpfile.Name())
 	assert.NoError(t, err)
 
 	assert.Equal(t, "{\"level\":\"warn\",\"method\":\"GET\",\"url\":\"http://foo.com/health\",\"status\":404,\"size\":45,\"duration\":2,\"message\":\"GET /health\"}\n", string(actual))
@@ -90,7 +90,7 @@ func TestHandler5xx(t *testing.T) {
 
 	Handler(req, http.StatusInternalServerError, 45, 2*time.Millisecond)
 
-	actual, err := ioutil.ReadFile(tmpfile.Name())
+	actual, err := os.ReadFile(tmpfile.Name())
 	assert.NoError(t, err)
 
 	assert.Equal(t, "{\"level\":\"error\",\"method\":\"GET\",\"url\":\"http://foo.com/health\",\"status\":500,\"size\":45,\"duration\":2,\"message\":\"GET /health\"}\n", string(actual))

@@ -26,7 +26,7 @@ func TestCacheProvider(t *testing.T) {
 		CleanInterval: 2 * time.Second,
 	})
 
-	body, err := ioutil.ReadFile("../../../../_resources/demo/kayaks.jpg")
+	body, err := os.ReadFile("../../../../_resources/demo/kayaks.jpg")
 	assert.NoError(t, err)
 
 	err = p.Set(&image.Resource{
