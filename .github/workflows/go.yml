@@ -17,14 +17,14 @@ jobs:
     steps:
 
     - name: Set up Go 1.x
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4
       with:
         go-version: "1.x"
       id: go
 
     - name: Install deps
       run: |
-        sido apt-get update
+        sudo apt-get update
         sudo apt-get install -y build-essential unzip wget gobject-introspection gtk-doc-tools libcfitsio-dev libfftw3-dev libgif-dev libgs-dev libgsf-1-dev libmatio-dev libopenslide-dev liborc-0.4-dev libpango1.0-dev libpoppler-glib-dev libwebp-dev libjpeg-turbo8-dev libtiff5-dev libexif-dev librsvg2-dev libimagequant-dev libheif-dev
 
     - name: Cache libvips
