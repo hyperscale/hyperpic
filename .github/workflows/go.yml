@@ -64,7 +64,7 @@ jobs:
         cat coverage.txt >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
 
-    - uses: actions/github-script@v4
+    - uses: actions/github-script@v6
       if: github.event_name == 'pull_request'
       continue-on-error: true
       env:
@@ -121,7 +121,7 @@ jobs:
         cat benchmark.txt >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
 
-    - uses: actions/github-script@v4
+    - uses: actions/github-script@v6
       if: github.event_name == 'pull_request'
       continue-on-error: true
       env:
