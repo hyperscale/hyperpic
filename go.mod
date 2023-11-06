@@ -4,7 +4,7 @@ require (
 	github.com/euskadi31/go-server v0.0.0-20191009113222-686c429d32ee
 	github.com/euskadi31/go-service v1.4.0
 	github.com/go-openapi/validate v0.21.0 // indirect
-	github.com/gorilla/schema v1.2.0
+	github.com/gorilla/schema v1.2.1
 	github.com/h2non/bimg v1.1.9
 	github.com/h2non/filetype v1.1.3
 	github.com/justinas/alice v1.2.0
