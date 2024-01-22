@@ -28,13 +28,13 @@ jobs:
         sudo apt-get install -y build-essential unzip wget gobject-introspection gtk-doc-tools libcfitsio-dev libfftw3-dev libgif-dev libgs-dev libgsf-1-dev libmatio-dev libopenslide-dev liborc-0.4-dev libpango1.0-dev libpoppler-glib-dev libwebp-dev libjpeg-turbo8-dev libtiff5-dev libexif-dev librsvg2-dev libimagequant-dev libheif-dev
 
     - name: Cache libvips
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/libvips-${{ matrix.libvips }}
         key: ${{ runner.os }}-${{ matrix.libvips }}
 
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       with:
         path: |
           ~/go/pkg/mod
