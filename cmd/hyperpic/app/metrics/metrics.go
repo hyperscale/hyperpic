@@ -15,7 +15,7 @@ func init() {
 	prometheus.MustRegister(ImageReceivedBytes)
 }
 
-// CacheHit counter
+// CacheHit counter.
 var CacheHit = prometheus.NewCounterVec(
 	prometheus.CounterOpts{
 		Name: "cache_hit_total",
@@ -24,7 +24,7 @@ var CacheHit = prometheus.NewCounterVec(
 	[]string{},
 )
 
-// CacheMiss counter
+// CacheMiss counter.
 var CacheMiss = prometheus.NewCounterVec(
 	prometheus.CounterOpts{
 		Name: "cache_miss_total",
@@ -33,7 +33,7 @@ var CacheMiss = prometheus.NewCounterVec(
 	[]string{},
 )
 
-// ImageDeliveredBytes counter
+// ImageDeliveredBytes counter.
 var ImageDeliveredBytes = prometheus.NewCounterVec(
 	prometheus.CounterOpts{
 		Name: "image_delivered_bytes",
@@ -42,7 +42,7 @@ var ImageDeliveredBytes = prometheus.NewCounterVec(
 	[]string{},
 )
 
-// ImageReceivedBytes counter
+// ImageReceivedBytes counter.
 var ImageReceivedBytes = prometheus.NewCounterVec(
 	prometheus.CounterOpts{
 		Name: "image_received_bytes",

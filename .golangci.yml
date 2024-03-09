@@ -1,13 +1,85 @@
-run:
-    concurrency: 4
-    deadline: 3m
-    issues-exit-code: 1
-    tests: false
-    skip-files:
-        - ".*_mock\\.go"
-        - "mock_.*\\.go"
-
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - gas
+    - goconst
+    - gocyclo
+    - gofmt
+    - revive
+    - govet
+    - ineffassign
+    - megacheck
+    - misspell
+    - typecheck
+    - unconvert
+    - gosimple
+    - staticcheck
+    - unused
+    - asciicheck
+    - bodyclose
+    - dogsled
+    - durationcheck
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - forbidigo
+    - forcetypeassert
+    - gocritic
+    - godot
+    - gosec
+    - nestif
+    - nilerr
+    - nlreturn
+    - noctx
+    - prealloc
+    - predeclared
+    - sqlclosecheck
+    - whitespace
+    - wrapcheck
+    - wsl
+  fast: false
+linters-settings:
+  depguard:
+    rules:
+      main:
+        allow:
+          - $all
+  dupl:
+    threshold: 99
+  errcheck:
+    check-blank: false
+    check-type-assertions: false
+  goconst:
+    min-len: 3
+    min-occurrences: 2
+  gocyclo:
+    min-complexity: 18
+  gofmt:
+    simplify: true
+  goimports:
+    local-prefixes: go.opentelemetry.io
+  govet:
+    check-shadowing: false
+  maligned:
+    suggest-new: true
+  misspell:
+    ignore-words:
+      - cancelled
+    locale: US
+  revive:
+    ignore-generated-header: true
+    severity: warning
 output:
-    format: colored-line-number
-    print-issued-lines: true
-    print-linter-name: true
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+run:
+  concurrency: 4
+  issues-exit-code: 1
+  skip-files:
+    - .*_mock\.go
+    - mock_.*\.go
+    - .*/pkg/mod/.*$
+  tests: false
+  timeout: 1m
