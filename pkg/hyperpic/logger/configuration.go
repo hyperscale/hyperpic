@@ -6,13 +6,13 @@ package logger
 
 import "github.com/rs/zerolog"
 
-// Configuration struct
+// Configuration struct.
 type Configuration struct {
 	LevelName string `mapstructure:"level"`
 	Prefix    string
 }
 
-// Level type
+// Level type.
 func (c Configuration) Level() zerolog.Level {
 	switch c.LevelName {
 	case "debug":

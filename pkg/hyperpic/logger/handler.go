@@ -12,7 +12,7 @@ import (
 	"github.com/rs/zerolog/hlog"
 )
 
-// Handler for zerolog
+// Handler for zerolog.
 func Handler(r *http.Request, status, size int, duration time.Duration) {
 	rlog := hlog.FromRequest(r)
 

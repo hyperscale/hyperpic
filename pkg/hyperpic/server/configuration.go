@@ -11,13 +11,13 @@ import (
 	server "github.com/euskadi31/go-server"
 )
 
-// HTTPConfiguration struct
+// HTTPConfiguration struct.
 type HTTPConfiguration struct {
 	Host string
 	Port int
 }
 
-// HTTPSConfiguration struct
+// HTTPSConfiguration struct.
 type HTTPSConfiguration struct {
 	Host      string
 	Port      int
@@ -26,7 +26,7 @@ type HTTPSConfiguration struct {
 	KeyFile   string `mapstructure:"key_file"`
 }
 
-// Configuration struct
+// Configuration struct.
 type Configuration struct {
 	HTTP              *HTTPConfiguration
 	HTTPS             *HTTPSConfiguration
@@ -40,7 +40,7 @@ type Configuration struct {
 	HealthCheck       bool
 }
 
-// ToConfig returns server.Configuration
+// ToConfig returns server.Configuration.
 func (c Configuration) ToConfig() *server.Configuration {
 	cfg := &server.Configuration{
 		ShutdownTimeout:   c.ShutdownTimeout,

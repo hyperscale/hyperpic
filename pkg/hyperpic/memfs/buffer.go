@@ -9,7 +9,7 @@ import (
 	"io"
 )
 
-// Buffer is a usable block of data similar to a file
+// Buffer is a usable block of data similar to a file.
 type Buffer interface {
 	io.Reader
 	io.ReaderAt
@@ -20,11 +20,11 @@ type Buffer interface {
 	Truncate(int64) error
 }
 
-// MinBufferSize is the minimal initial allocated buffer size
+// MinBufferSize is the minimal initial allocated buffer size.
 const MinBufferSize = 512
 
-// ErrTooLarge is thrown if it was not possible to enough memory
-var ErrTooLarge = errors.New("Volume too large")
+// ErrTooLarge is thrown if it was not possible to enough memory.
+var ErrTooLarge = errors.New("volume too large")
 
 // Buf is a Buffer working on a slice of bytes.
 type Buf struct {
@@ -32,7 +32,7 @@ type Buf struct {
 	ptr int64
 }
 
-// NewBuffer creates a new data volume based on a buffer
+// NewBuffer creates a new data volume based on a buffer.
 func NewBuffer(buf *[]byte) *Buf {
 	return &Buf{
 		buf: buf,
@@ -41,29 +41,36 @@ func NewBuffer(buf *[]byte) *Buf {
 
 // Seek sets the offset for the next Read or Write on the buffer to offset,
 // interpreted according to whence:
-// 	0 (os.SEEK_SET) means relative to the origin of the file
-// 	1 (os.SEEK_CUR) means relative to the current offset
-// 	2 (os.SEEK_END) means relative to the end of the file
+//
+//	0 (os.SEEK_SET) means relative to the origin of the file
+//	1 (os.SEEK_CUR) means relative to the current offset
+//	2 (os.SEEK_END) means relative to the end of the file
+//
 // It returns the new offset and an error, if any.
 func (v *Buf) Seek(offset int64, whence int) (int64, error) {
 	var abs int64
+
 	switch whence {
 	case io.SeekStart: // Relative to the origin of the file
 		abs = offset
 	case io.SeekCurrent: // Relative to the current offset
-		abs = int64(v.ptr) + offset
+		abs = v.ptr + offset
 	case io.SeekEnd: // Relative to the end
 		abs = int64(len(*v.buf)) + offset
 	default:
 		return 0, errors.New("Seek: invalid whence")
 	}
+
 	if abs < 0 {
 		return 0, errors.New("Seek: negative position")
 	}
+
 	if abs > int64(len(*v.buf)) {
 		return 0, errors.New("Seek: too far")
 	}
+
 	v.ptr = abs
+
 	return abs, nil
 }
 
@@ -73,14 +80,18 @@ func (v *Buf) Seek(offset int64, whence int) (int64, error) {
 func (v *Buf) Write(p []byte) (int, error) {
 	l := len(p)
 	writeEnd := int(v.ptr) + l - len(*v.buf)
+
 	if writeEnd > 0 {
 		err := v.grow(writeEnd)
 		if err != nil {
 			return 0, err
 		}
 	}
+
 	copy((*v.buf)[v.ptr:], p)
+
 	v.ptr += int64(l)
+
 	return l, nil
 }
 
@@ -96,12 +107,14 @@ func (v *Buf) Read(p []byte) (n int, err error) {
 	if len(p) == 0 {
 		return 0, nil
 	}
+
 	if v.ptr >= int64(len(*v.buf)) {
 		return 0, io.EOF
 	}
 
 	n = copy(p, (*v.buf)[v.ptr:])
 	v.ptr += int64(n)
+
 	return
 }
 
@@ -113,6 +126,7 @@ func (v *Buf) ReadAt(p []byte, off int64) (n int, err error) {
 	if len(p) == 0 {
 		return 0, nil
 	}
+
 	if off >= int64(len(*v.buf)) {
 		return 0, io.EOF
 	}
@@ -121,6 +135,7 @@ func (v *Buf) ReadAt(p []byte, off int64) (n int, err error) {
 	if n < len(p) {
 		err = io.EOF
 	}
+
 	return
 }
 
@@ -133,35 +148,47 @@ func (v *Buf) Truncate(size int64) (err error) {
 	if size < 0 {
 		return errors.New("Truncate: size must be non-negative")
 	}
+
 	bufSize := int64(len(*v.buf))
+
+	// nolint: gocritic
 	if size == bufSize {
 		return nil
 	} else if size < bufSize {
 		*v.buf = (*v.buf)[:size]
 	} else /* size > bufSize */ {
 		growSize := int(size - bufSize)
+
 		if err = v.grow(growSize); err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 
 func (v *Buf) grow(n int) error {
 	m := len(*v.buf)
+
 	if (m + n) > cap(*v.buf) {
 		size := 2*cap(*v.buf) + MinBufferSize
+
 		if size < m+n {
 			size = m + n + MinBufferSize
 		}
+
 		buf, err := makeSlice(size)
+
 		if err != nil {
 			return err
 		}
+
 		copy(buf, *v.buf)
 		*v.buf = buf
 	}
+
 	*v.buf = (*v.buf)[0 : m+n]
+
 	return nil
 }
 
@@ -173,9 +200,12 @@ func makeSlice(n int) (b []byte, err error) {
 		if recover() != nil {
 			b = nil
 			err = ErrTooLarge
+
 			return
 		}
 	}()
+
 	b = make([]byte, n)
+
 	return
 }

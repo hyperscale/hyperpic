@@ -11,6 +11,6 @@ var (
 	// Revision is the build source control revision.
 	Revision = "Unspecified"
 
-	// BuildAt date
+	// BuildAt date.
 	BuildAt string
 )
