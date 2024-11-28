@@ -651,7 +651,7 @@ func TestImageControllerParseImageFileFromRequestMultipartWithTooBigFile(t *test
 
 	data, err := controller.parseImageFileFromRequest(wr, req)
 	assert.Nil(t, data)
-	assert.EqualError(t, err, "http: request body too large")
+	assert.EqualError(t, err, "parse multipart form failed: http: request body too large")
 }
 
 func TestImageControllerPostImageWithFailOnSourceProviderSet(t *testing.T) {

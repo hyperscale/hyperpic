@@ -121,7 +121,9 @@ func TestGetImageMimeType(t *testing.T) {
 		{bimg.GIF, "image/gif"},
 		{bimg.PDF, "application/pdf"},
 		{bimg.SVG, "image/svg+xml"},
-		{bimg.UNKNOWN, "image/jpeg"},
+		{bimg.HEIF, "image/heif"},
+		{bimg.AVIF, "image/avif"},
+		{bimg.UNKNOWN, "application/octet-stream"},
 	}
 
 	for _, file := range files {
