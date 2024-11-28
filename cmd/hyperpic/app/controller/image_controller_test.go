@@ -306,7 +306,7 @@ func TestImageControllerGetImageInCache(t *testing.T) {
 	})).Return(&image.Resource{
 		Path:       "/kayaks.jpg",
 		Body:       data,
-		Size:       len(data),
+		Size:       uint64(len(data)),
 		ModifiedAt: time.Now(),
 		Options:    opts,
 	}, nil).Run(func(args mock.Arguments) {

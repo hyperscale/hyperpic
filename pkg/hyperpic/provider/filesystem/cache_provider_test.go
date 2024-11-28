@@ -32,7 +32,7 @@ func TestCacheProvider(t *testing.T) {
 	err = p.Set(&image.Resource{
 		Path: "/kayaks.jpg",
 		Body: body,
-		Size: len(body),
+		Size: uint64(len(body)),
 		Options: &image.Options{
 			Width:  200,
 			Height: 200,
@@ -83,7 +83,7 @@ func TestCacheProvider(t *testing.T) {
 	err = p.Set(&image.Resource{
 		Path: "/kayaks.jpg",
 		Body: body,
-		Size: len(body),
+		Size: uint64(len(body)),
 		Options: &image.Options{
 			Width:  200,
 			Height: 200,

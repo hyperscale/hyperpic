@@ -28,7 +28,7 @@ func TestCacheProvider(t *testing.T) {
 	err = p.Set(&image.Resource{
 		Path: "/kayaks.jpg",
 		Body: body,
-		Size: len(body),
+		Size: uint64(len(body)),
 		Options: &image.Options{
 			Width:  200,
 			Height: 200,
@@ -39,7 +39,7 @@ func TestCacheProvider(t *testing.T) {
 	err = p.Set(&image.Resource{
 		Path: "/kayaks-2.jpg",
 		Body: body,
-		Size: len(body),
+		Size: uint64(len(body)),
 		Options: &image.Options{
 			Width:  200,
 			Height: 200,
@@ -86,7 +86,7 @@ func TestCacheProvider(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, body, res.Body)
-	assert.Equal(t, len(body), res.Size)
+	assert.Equal(t, uint64(len(body)), res.Size)
 
 	err = p.Del(&image.Resource{
 		Path: "/..",
@@ -106,7 +106,7 @@ func TestCacheProvider(t *testing.T) {
 	err = p.Set(&image.Resource{
 		Path: "/kayaks.jpg",
 		Body: body,
-		Size: len(body),
+		Size: uint64(len(body)),
 		Options: &image.Options{
 			Width:  200,
 			Height: 200,
@@ -178,7 +178,7 @@ func BenchmarkCacheProviderGet(b *testing.B) {
 	err = p.Set(&image.Resource{
 		Path: "/kayaks.jpg",
 		Body: body,
-		Size: len(body),
+		Size: uint64(len(body)),
 		Options: &image.Options{
 			Width:  200,
 			Height: 200,

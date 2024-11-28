@@ -48,7 +48,7 @@ func (p *CacheProvider) removeOldCache(path string, key string, resource *image.
 		delete(p.container[path], key)
 		p.mtx.Unlock()
 
-		atomic.AddUint64(&p.size, ^uint64(resource.Size))
+		atomic.AddUint64(&p.size, ^resource.Size)
 	}
 }
 
@@ -94,7 +94,7 @@ func (p *CacheProvider) Del(resource *image.Resource) error {
 		return nil
 	}
 
-	size := 0
+	size := uint64(0)
 
 	for _, item := range container {
 		size += item.Size
@@ -106,7 +106,7 @@ func (p *CacheProvider) Del(resource *image.Resource) error {
 	delete(p.container, path)
 	p.mtx.Unlock()
 
-	atomic.AddUint64(&p.size, ^uint64(size))
+	atomic.AddUint64(&p.size, ^size)
 
 	return nil
 }
@@ -147,7 +147,7 @@ func (p *CacheProvider) Get(resource *image.Resource) (*image.Resource, error) {
 func (p *CacheProvider) Set(resource *image.Resource) error {
 	size := atomic.LoadUint64(&p.size)
 
-	if (size + uint64(resource.Size)) >= uint64(p.config.MemoryLimit) {
+	if (size + resource.Size) >= p.config.MemoryLimit {
 		return fmt.Errorf("memory cache provider: allowed memory size of %d bytes exhausted", p.config.MemoryLimit)
 	}
 
@@ -172,7 +172,7 @@ func (p *CacheProvider) Set(resource *image.Resource) error {
 
 	p.container[path][key] = res
 
-	atomic.AddUint64(&p.size, uint64(res.Size))
+	atomic.AddUint64(&p.size, res.Size)
 
 	log.Debug().Msgf("Write cache size in memory: %d", res.Size)
 

@@ -62,7 +62,7 @@ func TestSourceProvider(t *testing.T) {
 	err = p.Set(&image.Resource{
 		Path: "/test.jpg",
 		Body: body,
-		Size: len(body),
+		Size: uint64(len(body)),
 	})
 	assert.NoError(t, err)
 
