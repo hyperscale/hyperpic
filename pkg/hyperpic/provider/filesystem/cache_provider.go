@@ -126,7 +126,7 @@ func (p CacheProvider) Get(resource *image.Resource) (*image.Resource, error) {
 		Name:       name,
 		Options:    resource.Options,
 		Body:       body,
-		Size:       uint64(d.Size()),
+		Size:       uint64(d.Size()), // nolint: gosec
 		ModifiedAt: d.ModTime(),
 	}, nil
 }
