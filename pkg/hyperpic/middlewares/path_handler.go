@@ -13,10 +13,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// NewPathHandler parse query string
+// NewPathHandler parse query string.
 func NewPathHandler() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// nolint: wsl
 			if fsutil.ContainsDotDot(r.URL.Path) {
 				// Too many programs use r.URL.Path to construct the argument to
 				// serveFile. Reject the request under the assumption that happened

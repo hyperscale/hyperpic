@@ -12,7 +12,7 @@ import (
 	"github.com/hyperscale/hyperpic/cmd/hyperpic/app/config"
 )
 
-// NewAuthHandler authenticate by key
+// NewAuthHandler authenticate by key.
 func NewAuthHandler(cfg *config.AuthConfiguration) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

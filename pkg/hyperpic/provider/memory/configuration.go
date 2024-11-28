@@ -6,14 +6,14 @@ package memory
 
 import "time"
 
-// CacheConfiguration struct
+// CacheConfiguration struct.
 type CacheConfiguration struct {
 	LifeTime      time.Duration `mapstructure:"life_time"`
 	CleanInterval time.Duration `mapstructure:"clean_interval"`
 	MemoryLimit   int           `mapstructure:"memory_limit"`
 }
 
-// SourceConfiguration struct
+// SourceConfiguration struct.
 type SourceConfiguration struct {
 	MemoryLimit int `mapstructure:"memory_limit"`
 }

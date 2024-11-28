@@ -17,11 +17,12 @@ import (
 	"github.com/rs/zerolog/hlog"
 )
 
-// Services keys
+// Services keys.
 const (
 	RouterKey = "service.http.router"
 )
 
+// nolint: forcetypeassert
 func init() {
 	service.Set(RouterKey, func(c service.Container) interface{} {
 		cfg := c.Get(ConfigKey).(*config.Configuration)

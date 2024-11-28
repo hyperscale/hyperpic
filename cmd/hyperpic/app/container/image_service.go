@@ -9,7 +9,7 @@ import (
 	"github.com/hyperscale/hyperpic/pkg/hyperpic/image"
 )
 
-// Services keys
+// Services keys.
 const (
 	ImageOptionParserKey = "service.image.options.parser"
 	ImageProcessorKey    = "service.image.processor"

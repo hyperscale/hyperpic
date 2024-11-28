@@ -14,12 +14,13 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Services keys
+// Services keys.
 const (
 	CacheProviderKey  = "service.provider.cache"
 	SourceProviderKey = "service.provider.source"
 )
 
+// nolint: forcetypeassert
 func init() {
 	service.Set(CacheProviderKey, func(c service.Container) interface{} {
 		cfg := c.Get(ConfigKey).(*config.Configuration)

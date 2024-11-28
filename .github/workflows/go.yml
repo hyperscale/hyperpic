@@ -14,6 +14,9 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v4
+
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
         with:
@@ -31,20 +34,6 @@ jobs:
           path: |
             ~/libvips-${{ matrix.libvips }}
           key: ${{ runner.os }}-${{ matrix.libvips }}
-
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/go/pkg/mod
-            ~/.cache/go-build
-            ~/Library/Caches/go-build
-            %LocalAppData%\go-build
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v4
 
       - name: Install vips
         shell: bash
@@ -171,8 +160,8 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6.1.1
         with:
-          version: v1.55.2
-          skip-pkg-cache: true
+          version: v1.62.2
+          skip-cache: true
 
       - name: Coveralls
         uses: shogo82148/actions-goveralls@v1

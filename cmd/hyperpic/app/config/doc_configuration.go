@@ -4,7 +4,7 @@
 
 package config
 
-// DocConfiguration struct
+// DocConfiguration struct.
 type DocConfiguration struct {
 	Enable bool
 }

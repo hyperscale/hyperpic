@@ -4,35 +4,35 @@
 
 package httputil
 
-// ErrorMessageInterface interface
+// ErrorMessageInterface interface.
 type ErrorMessageInterface interface {
 	GetCode() int
 	GetMessage() string
 	Error() string
 }
 
-// ErrorMessage struct
+// ErrorMessage struct.
 type ErrorMessage struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 }
 
-// Error message
+// Error message.
 func (e ErrorMessage) Error() string {
 	return e.Message
 }
 
-// GetCode error
+// GetCode error.
 func (e ErrorMessage) GetCode() int {
 	return e.Code
 }
 
-// GetMessage error
+// GetMessage error.
 func (e ErrorMessage) GetMessage() string {
 	return e.Message
 }
 
-// ErrorResponse struct
+// ErrorResponse struct.
 type ErrorResponse struct {
 	Error ErrorMessage `json:"error"`
 }

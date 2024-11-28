@@ -21,7 +21,8 @@ func parseFloat(value string) float64 {
 	return math.Abs(val)
 }
 
-// NewClientHintsHandler parse query string
+// NewClientHintsHandler parse query string.
+//
 // see: http://httpwg.org/http-extensions/client-hints.html
 func NewClientHintsHandler() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {

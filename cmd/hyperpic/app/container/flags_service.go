@@ -11,7 +11,7 @@ import (
 	"github.com/euskadi31/go-service"
 )
 
-// Services keys
+// Services keys.
 const (
 	FlagsKey = "service.flags"
 )

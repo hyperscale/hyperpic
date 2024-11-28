@@ -34,7 +34,7 @@ type imageController struct {
 	cacheProvider  provider.CacheProvider
 }
 
-// NewImageController func
+// NewImageController func.
 func NewImageController(
 	cfg *config.Configuration,
 	optionParser *image.OptionParser,
@@ -51,7 +51,7 @@ func NewImageController(
 	}
 }
 
-// Mount endpoints
+// Mount endpoints.
 func (c imageController) Mount(r *server.Router) {
 	chain := alice.New(
 		middlewares.NewPathHandler(),
@@ -73,7 +73,7 @@ func (c imageController) Mount(r *server.Router) {
 	r.AddPrefixRoute("/", private.ThenFunc(c.deleteHandler)).Methods(http.MethodDelete)
 }
 
-// GET /:file
+// GET /:file.
 func (c imageController) getHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -150,6 +150,7 @@ func (c imageController) getHandler(w http.ResponseWriter, r *http.Request) {
 	metrics.ImageDeliveredBytes.With(map[string]string{}).Add(float64(resource.Size))
 }
 
+// nolint: goconst
 func (c imageController) parseImageFileFromRequest(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	if r.Body == nil {
 		return nil, errors.New("missing form body")
@@ -166,29 +167,29 @@ func (c imageController) parseImageFileFromRequest(w http.ResponseWriter, r *htt
 
 	ct, _, err := mime.ParseMediaType(ct)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse media type failed: %w", err)
 	}
 
 	switch ct {
 	case "multipart/form-data":
 		if err := r.ParseMultipartForm(c.cfg.Image.Source.MaxSize); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("parse multipart form failed: %w", err)
 		}
 
 		file, _, err := r.FormFile("image")
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("parse form file failed: %w", err)
 		}
 
 		defer file.Close()
 
-		return io.ReadAll(file)
+		return io.ReadAll(file) // nolint: wrapcheck
 	default:
-		return io.ReadAll(r.Body)
+		return io.ReadAll(r.Body) // nolint: wrapcheck
 	}
 }
 
-// POST /:file
+// POST /:file.
 func (c imageController) postHandler(w http.ResponseWriter, r *http.Request) {
 	log := hlog.FromRequest(r)
 
@@ -249,7 +250,7 @@ func (c imageController) postHandler(w http.ResponseWriter, r *http.Request) {
 	metrics.ImageReceivedBytes.With(map[string]string{}).Add(float64(length))
 }
 
-// DELETE /:file
+// DELETE /:file.
 func (c imageController) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	resource := &image.Resource{
 		Path: r.URL.Path,

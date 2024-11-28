@@ -6,6 +6,7 @@ package filesystem
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -18,12 +19,12 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// CacheProvider struct
+// CacheProvider struct.
 type CacheProvider struct {
 	config *CacheConfiguration
 }
 
-// NewCacheProvider constructor of FS Cache provider
+// NewCacheProvider constructor of FS Cache provider.
 func NewCacheProvider(cfg *CacheConfiguration) *CacheProvider {
 	p := &CacheProvider{
 		config: cfg,
@@ -43,15 +44,16 @@ func (p CacheProvider) removeOldCacheFile(path string, f os.FileInfo, err error)
 
 	if !f.IsDir() && now.After(f.ModTime().Add(p.config.LifeTime)) {
 		log.Debug().Msgf("Remove file %s", path)
+
 		if err := os.Remove(path); err != nil {
-			return err
+			return fmt.Errorf("remove file: %w", err)
 		}
 	}
 
 	return nil
 }
 
-// Run cleanner
+// Run cleanner.
 func (p CacheProvider) Run() {
 	log.Debug().Msg("Cleanner running")
 
@@ -70,18 +72,18 @@ func (p CacheProvider) Run() {
 	}()
 }
 
-// Del all cache files for source file
+// Del all cache files for source file.
 func (p CacheProvider) Del(resource *image.Resource) error {
 	if fsutil.ContainsDotDot(resource.Path) {
-		return errors.New("Invalid URL path")
+		return errors.New("invalid URL path")
 	}
 
 	path := p.config.Path + "/" + strings.TrimPrefix(resource.Path, "/")
 
-	return os.RemoveAll(path)
+	return os.RemoveAll(path) // nolint: wrapcheck
 }
 
-// Get cached file
+// Get cached file.
 func (p CacheProvider) Get(resource *image.Resource) (*image.Resource, error) {
 	if fsutil.ContainsDotDot(resource.Path) {
 		return nil, ErrInvalidPath
@@ -97,13 +99,13 @@ func (p CacheProvider) Get(resource *image.Resource) (*image.Resource, error) {
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("open cache file: %w", err)
 	}
-	defer f.Close()
+	defer f.Close() // nolint: wsl
 
 	d, err := f.Stat()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("stat cache file: %w", err)
 	}
 
 	if d.IsDir() {
@@ -114,7 +116,7 @@ func (p CacheProvider) Get(resource *image.Resource) (*image.Resource, error) {
 
 	body, err := io.ReadAll(f)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("read cache file: %w", err)
 	}
 
 	_, name := filepath.Split(resource.Path)
@@ -129,24 +131,24 @@ func (p CacheProvider) Get(resource *image.Resource) (*image.Resource, error) {
 	}, nil
 }
 
-// Set file to cache
+// Set file to cache.
 func (p CacheProvider) Set(resource *image.Resource) error {
 	path := p.config.Path + "/" + strings.TrimPrefix(resource.Path, "/")
 	filename := path + "/" + resource.Options.Hash()
 
 	if err := os.MkdirAll(path, os.ModePerm); err != nil {
-		return err
+		return fmt.Errorf("create cache directory: %w", err)
 	}
 
 	file, err := os.Create(filename)
 	if err != nil {
-		return err
+		return fmt.Errorf("create cache file: %w", err)
 	}
 	defer file.Close()
 
 	n, err := io.Copy(file, memfs.NewBuffer(&resource.Body))
 	if err != nil {
-		return err
+		return fmt.Errorf("write cache file: %w", err)
 	}
 
 	log.Debug().Msgf("Write cache file size: %d", n)

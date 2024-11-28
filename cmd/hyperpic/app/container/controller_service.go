@@ -12,12 +12,13 @@ import (
 	"github.com/hyperscale/hyperpic/pkg/hyperpic/provider"
 )
 
-// Services keys
+// Services keys.
 const (
 	DocControllerKey   = "service.controller.doc"
 	ImageControllerKey = "service.controller.image"
 )
 
+// nolint: forcetypeassert
 func init() {
 	service.Set(DocControllerKey, func(c service.Container) interface{} {
 		return controller.NewDocController()

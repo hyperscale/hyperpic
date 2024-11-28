@@ -6,14 +6,14 @@ package filesystem
 
 import "time"
 
-// CacheConfiguration struct
+// CacheConfiguration struct.
 type CacheConfiguration struct {
 	Path          string
 	LifeTime      time.Duration `mapstructure:"life_time"`
 	CleanInterval time.Duration `mapstructure:"clean_interval"`
 }
 
-// SourceConfiguration struct
+// SourceConfiguration struct.
 type SourceConfiguration struct {
 	Path string
 }

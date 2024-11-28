@@ -9,7 +9,7 @@ import (
 	"github.com/hyperscale/hyperpic/pkg/hyperpic/provider/memory"
 )
 
-// ImageCacheConfiguration struct
+// ImageCacheConfiguration struct.
 type ImageCacheConfiguration struct {
 	Provider string
 	FS       *filesystem.CacheConfiguration

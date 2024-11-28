@@ -4,7 +4,7 @@
 
 package config
 
-// AuthConfiguration struct
+// AuthConfiguration struct.
 type AuthConfiguration struct {
 	Secret string
 }

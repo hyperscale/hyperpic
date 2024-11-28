@@ -16,18 +16,18 @@ import (
 type docController struct {
 }
 
-// NewDocController func
+// NewDocController func.
 func NewDocController() server.Controller {
 	return &docController{}
 }
 
-// Mount endpoints
+// Mount endpoints.
 func (c docController) Mount(r *server.Router) {
 	r.AddRouteFunc("/docs/swagger.yaml", c.getSwaggerHandler).Methods(http.MethodGet)
 	r.AddRouteFunc("/docs/", c.getDocHandler).Methods(http.MethodGet)
 }
 
-// GET /docs/swagger.yaml
+// GET /docs/swagger.yaml.
 func (c docController) getSwaggerHandler(w http.ResponseWriter, r *http.Request) {
 	name := "swagger.yaml"
 
@@ -47,7 +47,7 @@ func (c docController) getSwaggerHandler(w http.ResponseWriter, r *http.Request)
 	)
 }
 
-// GET /docs/
+// GET /docs/.
 func (c docController) getDocHandler(w http.ResponseWriter, r *http.Request) {
 	name := "index.html"
 

@@ -18,7 +18,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// CacheProvider struct
+// CacheProvider struct.
 type CacheProvider struct {
 	config    *CacheConfiguration
 	size      uint64
@@ -26,7 +26,7 @@ type CacheProvider struct {
 	container map[string]map[string]*image.Resource
 }
 
-// NewCacheProvider constructor of FS Cache provider
+// NewCacheProvider constructor of FS Cache provider.
 func NewCacheProvider(cfg *CacheConfiguration) *CacheProvider {
 	p := &CacheProvider{
 		config:    cfg,
@@ -52,7 +52,7 @@ func (p *CacheProvider) removeOldCache(path string, key string, resource *image.
 	}
 }
 
-// Run cleanner
+// Run cleanner.
 func (p *CacheProvider) Run() {
 	log.Debug().Msg("Cleanner running")
 
@@ -81,10 +81,10 @@ func (p *CacheProvider) Run() {
 	}()
 }
 
-// Del all cache files for source file
+// Del all cache files for source file.
 func (p *CacheProvider) Del(resource *image.Resource) error {
 	if fsutil.ContainsDotDot(resource.Path) {
-		return errors.New("Invalid URL path")
+		return errors.New("invalid URL path")
 	}
 
 	path := strings.TrimPrefix(resource.Path, "/")
@@ -111,7 +111,7 @@ func (p *CacheProvider) Del(resource *image.Resource) error {
 	return nil
 }
 
-// Get cached file
+// Get cached file.
 func (p *CacheProvider) Get(resource *image.Resource) (*image.Resource, error) {
 	if fsutil.ContainsDotDot(resource.Path) {
 		return nil, ErrInvalidPath
@@ -143,11 +143,11 @@ func (p *CacheProvider) Get(resource *image.Resource) (*image.Resource, error) {
 	}, nil
 }
 
-// Set file to cache
+// Set file to cache.
 func (p *CacheProvider) Set(resource *image.Resource) error {
-	size := int(atomic.LoadUint64(&p.size))
+	size := atomic.LoadUint64(&p.size)
 
-	if (size + resource.Size) >= p.config.MemoryLimit {
+	if (size + uint64(resource.Size)) >= uint64(p.config.MemoryLimit) {
 		return fmt.Errorf("memory cache provider: allowed memory size of %d bytes exhausted", p.config.MemoryLimit)
 	}
 

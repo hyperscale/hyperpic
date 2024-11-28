@@ -4,7 +4,7 @@
 
 package config
 
-// ImageConfiguration struct
+// ImageConfiguration struct.
 type ImageConfiguration struct {
 	Source  *ImageSourceConfiguration
 	Cache   *ImageCacheConfiguration

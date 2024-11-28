@@ -17,13 +17,14 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Services keys
+// Services keys.
 const (
 	ConfigKey = "service.config"
 )
 
 const name = "hyperpic"
 
+// nolint: forcetypeassert
 func init() {
 	service.Set(ConfigKey, func(c service.Container) interface{} {
 		cmd := c.Get(FlagsKey).(*flag.FlagSet)
@@ -61,7 +62,7 @@ func init() {
 		options.SetDefault("image.cache.fs.clean_interval", "1h")
 		options.SetDefault("image.cache.memory.life_time", "24h")
 		options.SetDefault("image.cache.memory.clean_interval", "1h")
-		options.SetDefault("image.cache.memory.memory_limit", uint64(memory.TotalMemory()/2))
+		options.SetDefault("image.cache.memory.memory_limit", memory.TotalMemory()/2)
 		options.SetDefault("image.support.extensions", map[string]bool{
 			"jpg":  true,
 			"jpeg": true,

@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-// NewSecurityHandler parse query string
+// NewSecurityHandler parse query string.
 func NewSecurityHandler() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -1,15 +1,24 @@
+issues:
+  exclude-case-sensitive: false
+  exclude-dirs-use-default: true
+  exclude-files:
+    - .*_mock\.go
+    - mock_.*\.go
+    - .*/pkg/mod/.*$
+    - .*/go/src/.*\.go
+  exclude-generated: strict
+  exclude-use-default: true
+  max-issues-per-linter: 50
 linters:
   disable-all: true
   enable:
     - errcheck
-    - gas
     - goconst
     - gocyclo
     - gofmt
     - revive
     - govet
     - ineffassign
-    - megacheck
     - misspell
     - typecheck
     - unconvert
@@ -22,7 +31,6 @@ linters:
     - durationcheck
     - errorlint
     - exhaustive
-    - exportloopref
     - forbidigo
     - forcetypeassert
     - gocritic
@@ -60,9 +68,8 @@ linters-settings:
   goimports:
     local-prefixes: go.opentelemetry.io
   govet:
-    check-shadowing: false
-  maligned:
-    suggest-new: true
+    disable:
+      - shadow
   misspell:
     ignore-words:
       - cancelled
@@ -71,15 +78,12 @@ linters-settings:
     ignore-generated-header: true
     severity: warning
 output:
-  format: colored-line-number
+  formats:
+    - format: colored-line-number
   print-issued-lines: true
   print-linter-name: true
 run:
   concurrency: 4
   issues-exit-code: 1
-  skip-files:
-    - .*_mock\.go
-    - mock_.*\.go
-    - .*/pkg/mod/.*$
   tests: false
   timeout: 1m

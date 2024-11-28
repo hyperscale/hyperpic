@@ -13,10 +13,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// FitType type
+// FitType type.
 type FitType int
 
-// Fit
+// Fit.
 const (
 	FitContain FitType = iota
 	FitMax
@@ -34,10 +34,10 @@ const (
 	FitCropFocalPoint
 )
 
-// FilterType type
+// FilterType type.
 type FilterType int
 
-// Filter
+// Filter.
 const (
 	FilterGreyscale FilterType = iota
 	FilterSepia
@@ -87,7 +87,7 @@ var filterToType = map[string]FilterType{
 }
 */
 
-// CropType struct
+// CropType struct.
 type CropType struct {
 	Width  int
 	Height int
@@ -95,7 +95,7 @@ type CropType struct {
 	Y      int
 }
 
-// Options represent all the supported image transformation params as first level members
+// Options represent all the supported image transformation params as first level members.
 type Options struct {
 	Orientation bimg.Angle     `schema:"or"`
 	Crop        CropType       `schema:"crop"`
@@ -114,10 +114,10 @@ type Options struct {
 	Format      bimg.ImageType `schema:"fm"`
 	Compression int            `schema:"-"`
 	hash        string         `schema:"-"`
-	//pixel       int            `schema:"-"`
+	// pixel       int            `schema:"-"`
 }
 
-// Hash return hash of options
+// Hash return hash of options.
 func (o *Options) Hash() string {
 	if o.hash != "" {
 		return o.hash
@@ -145,7 +145,7 @@ func (o *Options) Hash() string {
 	return o.hash
 }
 
-// ToBimg creates a new bimg compatible options struct mapping the fields properly
+// ToBimg creates a new bimg compatible options struct mapping the fields properly.
 func (o Options) ToBimg() bimg.Options {
 	dpr := o.DPR
 

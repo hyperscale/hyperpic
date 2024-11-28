@@ -15,19 +15,20 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Run Hyperpic api server
+// Run Hyperpic api server.
 func Run() (err error) {
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
 
 	_ = service.Get(container.LoggerKey)
 
-	router := service.Get(container.RouterKey).(*server.Server)
+	router := service.Get(container.RouterKey).(*server.Server) // nolint: forcetypeassert
 
 	log.Info().Msg("Rinning")
 
 	go func() {
 		log.Info().Msg("Rinning HTTP Router")
+
 		if e := router.Run(); e != nil {
 			log.Error().Err(e).Msg("server.Run() failed")
 
@@ -39,5 +40,5 @@ func Run() (err error) {
 
 	log.Info().Msg("Shutdown")
 
-	return router.Shutdown()
+	return router.Shutdown() // nolint: wrapcheck
 }

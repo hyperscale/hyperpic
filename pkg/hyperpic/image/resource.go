@@ -6,7 +6,7 @@ package image
 
 import "time"
 
-// Resource struct
+// Resource struct.
 type Resource struct {
 	Name       string
 	Path       string

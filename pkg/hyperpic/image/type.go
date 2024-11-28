@@ -33,6 +33,8 @@ func IsImageMimeTypeSupported(mime string) bool {
 }
 
 // IsFormatSupported returns true if the image format is supported by bimg.
+//
+// nolint: goconst
 func IsFormatSupported(format string) bool {
 	// Some payloads may expose the MIME type for SVG as text/xml
 	if format == "xml" {
@@ -47,6 +49,8 @@ func IsFormatSupported(format string) bool {
 }
 
 // ExtensionToType returns the image type based on the given image type alias.
+//
+// nolint: goconst
 func ExtensionToType(name string) bimg.ImageType {
 	ext := strings.ToLower(name)
 

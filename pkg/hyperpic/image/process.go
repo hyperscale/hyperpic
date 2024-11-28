@@ -13,13 +13,14 @@ import (
 	"github.com/h2non/filetype"
 )
 
-// Image stores an image binary buffer and its MIME type
+// Image stores an image binary buffer and its MIME type.
 type Image struct {
 	Body []byte
 	Mime string
 }
 
-// Processor interface
+// Processor interface.
+//
 //go:generate mockery -case=underscore -inpkg -name=Processor
 type Processor interface {
 	ProcessImage(resource *Resource) error
@@ -27,7 +28,7 @@ type Processor interface {
 
 type processor struct{}
 
-// NewProcessor constructor
+// NewProcessor constructor.
 func NewProcessor() Processor {
 	return &processor{}
 }
@@ -43,13 +44,14 @@ func (processor) process(buf []byte, opts bimg.Options) (out Image, err error) {
 			default:
 				err = errors.New("libvips internal error")
 			}
+
 			out = Image{}
 		}
 	}()
 
 	buf, err = bimg.Resize(buf, opts)
 	if err != nil {
-		return Image{}, err
+		return Image{}, fmt.Errorf("resize: %w", err)
 	}
 
 	mime := GetImageMimeType(bimg.DetermineImageType(buf))
@@ -57,12 +59,13 @@ func (processor) process(buf []byte, opts bimg.Options) (out Image, err error) {
 	return Image{Body: buf, Mime: mime}, nil
 }
 
-// ProcessImage from resource
+// ProcessImage from resource.
 func (p processor) ProcessImage(resource *Resource) error {
 	// Infer the body MIME type via mimesniff algorithm
 	mimeType := http.DetectContentType(resource.Body)
 
 	// If cannot infer the type, infer it via magic numbers
+	// nolint: goconst
 	if mimeType == "application/octet-stream" {
 		kind, err := filetype.Get(resource.Body)
 		if err == nil && kind.MIME.Value != "" {
@@ -82,7 +85,7 @@ func (p processor) ProcessImage(resource *Resource) error {
 
 	img, err := p.process(resource.Body, resource.Options.ToBimg())
 	if err != nil {
-		return err
+		return fmt.Errorf("process image: %w", err)
 	}
 
 	resource.MimeType = img.Mime
@@ -93,6 +96,7 @@ func (p processor) ProcessImage(resource *Resource) error {
 
 // GetImageMimeType returns the MIME type based on the given image type code.
 func GetImageMimeType(code bimg.ImageType) string {
+	// nolint: exhaustive
 	switch code {
 	case bimg.PNG:
 		return "image/png"
@@ -106,7 +110,15 @@ func GetImageMimeType(code bimg.ImageType) string {
 		return "image/svg+xml"
 	case bimg.PDF:
 		return "application/pdf"
-	default:
+	case bimg.HEIF:
+		return "image/heif"
+	case bimg.AVIF:
+		return "image/avif"
+	case bimg.JPEG:
 		return "image/jpeg"
+	case bimg.MAGICK:
+		return "image/magick"
+	default:
+		return "application/octet-stream"
 	}
 }

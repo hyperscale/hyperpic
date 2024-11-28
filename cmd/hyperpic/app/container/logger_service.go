@@ -15,11 +15,12 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Services keys
+// Services keys.
 const (
 	LoggerKey = "service.logger"
 )
 
+// nolint: forcetypeassert
 func init() {
 	service.Set(LoggerKey, func(c service.Container) interface{} {
 		cfg := c.Get(ConfigKey).(*config.Configuration)

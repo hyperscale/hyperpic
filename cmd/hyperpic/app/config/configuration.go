@@ -10,7 +10,7 @@ import (
 	"github.com/hyperscale/hyperpic/pkg/hyperpic/server"
 )
 
-// Configuration struct
+// Configuration struct.
 type Configuration struct {
 	Logger *logger.Configuration
 	Server *server.Configuration
@@ -19,7 +19,7 @@ type Configuration struct {
 	Doc    *DocConfiguration
 }
 
-// NewConfiguration constructor
+// NewConfiguration constructor.
 func NewConfiguration() *Configuration {
 	return &Configuration{
 		Server: &server.Configuration{},

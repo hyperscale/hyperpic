@@ -17,12 +17,12 @@ import (
 	"github.com/h2non/bimg"
 )
 
-// OptionParser struct
+// OptionParser struct.
 type OptionParser struct {
 	decoder *schema.Decoder
 }
 
-// NewOptionParser func
+// NewOptionParser func.
 func NewOptionParser() *OptionParser {
 	decoder := schema.NewDecoder()
 	decoder.IgnoreUnknownKeys(true)
@@ -45,7 +45,7 @@ func (p *OptionParser) register() {
 }
 
 func (p OptionParser) colorConverter(s string) reflect.Value {
-	const max float64 = 255
+	const maxVal float64 = 255
 
 	buf := []uint8{}
 
@@ -66,7 +66,7 @@ func (p OptionParser) colorConverter(s string) reflect.Value {
 
 		for _, num := range parts {
 			n, _ := strconv.ParseUint(strings.Trim(num, " "), 10, 8)
-			buf = append(buf, uint8(math.Min(float64(n), max)))
+			buf = append(buf, uint8(math.Min(float64(n), maxVal)))
 		}
 
 		return reflect.ValueOf(buf)
@@ -85,9 +85,9 @@ func (p OptionParser) colorConverter(s string) reflect.Value {
 		return reflect.ValueOf(buf)
 	}
 
-	buf = append(buf, uint8(d[0]))
-	buf = append(buf, uint8(d[1]))
-	buf = append(buf, uint8(d[2]))
+	buf = append(buf, d[0])
+	buf = append(buf, d[1])
+	buf = append(buf, d[2])
 
 	return reflect.ValueOf(buf)
 }
@@ -159,12 +159,12 @@ func (p OptionParser) cropConverter(s string) reflect.Value {
 	})
 }
 
-// Parse Option from url
+// Parse Option from url.
 func (p OptionParser) Parse(r *http.Request) (*Options, error) {
 	option := &Options{}
 
 	if err := p.decoder.Decode(option, r.URL.Query()); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse options: %w", err)
 	}
 
 	return option, nil
