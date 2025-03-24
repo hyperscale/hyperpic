@@ -46,7 +46,7 @@ func init() {
 		case "fs":
 			source = filesystem.NewSourceProvider(cfg.Image.Source.FS)
 		default:
-			log.Fatal().Err(fmt.Errorf("The source %s provider is not supported", cfg.Image.Source.Provider)).Msg("Source Provider")
+			log.Fatal().Err(fmt.Errorf("the source %s provider is not supported", cfg.Image.Source.Provider)).Msg("Source Provider")
 		}
 
 		return source
