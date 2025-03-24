@@ -7,8 +7,8 @@ package middlewares
 import "errors"
 
 var (
-	errContextIsNull     = errors.New("The context is null")
-	errNotFountInContext = errors.New("The entry is not found in context")
+	errContextIsNull     = errors.New("the context is null")
+	errNotFountInContext = errors.New("the entry is not found in context")
 )
 
 type key int
