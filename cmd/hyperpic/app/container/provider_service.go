@@ -31,7 +31,7 @@ func init() {
 		case "fs":
 			cache = filesystem.NewCacheProvider(cfg.Image.Cache.FS)
 		default:
-			log.Fatal().Err(fmt.Errorf("The cache %s provider is not supported", cfg.Image.Cache.Provider)).Msg("Cache Provider")
+			log.Fatal().Err(fmt.Errorf("the cache %s provider is not supported", cfg.Image.Cache.Provider)).Msg("Cache Provider")
 		}
 
 		return cache

@@ -124,7 +124,7 @@ func (o *Options) Hash() string {
 	}
 
 	hasher := sha256.New()
-	_, _ = hasher.Write([]byte(fmt.Sprintf(
+	_, _ = fmt.Fprintf(hasher,
 		"w=%d&h=%d&fit=%d&q=%d&fm=%d&dpr=%f&or=%d&bg=%v&bri=%d&con=%d&gam=%f&sharp=%d&blur=%d",
 		o.Width,
 		o.Height,
@@ -139,7 +139,7 @@ func (o *Options) Hash() string {
 		o.Gamma,
 		o.Sharpen,
 		o.Blur,
-	)))
+	)
 	o.hash = hex.EncodeToString(hasher.Sum(nil))
 
 	return o.hash
