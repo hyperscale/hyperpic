@@ -18,7 +18,7 @@ import (
 func TestOptionsFromContext(t *testing.T) {
 	opts, err := OptionsFromContext(nil)
 	assert.Nil(t, opts)
-	assert.EqualError(t, err, "The context is null")
+	assert.EqualError(t, err, "the context is null")
 }
 
 func TestOptionsHandlerWithError(t *testing.T) {
