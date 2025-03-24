@@ -1,89 +1,104 @@
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    paths:
+      - .*_mock\.go
+      - mock_.*\.go
+      - .*/pkg/mod/.*$
+      - .*/go/src/.*\.go
+      - third_party$
+      - builtin$
+      - examples$
+  settings:
+    gofmt:
+      simplify: true
+    goimports:
+      local-prefixes:
+        - go.opentelemetry.io
 issues:
-  exclude-case-sensitive: false
-  exclude-dirs-use-default: true
-  exclude-files:
-    - .*_mock\.go
-    - mock_.*\.go
-    - .*/pkg/mod/.*$
-    - .*/go/src/.*\.go
-  exclude-generated: strict
-  exclude-use-default: true
   max-issues-per-linter: 50
 linters:
-  disable-all: true
+  default: none
   enable:
-    - errcheck
-    - goconst
-    - gocyclo
-    - gofmt
-    - revive
-    - govet
-    - ineffassign
-    - misspell
-    - typecheck
-    - unconvert
-    - gosimple
-    - staticcheck
-    - unused
     - asciicheck
     - bodyclose
     - dogsled
     - durationcheck
+    - errcheck
     - errorlint
     - exhaustive
     - forbidigo
     - forcetypeassert
+    - goconst
     - gocritic
+    - gocyclo
     - godot
     - gosec
+    - govet
+    - ineffassign
+    - misspell
     - nestif
     - nilerr
     - nlreturn
     - noctx
     - prealloc
     - predeclared
+    - revive
     - sqlclosecheck
+    - staticcheck
+    - unconvert
+    - unused
     - whitespace
     - wrapcheck
     - wsl
-  fast: false
-linters-settings:
-  depguard:
-    rules:
-      main:
-        allow:
-          - $all
-  dupl:
-    threshold: 99
-  errcheck:
-    check-blank: false
-    check-type-assertions: false
-  goconst:
-    min-len: 3
-    min-occurrences: 2
-  gocyclo:
-    min-complexity: 18
-  gofmt:
-    simplify: true
-  goimports:
-    local-prefixes: go.opentelemetry.io
-  govet:
-    disable:
-      - shadow
-  misspell:
-    ignore-words:
-      - cancelled
-    locale: US
-  revive:
-    ignore-generated-header: true
-    severity: warning
+  exclusions:
+    paths:
+      - .*_mock\.go
+      - mock_.*\.go
+      - .*/pkg/mod/.*$
+      - .*/go/src/.*\.go
+      - third_party$
+      - builtin$
+      - examples$
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+  settings:
+    depguard:
+      rules:
+        main:
+          allow:
+            - $all
+    dupl:
+      threshold: 99
+    errcheck:
+      check-blank: false
+      check-type-assertions: false
+    goconst:
+      min-len: 3
+      min-occurrences: 2
+    gocyclo:
+      min-complexity: 18
+    govet:
+      disable:
+        - shadow
+    misspell:
+      ignore-rules:
+        - cancelled
+      locale: US
+    revive:
+      severity: warning
 output:
   formats:
-    - format: colored-line-number
-  print-issued-lines: true
-  print-linter-name: true
+    text:
+      path: stdout
+      print-issued-lines: true
+      print-linter-name: true
 run:
   concurrency: 4
   issues-exit-code: 1
   tests: false
-  timeout: 1m
+version: "2"
